@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 import random
+#trial
 
 def generate_sudoku(size=9):
     def pattern(r, c): return (size//3*(r % (size//3)) + r//(size//3) + c) % size
