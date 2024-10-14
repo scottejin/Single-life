@@ -24,6 +24,7 @@ def generate_maze(grid, x, y):
     for dx, dy in directions:
         nx, ny = x + dx, y + dy
         if 0 <= nx < GRID_WIDTH and 0 <= ny < GRID_HEIGHT and not grid[ny][nx]:
+            # Remove the wall between the current cell and the next cell
             pygame.draw.line(screen, WHITE, (x * CELL_SIZE + CELL_SIZE // 2, y * CELL_SIZE + CELL_SIZE // 2),
                              (nx * CELL_SIZE + CELL_SIZE // 2, ny * CELL_SIZE + CELL_SIZE // 2), 2)
             pygame.display.flip()
