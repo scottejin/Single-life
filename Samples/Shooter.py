@@ -2,6 +2,7 @@ import pygame
 import sys
 import heapq
 import random
+import math
 
 # Constants
 SCREEN_WIDTH = 800
@@ -10,7 +11,7 @@ BLUE = (0, 0, 255)
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
-SPAWN_ENEMY_EVENT = pygame.USEREVENT + 1
+SPAWN_ENEMY_INTERVAL = 2000  # Interval in milliseconds
 
 # Initialize Pygame
 pygame.init()
@@ -25,8 +26,9 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
         self.speed = 5
-        self.spawn_time = pygame.time.get_ticks()  # Track spawn time
-        self.last_shot_time = 0  # Track the time of the last shot
+        self.spawn_time = pygame.time.get_ticks()
+        self.last_shot_time = 0
+        self.xp = 0
 
     def update(self, *args):
         keys = pygame.key.get_pressed()
@@ -39,27 +41,21 @@ class Player(pygame.sprite.Sprite):
         if keys[pygame.K_DOWN]:
             self.rect.y += self.speed
 
-        # Boundary checks
-        if self.rect.left < 0:
-            self.rect.left = 0
-        if self.rect.right > SCREEN_WIDTH:
-            self.rect.right = SCREEN_WIDTH
-        if self.rect.top < 0:
-            self.rect.top = 0
-        if self.rect.bottom > SCREEN_HEIGHT:
-            self.rect.bottom = SCREEN_HEIGHT
+        self.rect.clamp_ip(screen.get_rect())
 
     def is_immune(self):
-        # Check if the player is still within the immunity period
         return pygame.time.get_ticks() - self.spawn_time < 6000
 
     def shoot(self, target_x, target_y):
         current_time = pygame.time.get_ticks()
-        if current_time - self.last_shot_time >= 500:  # 500 ms = 0.5 seconds
+        if current_time - self.last_shot_time >= 500:
             self.last_shot_time = current_time
             bullet = Bullet(self.rect.centerx, self.rect.centery, target_x, target_y)
             return bullet
         return None
+
+    def add_xp(self, amount):
+        self.xp += amount ** 2
 
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, x, y, target_x, target_y):
@@ -70,18 +66,14 @@ class Bullet(pygame.sprite.Sprite):
         self.rect.center = (x, y)
         self.speed = 5
 
-        # Calculate direction
         dx, dy = target_x - x, target_y - y
         dist = (dx ** 2 + dy ** 2) ** 0.5
-        if dist != 0:
-            self.dx, self.dy = dx / dist, dy / dist
-        else:
-            self.dx, self.dy = 0, 0
+        self.dx, self.dy = (dx / dist, dy / dist) if dist != 0 else (0, 0)
 
     def update(self, *args):
         self.rect.x += self.dx * self.speed
         self.rect.y += self.dy * self.speed
-        if self.rect.bottom < 0 or self.rect.top > SCREEN_HEIGHT or self.rect.right < 0 or self.rect.left > SCREEN_WIDTH:
+        if not screen.get_rect().contains(self.rect):
             self.kill()
 
 class Enemy(pygame.sprite.Sprite):
@@ -135,6 +127,14 @@ class Enemy(pygame.sprite.Sprite):
 
         return []
 
+class XP(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+        self.image = pygame.Surface((10, 10))
+        self.image.fill((0, 255, 0))  # Green color for XP
+        self.rect = self.image.get_rect()
+        self.rect.center = (x, y)
+
 class Button:
     def __init__(self, x, y, width, height, text, color, text_color):
         self.rect = pygame.Rect(x, y, width, height)
@@ -150,14 +150,15 @@ class Button:
         screen.blit(text_surface, text_rect)
 
     def is_clicked(self, event):
-        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-            if self.rect.collidepoint(event.pos):
-                return True
-        return False
+        return event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.rect.collidepoint(event.pos)
 
-def spawn_enemy():
-    x = random.randint(0, SCREEN_WIDTH)
-    y = random.randint(0, SCREEN_HEIGHT)
+def spawn_enemy(player):
+    while True:
+        x = random.randint(0, SCREEN_WIDTH)
+        y = random.randint(0, SCREEN_HEIGHT)
+        distance = math.sqrt((x - player.rect.centerx) ** 2 + (y - player.rect.centery) ** 2)
+        if distance >= 140:
+            break
     enemy = Enemy(x, y)
     all_sprites.add(enemy)
     enemies.add(enemy)
@@ -175,18 +176,17 @@ running = True
 game_over = False
 score = 0
 start_time = pygame.time.get_ticks()
+last_spawn_time = pygame.time.get_ticks()
 
 # Sprite groups
 all_sprites = pygame.sprite.Group()
 bullets = pygame.sprite.Group()
 enemies = pygame.sprite.Group()
+xp_drops = pygame.sprite.Group()
 
 # Create player instance
 player = Player()
 all_sprites.add(player)
-
-# Set a timer to spawn enemies
-pygame.time.set_timer(SPAWN_ENEMY_EVENT, 2000)  # Spawn an enemy every 2 seconds
 
 # Create reset button instance
 reset_button = Button(SCREEN_WIDTH // 2 - 50, SCREEN_HEIGHT // 2 + 50, 100, 50, "Try Again", RED, WHITE)
@@ -195,17 +195,15 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        elif event.type == SPAWN_ENEMY_EVENT:
-            spawn_enemy()
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             if game_over and reset_button.is_clicked(event):
-                # Reset game state
                 game_over = False
                 score = 0
                 start_time = pygame.time.get_ticks()
                 all_sprites.empty()
                 bullets.empty()
                 enemies.empty()
+                xp_drops.empty()
                 player = Player()
                 all_sprites.add(player)
             else:
@@ -216,35 +214,42 @@ while running:
                     bullets.add(bullet)
 
     if not game_over:
-        # Update
+        current_time = pygame.time.get_ticks()
+        if current_time - last_spawn_time >= SPAWN_ENEMY_INTERVAL:
+            spawn_enemy(player)
+            last_spawn_time = current_time
+
         all_sprites.update(player)
 
-        # Update enemies with player reference
         for enemy in enemies:
             enemy.update(player)
 
-        # Check for bullet-enemy collisions
         hits = pygame.sprite.groupcollide(bullets, enemies, True, False)
         for hit in hits:
             for enemy in hits[hit]:
                 enemy.kill()
+                xp_drop = XP(enemy.rect.centerx, enemy.rect.centery)
+                all_sprites.add(xp_drop)
+                xp_drops.add(xp_drop)
 
-        # Update score based on elapsed time
+        xp_collected = pygame.sprite.spritecollide(player, xp_drops, True)
+        for xp in xp_collected:
+            player.add_xp(1)
+
         elapsed_time = (pygame.time.get_ticks() - start_time) // 1000
         score = elapsed_time
 
-        # Check for player-enemy collisions
         if not player.is_immune() and pygame.sprite.spritecollideany(player, enemies):
             game_over = True
 
-        # Draw
         screen.fill(WHITE)
         all_sprites.draw(screen)
 
-        # Display score
         font = pygame.font.Font(None, 36)
         score_text = font.render(f"Score: {score}", True, BLACK)
+        xp_text = font.render(f"XP: {player.xp}", True, BLACK)
         screen.blit(score_text, (10, 10))
+        screen.blit(xp_text, (10, 50))
 
         pygame.display.flip()
 
@@ -253,7 +258,6 @@ while running:
         reset_button.draw(screen)
         pygame.display.flip()
 
-    # Cap the frame rate
     clock.tick(60)
 
 pygame.quit()
