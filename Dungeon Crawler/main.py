@@ -3,7 +3,6 @@ import random
 import math
 import sys
 
-# Constants
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 WHITE = (255, 255, 255)
