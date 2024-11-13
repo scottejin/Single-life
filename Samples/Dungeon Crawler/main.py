@@ -13,14 +13,15 @@ WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 GRAY = (128, 128, 128)
 BLACK = (0, 0, 0)
-BLUE = (0, 0, 255)  # Color for doors
+BLUE = (0, 0, 255)
+GOLD = (255, 215, 0)  # Color for gold blocks
 
 # Create screen
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Endless Dungeon Explorer")
 
 # Map settings
-MAP_WIDTH, MAP_HEIGHT = 50, 50  # in tiles
+MAP_WIDTH, MAP_HEIGHT = 500, 500  # in tiles
 WORLD_WIDTH, WORLD_HEIGHT = MAP_WIDTH * TILE_SIZE, MAP_HEIGHT * TILE_SIZE
 
 # Dictionary to store dungeon rooms (for endless generation)
@@ -85,8 +86,31 @@ def create_v_tunnel(dungeon_map, y1, y2, x, doors):
     if count_white_spaces(dungeon_map, x, y2) <= 3:
         doors.append(Door(x, y2))
 
+def create_spawning_room(dungeon_map, doors):
+    """Creates a spawning room in the top left corner with gold blocks surrounding it."""
+    room_width, room_height = 6, 6  # Define the size of the spawning room
+    room_x, room_y = 0, 0  # Top left corner
+
+    # Create the room
+    for y in range(room_height):
+        for x in range(room_width):
+            dungeon_map[room_y + y][room_x + x] = 0  # Carve out space
+
+    # Surround the room with gold blocks
+    for y in range(room_height + 2):
+        for x in range(room_width + 2):
+            if y == 0 or y == room_height + 1 or x == 0 or x == room_width + 1:
+                dungeon_map[room_y + y - 1][room_x + x - 1] = 2  # Gold block
+
+    # Create a hallway connecting to the room
+    create_h_tunnel(dungeon_map, room_width, room_width + 4, room_height // 2, doors)
+
 def generate_room_at(dungeon_map, origin_x, origin_y, doors):
     """Generates a new room at the specified grid location."""
+    if origin_x == 0 and origin_y == 0:
+        create_spawning_room(dungeon_map, doors)
+        return dungeon_map
+
     max_rooms = 10
     min_room_size = 4
     max_room_size = 8
@@ -244,6 +268,8 @@ while running:
                 pygame.draw.rect(screen, GRAY, (tile_x, tile_y, TILE_SIZE, TILE_SIZE))
             elif current_room[row][col] == 0:  # Path
                 pygame.draw.rect(screen, WHITE, (tile_x, tile_y, TILE_SIZE, TILE_SIZE))
+            elif current_room[row][col] == 2:  # Gold block
+                pygame.draw.rect(screen, GOLD, (tile_x, tile_y, TILE_SIZE, TILE_SIZE))
 
     # Draw the doors
     for door in doors:
