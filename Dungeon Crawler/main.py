@@ -54,7 +54,6 @@ def create_room(dungeon_map, room):
         for x in range(room.width):
             dungeon_map[room.y + y][room.x + x] = 0  # Carve out space
 
-# Function to count white spaces around a given position
 def count_white_spaces(dungeon_map, x, y):
     white_spaces = 0
     for dx in [-1, 0, 1]:
@@ -66,11 +65,9 @@ def count_white_spaces(dungeon_map, x, y):
                 white_spaces += 1
     return white_spaces
 
-# Modified tunnel creation functions
 def create_h_tunnel(dungeon_map, x1, x2, y, doors):
     for x in range(min(x1, x2), max(x1, x2) + 1):
         dungeon_map[y][x] = 0
-    # Check and place doors at the ends of the tunnel
     if count_white_spaces(dungeon_map, x1, y) <= 3:
         doors.append(Door(x1, y))
     if count_white_spaces(dungeon_map, x2, y) <= 3:
@@ -79,7 +76,6 @@ def create_h_tunnel(dungeon_map, x1, x2, y, doors):
 def create_v_tunnel(dungeon_map, y1, y2, x, doors):
     for y in range(min(y1, y2), max(y1, y2) + 1):
         dungeon_map[y][x] = 0
-    # Check and place doors at the ends of the tunnel
     if count_white_spaces(dungeon_map, x, y1) <= 3:
         doors.append(Door(x, y1))
     if count_white_spaces(dungeon_map, x, y2) <= 3:
@@ -99,31 +95,26 @@ def generate_room_at(dungeon_map, origin_x, origin_y, doors):
         room_y = random.randint(1, MAP_HEIGHT - room_height - 1)
         new_room = Room(room_x, room_y, room_width, room_height)
 
-        # Check if the new room intersects with any existing rooms
-        failed = False
-        for other_room in rooms:
-            if (new_room.x < other_room.x + other_room.width and
-                new_room.x + new_room.width > other_room.x and
-                new_room.y < other_room.y + other_room.height and
-                new_room.y + new_room.height > other_room.y):
-                failed = True
-                break
+        failed = any(
+            new_room.x < other_room.x + other_room.width and
+            new_room.x + new_room.width > other_room.x and
+            new_room.y < other_room.y + other_room.height and
+            new_room.y + new_room.height > other_room.y
+            for other_room in rooms
+        )
 
         if not failed:
             create_room(dungeon_map, new_room)
 
-            if len(rooms) > 0:
-                # Connect the new room to the previous room with a tunnel
+            if rooms:
                 prev_room = rooms[-1]
-                (prev_x, prev_y) = prev_room.center()
-                (new_x, new_y) = new_room.center()
+                prev_x, prev_y = prev_room.center()
+                new_x, new_y = new_room.center()
 
                 if random.randint(0, 1) == 1:
-                    # First move horizontally, then vertically
                     create_h_tunnel(dungeon_map, prev_x, new_x, prev_y, doors)
                     create_v_tunnel(dungeon_map, prev_y, new_y, new_x, doors)
                 else:
-                    # First move vertically, then horizontally
                     create_v_tunnel(dungeon_map, prev_y, new_y, prev_x, doors)
                     create_h_tunnel(dungeon_map, prev_x, new_x, new_y, doors)
 
@@ -142,7 +133,7 @@ def load_room_at(player_grid_x, player_grid_y, doors):
 def find_walkable_tile(dungeon_map):
     for y in range(MAP_HEIGHT):
         for x in range(MAP_WIDTH):
-            if dungeon_map[y][x] == 0:  # Check for walkable tile
+            if dungeon_map[y][x] == 0:
                 return x * TILE_SIZE, y * TILE_SIZE
     return None
 
