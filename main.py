@@ -1,4 +1,3 @@
-# main.py
 import pygame
 import sys
 import random
@@ -87,11 +86,7 @@ while running:
                 seed = menu.seed
                 restart_game(seed)
                 is_paused = False
-
-    if in_main_menu:
-        main_menu.draw(screen)
-    elif not is_paused:
-        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+        elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             current_time = time.time()
             if current_time - last_shot_time >= 0.5:  # Limit to 2 bullets per second
                 mouse_x, mouse_y = pygame.mouse.get_pos()
@@ -101,6 +96,9 @@ while running:
                 bullets.append(Bullet(player_x, player_y, direction, bullet_speed))
                 last_shot_time = current_time
 
+    if in_main_menu:
+        main_menu.draw(screen)
+    elif not is_paused:
         current_room = load_room_at(current_room_x, current_room_y, dungeon_rooms, doors)
 
         keys = pygame.key.get_pressed()
@@ -153,7 +151,7 @@ while running:
             color = GRAY if door.is_open else BLUE
             pygame.draw.rect(screen, color, (tile_x, tile_y, TILE_SIZE, TILE_SIZE))
 
-        for bullet in bullets:
+        for bullet in bullets[:]:
             if not bullet.is_broken:
                 bullet.move(dt)
                 if bullet.check_collision(current_room):
@@ -161,6 +159,7 @@ while running:
             bullet_x, bullet_y = bullet.get_position()
             if bullet.is_broken:
                 pygame.draw.circle(screen, (255, 255, 0), (int(bullet_x - camera_x), int(bullet_y - camera_y)), 5)  # Yellow for breaking animation
+                bullets.remove(bullet)
             else:
                 pygame.draw.circle(screen, RED, (int(bullet_x - camera_x), int(bullet_y - camera_y)), 5)
 
