@@ -1,7 +1,7 @@
-# map.py
 import random
 from settings import TILE_SIZE, MAP_WIDTH, MAP_HEIGHT
 from utils import count_white_spaces
+from enemy import Enemy
 
 class Room:
     def __init__(self, x, y, width, height):
@@ -30,6 +30,13 @@ def create_room(dungeon_map, room):
         for x in range(room.width):
             dungeon_map[room.y + y][room.x + x] = 0  # Carve out space
 
+    # Ensure a 2x2 space for enemy spawning
+    spawn_x = room.x + room.width // 2 - 1
+    spawn_y = room.y + room.height // 2 - 1
+    for y in range(2):
+        for x in range(2):
+            dungeon_map[spawn_y + y][spawn_x + x] = 0
+
 def create_h_tunnel(dungeon_map, x1, x2, y, doors):
     for x in range(min(x1, x2), max(x1, x2) + 1):
         dungeon_map[y][x] = 0
@@ -46,7 +53,7 @@ def create_v_tunnel(dungeon_map, y1, y2, x, doors):
     if count_white_spaces(dungeon_map, x, y2) <= 3:
         doors.append(Door(x, y2))
 
-def generate_room_at(dungeon_map, origin_x, origin_y, doors):
+def generate_room_at(dungeon_map, origin_x, origin_y, doors, enemies):
     max_rooms = 10
     min_room_size = 4
     max_room_size = 8
@@ -83,14 +90,19 @@ def generate_room_at(dungeon_map, origin_x, origin_y, doors):
                     create_v_tunnel(dungeon_map, prev_y, new_y, prev_x, doors)
                     create_h_tunnel(dungeon_map, prev_x, new_x, new_y, doors)
 
+            # Spawn an enemy in the room
+            spawn_x = new_room.x + new_room.width // 2
+            spawn_y = new_room.y + new_room.height // 2
+            enemies.append(Enemy(spawn_x * TILE_SIZE, spawn_y * TILE_SIZE))
+
             rooms.append(new_room)
 
     return dungeon_map
 
-def load_room_at(player_grid_x, player_grid_y, dungeon_rooms, doors):
+def load_room_at(player_grid_x, player_grid_y, dungeon_rooms, doors, enemies):
     if (player_grid_x, player_grid_y) not in dungeon_rooms:
         dungeon_map = [[1 for _ in range(MAP_WIDTH)] for _ in range(MAP_HEIGHT)]
-        dungeon_map = generate_room_at(dungeon_map, player_grid_x, player_grid_y, doors)
+        dungeon_map = generate_room_at(dungeon_map, player_grid_x, player_grid_y, doors, enemies)
         dungeon_rooms[(player_grid_x, player_grid_y)] = dungeon_map
     return dungeon_rooms[(player_grid_x, player_grid_y)]
 

@@ -7,6 +7,7 @@ from player import Player
 from bullet import Bullet
 from menu import Menu
 from main_menu import MainMenu
+from enemy import Enemy
 import time
 
 pygame.init()
@@ -19,6 +20,7 @@ random.seed(seed)
 dungeon_rooms = {}
 doors = []
 bullets = []
+enemies = []
 last_shot_time = 0
 bullet_speed = 300  # Pixels per second
 menu = Menu(seed)
@@ -27,18 +29,19 @@ is_paused = False
 in_main_menu = True
 
 def restart_game(seed):
-    global dungeon_rooms, doors, bullets, player, player_x, player_y, current_room_x, current_room_y
+    global dungeon_rooms, doors, bullets, player, player_x, player_y, current_room_x, current_room_y, enemies
     random.seed(seed)
     dungeon_rooms = {}
     doors = []
     bullets = []
+    enemies = []
     current_room_x, current_room_y = 0, 0
-    initial_room = load_room_at(0, 0, dungeon_rooms, doors)
+    initial_room = load_room_at(0, 0, dungeon_rooms, doors, enemies)
     player_x, player_y = find_walkable_tile(initial_room)
     player = Player(player_x, player_y, player_speed)
 
 try:
-    initial_room = load_room_at(0, 0, dungeon_rooms, doors)
+    initial_room = load_room_at(0, 0, dungeon_rooms, doors, enemies)
     player_x, player_y = find_walkable_tile(initial_room)
 except ValueError as e:
     print(f"Error during player initialization: {e}")
@@ -99,7 +102,7 @@ while running:
     if in_main_menu:
         main_menu.draw(screen)
     elif not is_paused:
-        current_room = load_room_at(current_room_x, current_room_y, dungeon_rooms, doors)
+        current_room = load_room_at(current_room_x, current_room_y, dungeon_rooms, doors, enemies)
 
         keys = pygame.key.get_pressed()
         dx, dy = 0, 0
@@ -162,6 +165,10 @@ while running:
                 bullets.remove(bullet)
             else:
                 pygame.draw.circle(screen, RED, (int(bullet_x - camera_x), int(bullet_y - camera_y)), 5)
+
+        for enemy in enemies:
+            enemy_x, enemy_y = enemy.get_position()
+            pygame.draw.rect(screen, BLUE, (enemy_x - camera_x, enemy_y - camera_y, TILE_SIZE, TILE_SIZE))
 
         pygame.draw.rect(screen, RED, (SCREEN_WIDTH // 2 - PLAYER_SIZE // 2, SCREEN_HEIGHT // 2 - PLAYER_SIZE // 2, PLAYER_SIZE, PLAYER_SIZE))
 
