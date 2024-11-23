@@ -3,10 +3,11 @@ import pygame
 from settings import SCREEN_WIDTH, SCREEN_HEIGHT, WHITE, BLACK, RED
 
 class Menu:
-    def __init__(self):
+    def __init__(self, seed):
         self.font = pygame.font.Font(None, 74)
         self.options = ["Restart", "Exit"]
         self.selected_option = 0
+        self.seed = seed
 
     def draw(self, screen):
         screen.fill(BLACK)
@@ -15,6 +16,10 @@ class Menu:
             text = self.font.render(option, True, color)
             rect = text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + i * 100))
             screen.blit(text, rect)
+
+        seed_text = self.font.render(f"Seed: {self.seed}", True, WHITE)
+        seed_rect = seed_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 200))
+        screen.blit(seed_text, seed_rect)
 
     def handle_event(self, event):
         if event.type == pygame.KEYDOWN:

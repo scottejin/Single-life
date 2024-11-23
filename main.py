@@ -1,6 +1,7 @@
 # main.py
 import pygame
 import sys
+import random
 from settings import *
 from map import load_room_at, find_walkable_tile, update_doors
 from player import Player
@@ -12,12 +13,15 @@ pygame.init()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SCALED | pygame.DOUBLEBUF)
 pygame.display.set_caption("Endless Dungeon Explorer")
 
+seed = random.randint(0, 1000000)
+random.seed(seed)
+
 dungeon_rooms = {}
 doors = []
 bullets = []
 last_shot_time = 0
 bullet_speed = 300  # Pixels per second
-menu = Menu()
+menu = Menu(seed)
 is_paused = False
 
 try:
