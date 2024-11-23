@@ -36,3 +36,8 @@ class Enemy:
 
             if (int(self.x // TILE_SIZE), int(self.y // TILE_SIZE)) == next_tile:
                 self.path.pop(0)
+
+        # Check for collision with the player
+        if abs(self.x - player_x) < TILE_SIZE // 2 and abs(self.y - player_y) < TILE_SIZE // 2:
+            # Handle collision with the player (e.g., reduce player health)
+            pass

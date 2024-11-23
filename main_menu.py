@@ -1,4 +1,3 @@
-# main_menu.py
 import pygame
 from settings import SCREEN_WIDTH, SCREEN_HEIGHT, WHITE, BLACK, RED
 

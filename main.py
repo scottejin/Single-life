@@ -136,7 +136,6 @@ while running:
             current_room_y -= 1
             player_y = (MAP_HEIGHT - 1) * TILE_SIZE
         elif player_y >= MAP_HEIGHT * TILE_SIZE:
-            current_room_y += 1
             player_y = 0
 
         camera_x = int(player_x - SCREEN_WIDTH // 2)

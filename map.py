@@ -27,24 +27,38 @@ def create_room(dungeon_map, room):
             dungeon_map[spawn_y + y][spawn_x + x] = 0
 
 def create_h_tunnel(dungeon_map, x1, x2, y):
-    max_length = 20
-    if abs(x2 - x1) > max_length:
-        if x2 > x1:
-            x2 = x1 + max_length
-        else:
-            x2 = x1 - max_length
     for x in range(min(x1, x2), max(x1, x2) + 1):
         dungeon_map[y][x] = 0
 
 def create_v_tunnel(dungeon_map, y1, y2, x):
-    max_length = 20
-    if abs(y2 - y1) > max_length:
-        if y2 > y1:
-            y2 = y1 + max_length
-        else:
-            y2 = y1 - max_length
     for y in range(min(y1, y2), max(y1, y2) + 1):
         dungeon_map[y][x] = 0
+
+def is_connected(dungeon_map, start_x, start_y):
+    """
+    Check if the entire map is connected using flood-fill.
+    """
+    visited = set()
+    stack = [(start_x, start_y)]
+
+    while stack:
+        x, y = stack.pop()
+        if (x, y) in visited or dungeon_map[y][x] != 0:
+            continue
+        visited.add((x, y))
+
+        # Add adjacent tiles
+        for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+            nx, ny = x + dx, y + dy
+            if 0 <= nx < MAP_WIDTH and 0 <= ny < MAP_HEIGHT:
+                stack.append((nx, ny))
+
+    # Check if all walkable tiles are visited
+    for y in range(MAP_HEIGHT):
+        for x in range(MAP_WIDTH):
+            if dungeon_map[y][x] == 0 and (x, y) not in visited:
+                return False
+    return True
 
 def generate_room_at(dungeon_map, origin_x, origin_y, enemies, spawners):
     max_rooms = 10
@@ -89,6 +103,11 @@ def generate_room_at(dungeon_map, origin_x, origin_y, enemies, spawners):
             spawners.append(EnemySpawner(spawn_x * TILE_SIZE, spawn_y * TILE_SIZE))
 
             rooms.append(new_room)
+
+    # Validate connectivity
+    start_x, start_y = rooms[0].center()
+    if not is_connected(dungeon_map, start_x, start_y):
+        return generate_room_at([[1 for _ in range(MAP_WIDTH)] for _ in range(MAP_HEIGHT)], origin_x, origin_y, enemies, spawners)
 
     return dungeon_map
 
