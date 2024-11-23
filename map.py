@@ -39,6 +39,12 @@ def create_room(dungeon_map, room):
             dungeon_map[spawn_y + y][spawn_x + x] = 0
 
 def create_h_tunnel(dungeon_map, x1, x2, y, doors):
+    max_length = 20
+    if abs(x2 - x1) > max_length:
+        if x2 > x1:
+            x2 = x1 + max_length
+        else:
+            x2 = x1 - max_length
     for x in range(min(x1, x2), max(x1, x2) + 1):
         dungeon_map[y][x] = 0
     if count_white_spaces(dungeon_map, x1, y) <= 3:
@@ -47,6 +53,12 @@ def create_h_tunnel(dungeon_map, x1, x2, y, doors):
         doors.append(Door(x2, y))
 
 def create_v_tunnel(dungeon_map, y1, y2, x, doors):
+    max_length = 20
+    if abs(y2 - y1) > max_length:
+        if y2 > y1:
+            y2 = y1 + max_length
+        else:
+            y2 = y1 - max_length
     for y in range(min(y1, y2), max(y1, y2) + 1):
         dungeon_map[y][x] = 0
     if count_white_spaces(dungeon_map, x, y1) <= 3:
