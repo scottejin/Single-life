@@ -168,7 +168,7 @@ while running:
 
         for enemy in enemies:
             enemy_x, enemy_y = enemy.get_position()
-            pygame.draw.rect(screen, BLUE, (enemy_x - camera_x, enemy_y - camera_y, TILE_SIZE, TILE_SIZE))
+            pygame.draw.rect(screen, ORANGE, (enemy_x - camera_x, enemy_y - camera_y, ENEMY_SIZE, ENEMY_SIZE))
 
         pygame.draw.rect(screen, RED, (SCREEN_WIDTH // 2 - PLAYER_SIZE // 2, SCREEN_HEIGHT // 2 - PLAYER_SIZE // 2, PLAYER_SIZE, PLAYER_SIZE))
 
