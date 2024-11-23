@@ -157,7 +157,7 @@ while running:
         for bullet in bullets[:]:
             if not bullet.is_broken:
                 bullet.move(dt)
-                if bullet.check_collision(current_room):
+                if bullet.check_collision(current_room, enemies):
                     bullet.break_bullet()
             bullet_x, bullet_y = bullet.get_position()
             if bullet.is_broken:
@@ -168,7 +168,11 @@ while running:
 
         for enemy in enemies:
             enemy_x, enemy_y = enemy.get_position()
+            health_ratio = enemy.health / 2
+            inner_color = ORANGE if health_ratio == 1 else (255, 140, 0)  # Darker orange if damaged
             pygame.draw.rect(screen, ORANGE, (enemy_x - camera_x, enemy_y - camera_y, ENEMY_SIZE, ENEMY_SIZE))
+            pygame.draw.rect(screen, inner_color, (enemy_x - camera_x + 2, enemy_y - camera_y + 2, ENEMY_SIZE - 4, ENEMY_SIZE - 4))
+            pygame.draw.rect(screen, BLACK, (enemy_x - camera_x + 2, enemy_y - camera_y + 2, (ENEMY_SIZE - 4) * health_ratio, ENEMY_SIZE - 4))
 
         pygame.draw.rect(screen, RED, (SCREEN_WIDTH // 2 - PLAYER_SIZE // 2, SCREEN_HEIGHT // 2 - PLAYER_SIZE // 2, PLAYER_SIZE, PLAYER_SIZE))
 
