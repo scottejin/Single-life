@@ -2,7 +2,7 @@ import pygame
 import sys
 import random
 
-# Initialize pygame start
+# Initialize pygame
 pygame.init()
 
 # Define constants
@@ -15,8 +15,8 @@ GRAY = (128, 128, 128)
 BLACK = (0, 0, 0)
 BLUE = (0, 0, 255)  # Color for doors
 
-# Create screen
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+# Create screen with VSync and double buffering enabled
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SCALED | pygame.DOUBLEBUF)
 pygame.display.set_caption("Endless Dungeon Explorer")
 
 # Map settings
@@ -140,24 +140,31 @@ def load_room_at(player_grid_x, player_grid_y, doors):
     return dungeon_rooms[(player_grid_x, player_grid_y)]
 
 def find_walkable_tile(dungeon_map):
+    """Find the first walkable tile in the dungeon."""
     for y in range(MAP_HEIGHT):
         for x in range(MAP_WIDTH):
-            if dungeon_map[y][x] == 0:  # Check for walkable tile
+            if dungeon_map[y][x] == 0:  # Walkable tile
                 return x * TILE_SIZE, y * TILE_SIZE
-    return None
+    raise ValueError("No walkable tiles found in the dungeon map!")
 
 # Define the doors list before using it
 doors = []
 
 # Player starting position
-initial_room = load_room_at(0, 0, doors)
-player_x, player_y = find_walkable_tile(initial_room)
-player_speed = 5
+try:
+    initial_room = load_room_at(0, 0, doors)
+    player_x, player_y = find_walkable_tile(initial_room)
+except ValueError as e:
+    print(f"Error during player initialization: {e}")
+    pygame.quit()
+    sys.exit()
+
+player_speed = 200  # Pixels per second
 
 # Collision detection function
 def is_walkable(x, y, dungeon_map, doors):
     """Check if a position on the map is walkable (not a wall)."""
-    map_x, map_y = x // TILE_SIZE, y // TILE_SIZE
+    map_x, map_y = int(x // TILE_SIZE), int(y // TILE_SIZE)
     if map_x < 0 or map_x >= MAP_WIDTH or map_y < 0 or map_y >= MAP_HEIGHT:
         return False
     if dungeon_map[map_y][map_x] == 0:
@@ -182,8 +189,12 @@ def update_doors(player_x, player_y, doors):
 clock = pygame.time.Clock()
 running = True
 current_room_x, current_room_y = 0, 0  # Start in the first room
+TARGET_FPS = 60
 
 while running:
+    # Time delta to sync updates
+    dt = clock.tick(TARGET_FPS) / 1000.0  # Duration of last frame in seconds
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -196,13 +207,13 @@ while running:
     new_player_x, new_player_y = player_x, player_y
 
     if keys[pygame.K_LEFT]:
-        new_player_x -= player_speed
+        new_player_x -= player_speed * dt
     if keys[pygame.K_RIGHT]:
-        new_player_x += player_speed
+        new_player_x += player_speed * dt
     if keys[pygame.K_UP]:
-        new_player_y -= player_speed
+        new_player_y -= player_speed * dt
     if keys[pygame.K_DOWN]:
-        new_player_y += player_speed
+        new_player_y += player_speed * dt
 
     # Collision detection
     if is_walkable(new_player_x, player_y, current_room, doors):
@@ -228,8 +239,8 @@ while running:
         player_y = 0
 
     # Calculate camera offset based on the player's position
-    camera_x = player_x - SCREEN_WIDTH // 2
-    camera_y = player_y - SCREEN_HEIGHT // 2
+    camera_x = int(player_x - SCREEN_WIDTH // 2)
+    camera_y = int(player_y - SCREEN_HEIGHT // 2)
 
     # Fill the screen
     screen.fill(BLACK)
@@ -257,9 +268,6 @@ while running:
 
     # Update display
     pygame.display.flip()
-
-    # Cap the frame rate
-    clock.tick(60)
 
 # Clean up
 pygame.quit()
