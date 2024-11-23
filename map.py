@@ -14,18 +14,6 @@ class Room:
     def center(self):
         return (self.x + self.width // 2, self.y + self.height // 2)
 
-class Door:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-        self.is_open = False
-
-    def open(self):
-        self.is_open = True
-
-    def close(self):
-        self.is_open = False
-
 def create_room(dungeon_map, room):
     for y in range(room.height):
         for x in range(room.width):
@@ -38,7 +26,7 @@ def create_room(dungeon_map, room):
         for x in range(2):
             dungeon_map[spawn_y + y][spawn_x + x] = 0
 
-def create_h_tunnel(dungeon_map, x1, x2, y, doors):
+def create_h_tunnel(dungeon_map, x1, x2, y):
     max_length = 20
     if abs(x2 - x1) > max_length:
         if x2 > x1:
@@ -47,12 +35,8 @@ def create_h_tunnel(dungeon_map, x1, x2, y, doors):
             x2 = x1 - max_length
     for x in range(min(x1, x2), max(x1, x2) + 1):
         dungeon_map[y][x] = 0
-    if count_white_spaces(dungeon_map, x1, y) <= 3:
-        doors.append(Door(x1, y))
-    if count_white_spaces(dungeon_map, x2, y) <= 3:
-        doors.append(Door(x2, y))
 
-def create_v_tunnel(dungeon_map, y1, y2, x, doors):
+def create_v_tunnel(dungeon_map, y1, y2, x):
     max_length = 20
     if abs(y2 - y1) > max_length:
         if y2 > y1:
@@ -61,12 +45,8 @@ def create_v_tunnel(dungeon_map, y1, y2, x, doors):
             y2 = y1 - max_length
     for y in range(min(y1, y2), max(y1, y2) + 1):
         dungeon_map[y][x] = 0
-    if count_white_spaces(dungeon_map, x, y1) <= 3:
-        doors.append(Door(x, y1))
-    if count_white_spaces(dungeon_map, x, y2) <= 3:
-        doors.append(Door(x, y2))
 
-def generate_room_at(dungeon_map, origin_x, origin_y, doors, enemies, spawners):
+def generate_room_at(dungeon_map, origin_x, origin_y, enemies, spawners):
     max_rooms = 10
     min_room_size = 4
     max_room_size = 8
@@ -97,11 +77,11 @@ def generate_room_at(dungeon_map, origin_x, origin_y, doors, enemies, spawners):
                 (new_x, new_y) = new_room.center()
 
                 if random.randint(0, 1) == 1:
-                    create_h_tunnel(dungeon_map, prev_x, new_x, prev_y, doors)
-                    create_v_tunnel(dungeon_map, prev_y, new_y, new_x, doors)
+                    create_h_tunnel(dungeon_map, prev_x, new_x, prev_y)
+                    create_v_tunnel(dungeon_map, prev_y, new_y, new_x)
                 else:
-                    create_v_tunnel(dungeon_map, prev_y, new_y, prev_x, doors)
-                    create_h_tunnel(dungeon_map, prev_x, new_x, new_y, doors)
+                    create_v_tunnel(dungeon_map, prev_y, new_y, prev_x)
+                    create_h_tunnel(dungeon_map, prev_x, new_x, new_y)
 
             # Spawn an enemy in the room
             spawn_x = new_room.x + new_room.width // 2
@@ -113,10 +93,10 @@ def generate_room_at(dungeon_map, origin_x, origin_y, doors, enemies, spawners):
 
     return dungeon_map
 
-def load_room_at(player_grid_x, player_grid_y, dungeon_rooms, doors, enemies, spawners):
+def load_room_at(player_grid_x, player_grid_y, dungeon_rooms, enemies, spawners):
     if (player_grid_x, player_grid_y) not in dungeon_rooms:
         dungeon_map = [[1 for _ in range(MAP_WIDTH)] for _ in range(MAP_HEIGHT)]
-        dungeon_map = generate_room_at(dungeon_map, player_grid_x, player_grid_y, doors, enemies, spawners)
+        dungeon_map = generate_room_at(dungeon_map, player_grid_x, player_grid_y, enemies, spawners)
         dungeon_rooms[(player_grid_x, player_grid_y)] = dungeon_map
     return dungeon_rooms[(player_grid_x, player_grid_y)]
 
@@ -126,10 +106,3 @@ def find_walkable_tile(dungeon_map):
             if dungeon_map[y][x] == 0:
                 return x * TILE_SIZE, y * TILE_SIZE
     raise ValueError("No walkable tiles found in the dungeon map!")
-
-def update_doors(player_x, player_y, doors):
-    for door in doors:
-        if abs(door.x * TILE_SIZE - player_x) < TILE_SIZE and abs(door.y * TILE_SIZE - player_y) < TILE_SIZE:
-            door.open()
-        else:
-            door.close()

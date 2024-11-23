@@ -1,4 +1,3 @@
-# player.py
 from settings import TILE_SIZE
 from utils import is_walkable
 
@@ -8,13 +7,13 @@ class Player:
         self.y = y
         self.speed = speed
 
-    def move(self, dx, dy, dt, dungeon_map, doors):
+    def move(self, dx, dy, dt, dungeon_map):
         new_x = self.x + dx * self.speed * dt
         new_y = self.y + dy * self.speed * dt
 
-        if is_walkable(new_x, self.y, dungeon_map, doors):
+        if is_walkable(new_x, self.y, dungeon_map):
             self.x = new_x
-        if is_walkable(self.x, new_y, dungeon_map, doors):
+        if is_walkable(self.x, new_y, dungeon_map):
             self.y = new_y
 
     def get_position(self):

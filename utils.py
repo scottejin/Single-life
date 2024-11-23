@@ -1,4 +1,3 @@
-# utils.py
 from settings import TILE_SIZE
 
 def count_white_spaces(dungeon_map, x, y):
@@ -12,13 +11,8 @@ def count_white_spaces(dungeon_map, x, y):
                 white_spaces += 1
     return white_spaces
 
-def is_walkable(x, y, dungeon_map, doors):
+def is_walkable(x, y, dungeon_map):
     map_x, map_y = int(x // TILE_SIZE), int(y // TILE_SIZE)
     if map_x < 0 or map_x >= len(dungeon_map[0]) or map_y < 0 or map_y >= len(dungeon_map):
         return False
-    if dungeon_map[map_y][map_x] == 0:
-        return True
-    for door in doors:
-        if door.x == map_x and door.y == map_y and door.is_open:
-            return True
-    return False
+    return dungeon_map[map_y][map_x] == 0

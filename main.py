@@ -3,7 +3,7 @@ import sys
 import random
 import time
 from settings import SCREEN_WIDTH, SCREEN_HEIGHT, TILE_SIZE, PLAYER_SIZE, ENEMY_SIZE, WHITE, RED, GRAY, BLACK, PURPLE, BLUE, ORANGE, MAP_WIDTH, MAP_HEIGHT, TARGET_FPS, player_speed
-from map import load_room_at, find_walkable_tile, update_doors
+from map import load_room_at, find_walkable_tile
 from player import Player
 from bullet import Bullet
 from menu import Menu
@@ -19,7 +19,6 @@ seed = str(random.randint(0, 1000000))
 random.seed(seed)
 
 dungeon_rooms = {}
-doors = []
 bullets = []
 enemies = []
 spawners = []
@@ -31,20 +30,19 @@ is_paused = False
 in_main_menu = True
 
 def restart_game(seed):
-    global dungeon_rooms, doors, bullets, player, player_x, player_y, current_room_x, current_room_y, enemies, spawners
+    global dungeon_rooms, bullets, player, player_x, player_y, current_room_x, current_room_y, enemies, spawners
     random.seed(seed)
     dungeon_rooms = {}
-    doors = []
     bullets = []
     enemies = []
     spawners = []
     current_room_x, current_room_y = 0, 0
-    initial_room = load_room_at(0, 0, dungeon_rooms, doors, enemies, spawners)
+    initial_room = load_room_at(0, 0, dungeon_rooms, enemies, spawners)
     player_x, player_y = find_walkable_tile(initial_room)
     player = Player(player_x, player_y, player_speed)
 
 try:
-    initial_room = load_room_at(0, 0, dungeon_rooms, doors, enemies, spawners)
+    initial_room = load_room_at(0, 0, dungeon_rooms, enemies, spawners)
     player_x, player_y = find_walkable_tile(initial_room)
 except ValueError as e:
     print(f"Error during player initialization: {e}")
@@ -105,7 +103,7 @@ while running:
     if in_main_menu:
         main_menu.draw(screen)
     elif not is_paused:
-        current_room = load_room_at(current_room_x, current_room_y, dungeon_rooms, doors, enemies, spawners)
+        current_room = load_room_at(current_room_x, current_room_y, dungeon_rooms, enemies, spawners)
 
         keys = pygame.key.get_pressed()
         dx, dy = 0, 0
@@ -118,10 +116,8 @@ while running:
         if keys[pygame.K_DOWN]:
             dy = 1
 
-        player.move(dx, dy, dt, current_room, doors)
+        player.move(dx, dy, dt, current_room)
         player_x, player_y = player.get_position()
-
-        update_doors(player_x, player_y, doors)
 
         if player_x < 0:
             current_room_x -= 1
@@ -150,12 +146,6 @@ while running:
                     pygame.draw.rect(screen, GRAY, (tile_x, tile_y, TILE_SIZE, TILE_SIZE))
                 elif current_room[row][col] == 0:
                     pygame.draw.rect(screen, WHITE, (tile_x, tile_y, TILE_SIZE, TILE_SIZE))
-
-        for door in doors:
-            tile_x = door.x * TILE_SIZE - camera_x
-            tile_y = door.y * TILE_SIZE - camera_y
-            color = GRAY if door.is_open else BLUE
-            pygame.draw.rect(screen, color, (tile_x, tile_y, TILE_SIZE, TILE_SIZE))
 
         for bullet in bullets[:]:
             if not bullet.is_broken:
