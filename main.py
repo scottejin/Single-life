@@ -1,7 +1,8 @@
 import pygame
 import sys
 import random
-from settings import *
+import time
+from settings import SCREEN_WIDTH, SCREEN_HEIGHT, TILE_SIZE, PLAYER_SIZE, ENEMY_SIZE, WHITE, RED, GRAY, BLACK, PURPLE, BLUE, ORANGE, MAP_WIDTH, MAP_HEIGHT, TARGET_FPS, player_speed
 from map import load_room_at, find_walkable_tile, update_doors
 from player import Player
 from bullet import Bullet
@@ -9,7 +10,6 @@ from menu import Menu
 from main_menu import MainMenu
 from enemy import Enemy
 from enemy_spawner import EnemySpawner
-import time
 
 pygame.init()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SCALED | pygame.DOUBLEBUF)
