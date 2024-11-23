@@ -37,7 +37,11 @@ def restart_game(seed):
     enemies = []
     spawners = []
     current_room_x, current_room_y = 0, 0
-    initial_room = load_room_at(0, 0, dungeon_rooms, enemies, spawners)
+
+    while True:
+        initial_room = load_room_at(0, 0, dungeon_rooms, enemies, spawners)
+        break
+
     player_x, player_y = find_walkable_tile(initial_room)
     player = Player(player_x, player_y, player_speed)
 
@@ -173,6 +177,12 @@ while running:
             pygame.draw.rect(screen, BLACK, (enemy_x - camera_x + 2, enemy_y - camera_y + 2, (ENEMY_SIZE - 4) * health_ratio, ENEMY_SIZE - 4))
 
         pygame.draw.rect(screen, RED, (SCREEN_WIDTH // 2 - PLAYER_SIZE // 2, SCREEN_HEIGHT // 2 - PLAYER_SIZE // 2, PLAYER_SIZE, PLAYER_SIZE))
+
+        # Draw a hollow circle with a radius of 6 blocks (6 * TILE_SIZE) centered around the player
+        circle_radius = 6 * TILE_SIZE
+        line_thickness = max(1, TILE_SIZE // 80)  # Ensure thickness is at least 1 pixel
+        circle_position = (int(player_x - camera_x), int(player_y - camera_y))
+        pygame.draw.circle(screen, BLUE, circle_position, circle_radius, line_thickness)
 
     else:
         menu.draw(screen)
