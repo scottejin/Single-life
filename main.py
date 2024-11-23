@@ -13,7 +13,7 @@ pygame.init()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SCALED | pygame.DOUBLEBUF)
 pygame.display.set_caption("Endless Dungeon Explorer")
 
-seed = random.randint(0, 1000000)
+seed = str(random.randint(0, 1000000))
 random.seed(seed)
 
 dungeon_rooms = {}
@@ -23,6 +23,17 @@ last_shot_time = 0
 bullet_speed = 300  # Pixels per second
 menu = Menu(seed)
 is_paused = False
+
+def restart_game(seed):
+    global dungeon_rooms, doors, bullets, player, player_x, player_y, current_room_x, current_room_y
+    random.seed(seed)
+    dungeon_rooms = {}
+    doors = []
+    bullets = []
+    current_room_x, current_room_y = 0, 0
+    initial_room = load_room_at(0, 0, dungeon_rooms, doors)
+    player_x, player_y = find_walkable_tile(initial_room)
+    player = Player(player_x, player_y, player_speed)
 
 try:
     initial_room = load_room_at(0, 0, dungeon_rooms, doors)
@@ -49,13 +60,14 @@ while running:
         elif is_paused:
             action = menu.handle_event(event)
             if action == "Restart":
-                # Restart the game logic
-                player_x, player_y = find_walkable_tile(initial_room)
-                player = Player(player_x, player_y, player_speed)
-                bullets = []
+                restart_game(seed)
                 is_paused = False
             elif action == "Exit":
                 running = False
+            elif action == "Seed":
+                seed = menu.seed
+                restart_game(seed)
+                is_paused = False
 
     if not is_paused:
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
