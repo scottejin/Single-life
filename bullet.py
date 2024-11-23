@@ -16,7 +16,7 @@ class Bullet:
     def get_position(self):
         return self.x, self.y
 
-    def check_collision(self, dungeon_map, enemies):
+    def check_collision(self, dungeon_map, enemies, spawners):
         map_x, map_y = int(self.x // TILE_SIZE), int(self.y // TILE_SIZE)
         if map_x < 0 or map_x >= len(dungeon_map[0]) or map_y < 0 or map_y >= len(dungeon_map):
             return True
@@ -27,6 +27,10 @@ class Bullet:
             if abs(self.x - enemy_x) < TILE_SIZE // 2 and abs(self.y - enemy_y) < TILE_SIZE // 2:
                 if enemy.take_damage():
                     enemies.remove(enemy)
+                return True
+        for spawner in spawners:
+            if spawner.is_active and abs(self.x - spawner.spawn_x) < TILE_SIZE // 2 and abs(self.y - spawner.spawn_y) < TILE_SIZE // 2:
+                spawner.take_damage()
                 return True
         return False
 

@@ -2,6 +2,7 @@ import random
 from settings import TILE_SIZE, MAP_WIDTH, MAP_HEIGHT
 from utils import count_white_spaces
 from enemy import Enemy
+from enemy_spawner import EnemySpawner
 
 class Room:
     def __init__(self, x, y, width, height):
@@ -53,7 +54,7 @@ def create_v_tunnel(dungeon_map, y1, y2, x, doors):
     if count_white_spaces(dungeon_map, x, y2) <= 3:
         doors.append(Door(x, y2))
 
-def generate_room_at(dungeon_map, origin_x, origin_y, doors, enemies):
+def generate_room_at(dungeon_map, origin_x, origin_y, doors, enemies, spawners):
     max_rooms = 10
     min_room_size = 4
     max_room_size = 8
@@ -94,15 +95,16 @@ def generate_room_at(dungeon_map, origin_x, origin_y, doors, enemies):
             spawn_x = new_room.x + new_room.width // 2
             spawn_y = new_room.y + new_room.height // 2
             enemies.append(Enemy(spawn_x * TILE_SIZE, spawn_y * TILE_SIZE))
+            spawners.append(EnemySpawner(spawn_x * TILE_SIZE, spawn_y * TILE_SIZE))
 
             rooms.append(new_room)
 
     return dungeon_map
 
-def load_room_at(player_grid_x, player_grid_y, dungeon_rooms, doors, enemies):
+def load_room_at(player_grid_x, player_grid_y, dungeon_rooms, doors, enemies, spawners):
     if (player_grid_x, player_grid_y) not in dungeon_rooms:
         dungeon_map = [[1 for _ in range(MAP_WIDTH)] for _ in range(MAP_HEIGHT)]
-        dungeon_map = generate_room_at(dungeon_map, player_grid_x, player_grid_y, doors, enemies)
+        dungeon_map = generate_room_at(dungeon_map, player_grid_x, player_grid_y, doors, enemies, spawners)
         dungeon_rooms[(player_grid_x, player_grid_y)] = dungeon_map
     return dungeon_rooms[(player_grid_x, player_grid_y)]
 

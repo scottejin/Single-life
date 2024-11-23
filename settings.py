@@ -6,6 +6,7 @@ WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 GRAY = (128, 128, 128)
 BLACK = (0, 0, 0)
+PURPLE = (128, 0, 128)  # Color for the spawner
 BLUE = (0, 0, 255)  # Color for doors
 ORANGE = (255, 165, 0)  # Color for enemies
 MAP_WIDTH, MAP_HEIGHT = 50, 50  # in tiles

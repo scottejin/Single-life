@@ -8,6 +8,7 @@ from bullet import Bullet
 from menu import Menu
 from main_menu import MainMenu
 from enemy import Enemy
+from enemy_spawner import EnemySpawner
 import time
 
 pygame.init()
@@ -21,6 +22,7 @@ dungeon_rooms = {}
 doors = []
 bullets = []
 enemies = []
+spawners = []
 last_shot_time = 0
 bullet_speed = 300  # Pixels per second
 menu = Menu(seed)
@@ -29,19 +31,20 @@ is_paused = False
 in_main_menu = True
 
 def restart_game(seed):
-    global dungeon_rooms, doors, bullets, player, player_x, player_y, current_room_x, current_room_y, enemies
+    global dungeon_rooms, doors, bullets, player, player_x, player_y, current_room_x, current_room_y, enemies, spawners
     random.seed(seed)
     dungeon_rooms = {}
     doors = []
     bullets = []
     enemies = []
+    spawners = []
     current_room_x, current_room_y = 0, 0
-    initial_room = load_room_at(0, 0, dungeon_rooms, doors, enemies)
+    initial_room = load_room_at(0, 0, dungeon_rooms, doors, enemies, spawners)
     player_x, player_y = find_walkable_tile(initial_room)
     player = Player(player_x, player_y, player_speed)
 
 try:
-    initial_room = load_room_at(0, 0, dungeon_rooms, doors, enemies)
+    initial_room = load_room_at(0, 0, dungeon_rooms, doors, enemies, spawners)
     player_x, player_y = find_walkable_tile(initial_room)
 except ValueError as e:
     print(f"Error during player initialization: {e}")
@@ -102,7 +105,7 @@ while running:
     if in_main_menu:
         main_menu.draw(screen)
     elif not is_paused:
-        current_room = load_room_at(current_room_x, current_room_y, dungeon_rooms, doors, enemies)
+        current_room = load_room_at(current_room_x, current_room_y, dungeon_rooms, doors, enemies, spawners)
 
         keys = pygame.key.get_pressed()
         dx, dy = 0, 0
@@ -157,7 +160,7 @@ while running:
         for bullet in bullets[:]:
             if not bullet.is_broken:
                 bullet.move(dt)
-                if bullet.check_collision(current_room, enemies):
+                if bullet.check_collision(current_room, enemies, spawners):
                     bullet.break_bullet()
             bullet_x, bullet_y = bullet.get_position()
             if bullet.is_broken:
@@ -165,6 +168,11 @@ while running:
                 bullets.remove(bullet)
             else:
                 pygame.draw.circle(screen, RED, (int(bullet_x - camera_x), int(bullet_y - camera_y)), 5)
+
+        # Update and draw enemies
+        for spawner in spawners:
+            spawner.update(enemies)
+            spawner.draw(screen, camera_x, camera_y)
 
         for enemy in enemies:
             enemy_x, enemy_y = enemy.get_position()
