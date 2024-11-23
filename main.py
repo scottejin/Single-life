@@ -172,7 +172,7 @@ while running:
             spawner.draw(screen, camera_x, camera_y)
 
         for enemy in enemies[:]:
-            enemy.move_towards_player(player_x, player_y, dt)
+            enemy.move_towards_player(player_x, player_y, dt, current_room)
             enemy_x, enemy_y = enemy.get_position()
             if abs(enemy_x - player_x) < TILE_SIZE // 2 and abs(enemy_y - player_y) < TILE_SIZE // 2:
                 enemies.remove(enemy)
