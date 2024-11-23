@@ -1,6 +1,7 @@
+# map.py
 import random
 from settings import TILE_SIZE, MAP_WIDTH, MAP_HEIGHT
-from utils import count_white_spaces, is_walkable
+from utils import count_white_spaces
 
 class Room:
     def __init__(self, x, y, width, height):
