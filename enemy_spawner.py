@@ -11,8 +11,8 @@ class EnemySpawner:
         self.last_spawn_time = time.time()
         self.health = 10
         self.is_active = True
-        self.width = ENEMY_SIZE
-        self.height = ENEMY_SIZE
+        self.width = int(ENEMY_SIZE * 1.5)
+        self.height = int(ENEMY_SIZE * 1.5)
 
     def is_fully_within_blue_circle(self, player_x, player_y, radius):
         """Check if all corners of the spawner are within the blue circle."""
@@ -51,6 +51,6 @@ class EnemySpawner:
         spawner_y = self.spawn_y - camera_y
         health_ratio = self.health / 10
         inner_color = PURPLE if health_ratio == 1 else (128, 0, 128)  # Darker purple if damaged
-        pygame.draw.rect(screen, PURPLE, (spawner_x, spawner_y, ENEMY_SIZE, ENEMY_SIZE))
-        pygame.draw.rect(screen, inner_color, (spawner_x + 2, spawner_y + 2, ENEMY_SIZE - 4, ENEMY_SIZE - 4))
-        pygame.draw.rect(screen, BLACK, (spawner_x + 2, spawner_y + 2, (ENEMY_SIZE - 4) * health_ratio, ENEMY_SIZE - 4))
+        pygame.draw.rect(screen, PURPLE, (spawner_x, spawner_y, self.width, self.height))
+        pygame.draw.rect(screen, inner_color, (spawner_x + 2, spawner_y + 2, self.width - 4, self.height - 4))
+        pygame.draw.rect(screen, BLACK, (spawner_x + 2, spawner_y + 2, (self.width - 4) * health_ratio, self.height - 4))
