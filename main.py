@@ -7,6 +7,7 @@ from map import load_room_at, find_walkable_tile, update_doors
 from player import Player
 from bullet import Bullet
 from menu import Menu
+from main_menu import MainMenu
 import time
 
 pygame.init()
@@ -22,7 +23,9 @@ bullets = []
 last_shot_time = 0
 bullet_speed = 300  # Pixels per second
 menu = Menu(seed)
+main_menu = MainMenu()
 is_paused = False
+in_main_menu = True
 
 def restart_game(seed):
     global dungeon_rooms, doors, bullets, player, player_x, player_y, current_room_x, current_room_y
@@ -55,6 +58,21 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        elif in_main_menu:
+            action = main_menu.handle_event(event)
+            if action == "Start Game":
+                in_main_menu = False
+            elif action == "Options":
+                # Handle options menu
+                pass
+            elif action == "Instructions":
+                # Handle instructions screen
+                pass
+            elif action == "Credits":
+                # Handle credits screen
+                pass
+            elif action == "Exit":
+                running = False
         elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
             is_paused = not is_paused
         elif is_paused:
@@ -63,13 +81,16 @@ while running:
                 restart_game(seed)
                 is_paused = False
             elif action == "Exit":
-                running = False
+                in_main_menu = True
+                is_paused = False
             elif action == "Seed":
                 seed = menu.seed
                 restart_game(seed)
                 is_paused = False
 
-    if not is_paused:
+    if in_main_menu:
+        main_menu.draw(screen)
+    elif not is_paused:
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             current_time = time.time()
             if current_time - last_shot_time >= 0.5:  # Limit to 2 bullets per second

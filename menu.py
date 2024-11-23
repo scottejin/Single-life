@@ -4,7 +4,7 @@ from settings import SCREEN_WIDTH, SCREEN_HEIGHT, WHITE, BLACK, RED
 
 class Menu:
     def __init__(self, seed):
-        self.font = pygame.font.Font(None, 74)
+        self.font = pygame.font.Font(None, 50)
         self.options = ["Restart", "Exit", f"Seed: {seed}"]
         self.selected_option = 0
         self.seed = seed
@@ -15,7 +15,7 @@ class Menu:
         for i, option in enumerate(self.options):
             color = RED if i == self.selected_option else WHITE
             text = self.font.render(option, True, color)
-            rect = text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + i * 100))
+            rect = text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + i * 60))
             screen.blit(text, rect)
 
     def handle_event(self, event):
