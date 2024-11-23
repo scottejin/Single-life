@@ -83,26 +83,25 @@ def generate_room_at(dungeon_map, origin_x, origin_y, enemies, spawners):
                     create_v_tunnel(dungeon_map, prev_y, new_y, prev_x)
                     create_h_tunnel(dungeon_map, prev_x, new_x, new_y)
 
-            # Spawn an enemy in the room
+            # Spawn an enemy spawner in the room
             spawn_x = new_room.x + new_room.width // 2
             spawn_y = new_room.y + new_room.height // 2
-            enemies.append(Enemy(spawn_x * TILE_SIZE, spawn_y * TILE_SIZE))
             spawners.append(EnemySpawner(spawn_x * TILE_SIZE, spawn_y * TILE_SIZE))
 
             rooms.append(new_room)
 
     return dungeon_map
 
-def load_room_at(player_grid_x, player_grid_y, dungeon_rooms, enemies, spawners):
-    if (player_grid_x, player_grid_y) not in dungeon_rooms:
+def load_room_at(x, y, dungeon_rooms, enemies, spawners):
+    if (x, y) not in dungeon_rooms:
         dungeon_map = [[1 for _ in range(MAP_WIDTH)] for _ in range(MAP_HEIGHT)]
-        dungeon_map = generate_room_at(dungeon_map, player_grid_x, player_grid_y, enemies, spawners)
-        dungeon_rooms[(player_grid_x, player_grid_y)] = dungeon_map
-    return dungeon_rooms[(player_grid_x, player_grid_y)]
+        dungeon_map = generate_room_at(dungeon_map, x, y, enemies, spawners)
+        dungeon_rooms[(x, y)] = dungeon_map
+    return dungeon_rooms[(x, y)]
 
 def find_walkable_tile(dungeon_map):
     for y in range(MAP_HEIGHT):
         for x in range(MAP_WIDTH):
             if dungeon_map[y][x] == 0:
                 return x * TILE_SIZE, y * TILE_SIZE
-    raise ValueError("No walkable tiles found in the dungeon map!")
+    raise ValueError("No walkable tile found")

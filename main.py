@@ -29,6 +29,9 @@ main_menu = MainMenu()
 is_paused = False
 in_main_menu = True
 
+# Define circle_radius before the game loop
+circle_radius = 6 * TILE_SIZE
+
 def restart_game(seed):
     global dungeon_rooms, bullets, player, player_x, player_y, current_room_x, current_room_y, enemies, spawners
     random.seed(seed)
@@ -165,7 +168,7 @@ while running:
 
         # Update and draw enemies
         for spawner in spawners:
-            spawner.update(enemies)
+            spawner.update(enemies, player_x, player_y, circle_radius)
             spawner.draw(screen, camera_x, camera_y)
 
         for enemy in enemies[:]:
@@ -183,9 +186,8 @@ while running:
         pygame.draw.rect(screen, RED, (SCREEN_WIDTH // 2 - PLAYER_SIZE // 2, SCREEN_HEIGHT // 2 - PLAYER_SIZE // 2, PLAYER_SIZE, PLAYER_SIZE))
 
         # Draw a hollow circle with a radius of 6 blocks (6 * TILE_SIZE) centered around the player
-        circle_radius = 6 * TILE_SIZE
-        line_thickness = max(1, TILE_SIZE // 80)  # Ensure thickness is at least 1 pixel
         circle_position = (int(player_x - camera_x), int(player_y - camera_y))
+        line_thickness = max(1, TILE_SIZE // 80)  # Ensure thickness is at least 1 pixel
         pygame.draw.circle(screen, BLUE, circle_position, circle_radius, line_thickness)
 
     else:
