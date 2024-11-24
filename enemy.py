@@ -1,3 +1,4 @@
+# enemy.py
 from astar import astar
 from settings import TILE_SIZE
 
@@ -15,6 +16,7 @@ class Enemy:
 
     def take_damage(self):
         self.health -= 1
+        print(f"Enemy at ({self.x}, {self.y}) took damage! Remaining health: {self.health}")
         return self.health <= 0  # Return True if the enemy is dead
 
     def move_towards_player(self, player_x, player_y, dt, dungeon_map, player, enemies):
@@ -28,7 +30,7 @@ class Enemy:
             next_tile = self.path[0]
             direction_x = (next_tile[0] * TILE_SIZE + TILE_SIZE // 2) - self.x
             direction_y = (next_tile[1] * TILE_SIZE + TILE_SIZE // 2) - self.y
-            distance = (direction_x**2 + direction_y**2)**0.5
+            distance = (direction_x ** 2 + direction_y ** 2) ** 0.5
             if distance > 0:
                 direction_x /= distance
                 direction_y /= distance
@@ -42,7 +44,7 @@ class Enemy:
         else:
             direction_x = player_x - self.x
             direction_y = player_y - self.y
-            distance = (direction_x**2 + direction_y**2)**0.5
+            distance = (direction_x ** 2 + direction_y ** 2) ** 0.5
             if distance > 0:
                 direction_x /= distance
                 direction_y /= distance
@@ -53,3 +55,4 @@ class Enemy:
         if abs(self.x - player_x) < TILE_SIZE // 2 and abs(self.y - player_y) < TILE_SIZE // 2:
             player.health -= 1  # Reduce player's health by 1
             enemies.remove(self)  # Remove enemy from the list
+            print(f"Enemy collided with player! Player health: {player.health}")

@@ -1,13 +1,14 @@
 import pygame
 import time
 from enemy import Enemy
+from shielded_enemy import ShieldedEnemy
 from settings import TILE_SIZE, ENEMY_SIZE, PURPLE, BLACK
 
 class EnemySpawner:
     def __init__(self, spawn_x, spawn_y, spawn_interval=5):
         self.spawn_x = spawn_x
         self.spawn_y = spawn_y
-        self.spawn_interval = spawn_interval
+        self.spawn_interval = spawn_interval  # Interval in seconds
         self.last_spawn_time = time.time()
         self.max_health = 10  # Set maximum health
         self.health = self.max_health
@@ -35,24 +36,30 @@ class EnemySpawner:
     def update(self, enemies, player_x, player_y, radius):
         """Update spawner state and spawn enemies if within the blue circle."""
         if self.is_active and self.is_fully_within_blue_circle(player_x, player_y, radius):
-            if not self.first_seen:
-                # Spawn 2 enemies instantly the first time the spawner is seen inside the blue radius
-                enemies.append(Enemy(self.spawn_x, self.spawn_y))
-                enemies.append(Enemy(self.spawn_x, self.spawn_y))
-                self.first_seen = True
-                self.last_spawn_time = time.time()  # Reset the spawn timer
-
             current_time = time.time()
-            if current_time - self.last_spawn_time >= self.spawn_interval:
-                enemies.append(Enemy(self.spawn_x, self.spawn_y))
-                self.last_spawn_time = current_time
+            if not self.first_seen:
+                # Spawn a single ShieldedEnemy immediately
+                shielded_enemy = ShieldedEnemy(self.spawn_x, self.spawn_y)
+                enemies.append(shielded_enemy)
+                print(f"ShieldedEnemy spawned at ({self.spawn_x}, {self.spawn_y})")
+                self.first_seen = True
+                self.last_spawn_time = current_time  # Start the 5-second timer
+            else:
+                # Spawn normal enemies every 5 seconds
+                if current_time - self.last_spawn_time >= self.spawn_interval:
+                    new_enemy = Enemy(self.spawn_x, self.spawn_y)
+                    enemies.append(new_enemy)
+                    print(f"Normal Enemy spawned at ({self.spawn_x}, {self.spawn_y})")
+                    self.last_spawn_time = current_time
 
     def take_damage(self):
         """Handle spawner taking damage."""
         if self.is_active:
             self.health -= 1
+            print(f"EnemySpawner at ({self.spawn_x}, {self.spawn_y}) took damage! Remaining health: {self.health}")
             if self.health <= 0:
                 self.is_active = False
+                print(f"EnemySpawner at ({self.spawn_x}, {self.spawn_y}) destroyed!")
 
     def draw(self, screen, camera_x, camera_y):
         """Draw the spawner and its health bar."""

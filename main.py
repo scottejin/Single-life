@@ -2,13 +2,14 @@ import pygame
 import sys
 import random
 import time
-from settings import SCREEN_WIDTH, SCREEN_HEIGHT, TILE_SIZE, PLAYER_SIZE, ENEMY_SIZE, WHITE, GREEN, RED, GRAY, BLACK, PURPLE, BLUE, ORANGE, MAP_WIDTH, MAP_HEIGHT, TARGET_FPS, player_speed
+from settings import SCREEN_WIDTH, SCREEN_HEIGHT, TILE_SIZE, PLAYER_SIZE, ENEMY_SIZE, WHITE, GREEN, RED, GRAY, BLACK, PURPLE, BLUE, ORANGE, MAP_WIDTH, MAP_HEIGHT, TARGET_FPS, player_speed, DARK_ORANGE
 from map import load_room_at, find_walkable_tile
 from player import Player
 from bullet import Bullet
 from menu import Menu
 from main_menu import MainMenu
 from enemy import Enemy
+from shielded_enemy import ShieldedEnemy
 from enemy_spawner import EnemySpawner
 from end_game import draw_end_game_screen, handle_end_game_events  # Import from end_game.py
 
@@ -53,10 +54,7 @@ def restart_game(seed):
     spawners = []
     current_room_x, current_room_y = 0, 0
 
-    while True:
-        initial_room = load_room_at(0, 0, dungeon_rooms, enemies, spawners)
-        break
-
+    initial_room = load_room_at(0, 0, dungeon_rooms, enemies, spawners)
     player_x, player_y = find_walkable_tile(initial_room)
     player = Player(player_x, player_y, player_speed)
     start_time = time.time()
@@ -187,27 +185,32 @@ while running:
                 if abs(enemy_x - player_x) < TILE_SIZE // 2 and abs(enemy_y - player_y) < TILE_SIZE // 2:
                     if enemy in enemies:  # Double-check before removing
                         enemies.remove(enemy)
+                        print(f"Enemy at ({enemy_x}, {enemy_y}) collided with player.")
                 else:
-                    # Draw enemy border
-                    pygame.draw.rect(screen, ORANGE, (enemy_x - camera_x, enemy_y - camera_y, ENEMY_SIZE, ENEMY_SIZE))
+                    # Draw enemy based on its type
+                    if isinstance(enemy, ShieldedEnemy):
+                        enemy.draw(screen, camera_x, camera_y)
+                    else:
+                        # Draw enemy border
+                        pygame.draw.rect(screen, DARK_ORANGE, (enemy_x - camera_x, enemy_y - camera_y, ENEMY_SIZE, ENEMY_SIZE))
 
-                    # Draw solid orange inside
-                    pygame.draw.rect(screen, ORANGE, (enemy_x - camera_x + 2, enemy_y - camera_y + 2, ENEMY_SIZE - 4, ENEMY_SIZE - 4))
+                        # Draw solid orange inside
+                        pygame.draw.rect(screen, ORANGE, (enemy_x - camera_x + 2, enemy_y - camera_y + 2, ENEMY_SIZE - 4, ENEMY_SIZE - 4))
 
-                    # Calculate damage ratio
-                    damage_ratio = (enemy.max_health - enemy.health) / enemy.max_health
+                        # Calculate damage ratio
+                        damage_ratio = (enemy.max_health - enemy.health) / enemy.max_health
 
-                    # Draw black rectangle proportional to damage taken
-                    pygame.draw.rect(
-                        screen,
-                        BLACK,
-                        (
-                            enemy_x - camera_x + 2,
-                            enemy_y - camera_y + 2,
-                            ENEMY_SIZE - 4,
-                            (ENEMY_SIZE - 4) * damage_ratio  # Height increases as damage increases
+                        # Draw black rectangle proportional to damage taken
+                        pygame.draw.rect(
+                            screen,
+                            BLACK,
+                            (
+                                enemy_x - camera_x + 2,
+                                enemy_y - camera_y + 2,
+                                ENEMY_SIZE - 4,
+                                (ENEMY_SIZE - 4) * damage_ratio  # Height increases as damage increases
+                            )
                         )
-                    )
 
         pygame.draw.rect(screen, RED, (SCREEN_WIDTH // 2 - PLAYER_SIZE // 2, SCREEN_HEIGHT // 2 - PLAYER_SIZE // 2, PLAYER_SIZE, PLAYER_SIZE))
 
@@ -224,6 +227,7 @@ while running:
         # After updating the player and enemies
         if player.health <= 0:
             in_end_game = True  # Enter the end game state
+            print("Player has died. Entering end game state.")
 
     else:
         menu.draw(screen)

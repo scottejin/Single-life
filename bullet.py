@@ -27,6 +27,7 @@ class Bullet:
             if abs(self.x - enemy_x) < TILE_SIZE // 2 and abs(self.y - enemy_y) < TILE_SIZE // 2:
                 if enemy.take_damage():
                     enemies.remove(enemy)
+                    print(f"Enemy at ({enemy_x}, {enemy_y}) killed.")
                 return True
         for spawner in spawners:
             if spawner.is_active and abs(self.x - spawner.spawn_x) < TILE_SIZE // 2 and abs(self.y - spawner.spawn_y) < TILE_SIZE // 2:
