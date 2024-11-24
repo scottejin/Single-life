@@ -35,6 +35,14 @@ start_time = time.time()
 # Define circle_radius before the game loop
 circle_radius = 6 * TILE_SIZE
 
+# Initialize current_room_x and current_room_y
+current_room_x, current_room_y = 0, 0
+
+# Load the initial room and find a walkable tile for the player
+initial_room = load_room_at(current_room_x, current_room_y, dungeon_rooms, enemies, spawners)
+player_x, player_y = find_walkable_tile(initial_room)
+player = Player(player_x, player_y, player_speed)
+
 def restart_game(seed):
     global dungeon_rooms, bullets, player, player_x, player_y, current_room_x, current_room_y, enemies, spawners
     random.seed(seed)
@@ -51,19 +59,8 @@ def restart_game(seed):
     player_x, player_y = find_walkable_tile(initial_room)
     player = Player(player_x, player_y, player_speed)
 
-try:
-    initial_room = load_room_at(0, 0, dungeon_rooms, enemies, spawners)
-    player_x, player_y = find_walkable_tile(initial_room)
-except ValueError as e:
-    print(f"Error during player initialization: {e}")
-    pygame.quit()
-    sys.exit()
-
-player = Player(player_x, player_y, player_speed)
-
 clock = pygame.time.Clock()
 running = True
-current_room_x, current_room_y, = 0, 0
 
 while running:
     dt = clock.tick(TARGET_FPS) / 1000.0
@@ -89,29 +86,30 @@ while running:
                 running = False
         elif in_end_game:
             in_end_game, in_main_menu = handle_end_game_events(event, in_end_game, in_main_menu)
-        elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-            is_paused = not is_paused
-        elif is_paused:
-            action = menu.handle_event(event)
-            if action == "Restart":
-                restart_game(seed)
-                is_paused = False
-            elif action == "Exit":
-                in_main_menu = True
-                is_paused = False
-            elif action == "Seed":
-                seed = menu.seed
-                restart_game(seed)
-                is_paused = False
-        elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-            current_time = time.time()
-            if current_time - last_shot_time >= 0.5:  # Limit to 2 bullets per second
-                mouse_x, mouse_y = pygame.mouse.get_pos()
-                direction = (mouse_x - SCREEN_WIDTH // 2, mouse_y - SCREEN_HEIGHT // 2)
-                direction_length = (direction[0]**2 + direction[1]**2)**0.5
-                direction = (direction[0] / direction_length, direction[1] / direction_length)
-                bullets.append(Bullet(player_x, player_y, direction, bullet_speed))
-                last_shot_time = current_time
+        elif not is_paused:
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                is_paused = not is_paused
+            elif is_paused:
+                action = menu.handle_event(event)
+                if action == "Restart":
+                    restart_game(seed)
+                    is_paused = False
+                elif action == "Exit":
+                    in_main_menu = True
+                    is_paused = False
+                elif action == "Seed":
+                    seed = menu.seed
+                    restart_game(seed)
+                    is_paused = False
+            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                current_time = time.time()
+                if current_time - last_shot_time >= 0.5:  # Limit to 2 bullets per second
+                    mouse_x, mouse_y = pygame.mouse.get_pos()
+                    direction = (mouse_x - SCREEN_WIDTH // 2, mouse_y - SCREEN_HEIGHT // 2)
+                    direction_length = (direction[0]**2 + direction[1]**2)**0.5
+                    direction = (direction[0] / direction_length, direction[1] / direction_length)
+                    bullets.append(Bullet(player_x, player_y, direction, bullet_speed))
+                    last_shot_time = current_time
 
     if in_main_menu:
         main_menu.draw(screen)
@@ -123,13 +121,13 @@ while running:
 
         keys = pygame.key.get_pressed()
         dx, dy = 0, 0
-        if keys[pygame.K_LEFT]:
+        if keys[pygame.K_LEFT] or keys[pygame.K_a]:
             dx = -1
-        if keys[pygame.K_RIGHT]:
+        if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
             dx = 1
-        if keys[pygame.K_UP]:
+        if keys[pygame.K_UP] or keys[pygame.K_w]:
             dy = -1
-        if keys[pygame.K_DOWN]:
+        if keys[pygame.K_DOWN] or keys[pygame.K_s]:
             dy = 1
 
         player.move(dx, dy, dt, current_room)
@@ -209,11 +207,6 @@ while running:
                     )
 
         pygame.draw.rect(screen, RED, (SCREEN_WIDTH // 2 - PLAYER_SIZE // 2, SCREEN_HEIGHT // 2 - PLAYER_SIZE // 2, PLAYER_SIZE, PLAYER_SIZE))
-
-        # Draw a hollow circle with a radius of 6 blocks (6 * TILE_SIZE) centered around the player
-        circle_position = (int(player_x - camera_x), int(player_y - camera_y))
-        line_thickness = max(1, TILE_SIZE // 80)  # Ensure thickness is at least 1 pixel
-        pygame.draw.circle(screen, BLUE, circle_position, circle_radius, line_thickness)
 
         # Drawing the health bar
         health_bar_width = 100
