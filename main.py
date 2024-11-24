@@ -60,7 +60,7 @@ player = Player(player_x, player_y, player_speed)
 
 clock = pygame.time.Clock()
 running = True
-current_room_x, current_room_y = 0, 0
+current_room_x, current_room_y, = 0, 0
 
 while running:
     dt = clock.tick(TARGET_FPS) / 1000.0
@@ -179,21 +179,21 @@ while running:
                 # Draw enemy border
                 pygame.draw.rect(screen, ORANGE, (enemy_x - camera_x, enemy_y - camera_y, ENEMY_SIZE, ENEMY_SIZE))
 
-                # Calculate health ratio
-                health_ratio = enemy.health / 2
+                # Draw solid orange inside
+                pygame.draw.rect(screen, ORANGE, (enemy_x - camera_x + 2, enemy_y - camera_y + 2, ENEMY_SIZE - 4, ENEMY_SIZE - 4))
 
-                # Set inner color (darker orange if damaged)
-                inner_color = ORANGE if health_ratio == 1 else (255, 140, 0)
+                # Calculate damage ratio
+                damage_ratio = (enemy.max_health - enemy.health) / enemy.max_health
 
-                # Draw decreasing highlighted area based on health
+                # Draw black rectangle proportional to damage taken
                 pygame.draw.rect(
                     screen,
-                    inner_color,
+                    BLACK,
                     (
                         enemy_x - camera_x + 2,
                         enemy_y - camera_y + 2,
-                        (ENEMY_SIZE - 4) * health_ratio,  # Width decreases as health decreases
-                        ENEMY_SIZE - 4
+                        ENEMY_SIZE - 4,
+                        (ENEMY_SIZE - 4) * damage_ratio  # Height increases as damage increases
                     )
                 )
 

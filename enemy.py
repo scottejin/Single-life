@@ -5,7 +5,8 @@ class Enemy:
     def __init__(self, x, y):
         self.x = x
         self.y = y
-        self.health = 2
+        self.max_health = 2  # Set maximum health
+        self.health = self.max_health
         self.speed = 50  # Pixels per second
         self.path = []
 

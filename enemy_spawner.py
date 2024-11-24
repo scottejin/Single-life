@@ -9,7 +9,8 @@ class EnemySpawner:
         self.spawn_y = spawn_y
         self.spawn_interval = spawn_interval
         self.last_spawn_time = time.time()
-        self.health = 10
+        self.max_health = 10  # Set maximum health
+        self.health = self.max_health
         self.is_active = True
         self.width = int(ENEMY_SIZE * 1.5)
         self.height = int(ENEMY_SIZE * 1.5)
@@ -49,8 +50,24 @@ class EnemySpawner:
         """Draw the spawner and its health bar."""
         spawner_x = self.spawn_x - camera_x
         spawner_y = self.spawn_y - camera_y
-        health_ratio = self.health / 10
-        inner_color = PURPLE if health_ratio == 1 else (128, 0, 128)  # Darker purple if damaged
+
+        # Draw spawner border
         pygame.draw.rect(screen, PURPLE, (spawner_x, spawner_y, self.width, self.height))
-        pygame.draw.rect(screen, inner_color, (spawner_x + 2, spawner_y + 2, self.width - 4, self.height - 4))
-        pygame.draw.rect(screen, BLACK, (spawner_x + 2, spawner_y + 2, (self.width - 4) * health_ratio, self.height - 4))
+
+        # Draw solid purple inside
+        pygame.draw.rect(screen, PURPLE, (spawner_x + 2, spawner_y + 2, self.width - 4, self.height - 4))
+
+        # Calculate damage ratio
+        damage_ratio = (self.max_health - self.health) / self.max_health
+
+        # Draw black rectangle proportional to damage taken
+        pygame.draw.rect(
+            screen,
+            BLACK,
+            (
+                spawner_x + 2,
+                spawner_y + 2,
+                self.width - 4,
+                (self.height - 4) * damage_ratio  # Height increases as damage increases
+            )
+        )
