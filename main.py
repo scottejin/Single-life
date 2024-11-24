@@ -176,11 +176,26 @@ while running:
             if abs(enemy_x - player_x) < TILE_SIZE // 2 and abs(enemy_y - player_y) < TILE_SIZE // 2:
                 enemies.remove(enemy)
             else:
-                health_ratio = enemy.health / 2
-                inner_color = ORANGE if health_ratio == 1 else (255, 140, 0)  # Darker orange if damaged
+                # Draw enemy border
                 pygame.draw.rect(screen, ORANGE, (enemy_x - camera_x, enemy_y - camera_y, ENEMY_SIZE, ENEMY_SIZE))
-                pygame.draw.rect(screen, inner_color, (enemy_x - camera_x + 2, enemy_y - camera_y + 2, ENEMY_SIZE - 4, ENEMY_SIZE - 4))
-                pygame.draw.rect(screen, BLACK, (enemy_x - camera_x + 2, enemy_y - camera_y + 2, (ENEMY_SIZE - 4) * health_ratio, ENEMY_SIZE - 4))
+
+                # Calculate health ratio
+                health_ratio = enemy.health / 2
+
+                # Set inner color (darker orange if damaged)
+                inner_color = ORANGE if health_ratio == 1 else (255, 140, 0)
+
+                # Draw decreasing highlighted area based on health
+                pygame.draw.rect(
+                    screen,
+                    inner_color,
+                    (
+                        enemy_x - camera_x + 2,
+                        enemy_y - camera_y + 2,
+                        (ENEMY_SIZE - 4) * health_ratio,  # Width decreases as health decreases
+                        ENEMY_SIZE - 4
+                    )
+                )
 
         pygame.draw.rect(screen, RED, (SCREEN_WIDTH // 2 - PLAYER_SIZE // 2, SCREEN_HEIGHT // 2 - PLAYER_SIZE // 2, PLAYER_SIZE, PLAYER_SIZE))
 
