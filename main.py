@@ -10,6 +10,7 @@ from menu import Menu
 from main_menu import MainMenu
 from enemy import Enemy
 from enemy_spawner import EnemySpawner
+from end_game import draw_end_game_screen, handle_end_game_events  # Import from end_game.py
 
 pygame.init()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SCALED | pygame.DOUBLEBUF)
@@ -28,6 +29,8 @@ menu = Menu(seed)
 main_menu = MainMenu()
 is_paused = False
 in_main_menu = True
+in_end_game = False
+start_time = time.time()
 
 # Define circle_radius before the game loop
 circle_radius = 6 * TILE_SIZE
@@ -72,6 +75,7 @@ while running:
             action = main_menu.handle_event(event)
             if action == "Start Game":
                 in_main_menu = False
+                start_time = time.time()
             elif action == "Options":
                 # Handle options menu
                 pass
@@ -83,6 +87,8 @@ while running:
                 pass
             elif action == "Exit":
                 running = False
+        elif in_end_game:
+            in_end_game, in_main_menu = handle_end_game_events(event, in_end_game, in_main_menu)
         elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
             is_paused = not is_paused
         elif is_paused:
@@ -109,6 +115,9 @@ while running:
 
     if in_main_menu:
         main_menu.draw(screen)
+    elif in_end_game:
+        elapsed_time = time.time() - start_time
+        draw_end_game_screen(screen, elapsed_time, seed)
     elif not is_paused:
         current_room = load_room_at(current_room_x, current_room_y, dungeon_rooms, enemies, spawners)
 
@@ -215,7 +224,7 @@ while running:
 
         # After updating the player and enemies
         if player.health <= 0:
-            running = False  # Exit the game loop
+            in_end_game = True  # Enter the end game state
 
     else:
         menu.draw(screen)
