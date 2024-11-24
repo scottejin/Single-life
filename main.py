@@ -31,6 +31,7 @@ is_paused = False
 in_main_menu = True
 in_end_game = False
 start_time = time.time()
+elapsed_time = 0
 
 # Define circle_radius before the game loop
 circle_radius = 6 * TILE_SIZE
@@ -44,7 +45,7 @@ player_x, player_y = find_walkable_tile(initial_room)
 player = Player(player_x, player_y, player_speed)
 
 def restart_game(seed):
-    global dungeon_rooms, bullets, player, player_x, player_y, current_room_x, current_room_y, enemies, spawners
+    global dungeon_rooms, bullets, player, player_x, player_y, current_room_x, current_room_y, enemies, spawners, start_time, elapsed_time
     random.seed(seed)
     dungeon_rooms = {}
     bullets = []
@@ -58,6 +59,8 @@ def restart_game(seed):
 
     player_x, player_y = find_walkable_tile(initial_room)
     player = Player(player_x, player_y, player_speed)
+    start_time = time.time()
+    elapsed_time = 0
 
 clock = pygame.time.Clock()
 running = True
@@ -73,6 +76,7 @@ while running:
             if action == "Start Game":
                 in_main_menu = False
                 start_time = time.time()
+                elapsed_time = 0
             elif action == "Options":
                 # Handle options menu
                 pass
@@ -114,9 +118,9 @@ while running:
     if in_main_menu:
         main_menu.draw(screen)
     elif in_end_game:
-        elapsed_time = time.time() - start_time
         draw_end_game_screen(screen, elapsed_time, seed)
     elif not is_paused:
+        elapsed_time = time.time() - start_time
         current_room = load_room_at(current_room_x, current_room_y, dungeon_rooms, enemies, spawners)
 
         keys = pygame.key.get_pressed()
