@@ -40,6 +40,7 @@ class EnemySpawner:
                 enemies.append(Enemy(self.spawn_x, self.spawn_y))
                 enemies.append(Enemy(self.spawn_x, self.spawn_y))
                 self.first_seen = True
+                self.last_spawn_time = time.time()  # Reset the spawn timer
 
             current_time = time.time()
             if current_time - self.last_spawn_time >= self.spawn_interval:
