@@ -14,6 +14,7 @@ class EnemySpawner:
         self.is_active = True
         self.width = int(ENEMY_SIZE * 1.5)
         self.height = int(ENEMY_SIZE * 1.5)
+        self.first_seen = False  # Flag to track if spawner is seen inside the blue radius for the first time
 
     def is_fully_within_blue_circle(self, player_x, player_y, radius):
         """Check if all corners of the spawner are within the blue circle."""
@@ -34,6 +35,12 @@ class EnemySpawner:
     def update(self, enemies, player_x, player_y, radius):
         """Update spawner state and spawn enemies if within the blue circle."""
         if self.is_active and self.is_fully_within_blue_circle(player_x, player_y, radius):
+            if not self.first_seen:
+                # Spawn 2 enemies instantly the first time the spawner is seen inside the blue radius
+                enemies.append(Enemy(self.spawn_x, self.spawn_y))
+                enemies.append(Enemy(self.spawn_x, self.spawn_y))
+                self.first_seen = True
+
             current_time = time.time()
             if current_time - self.last_spawn_time >= self.spawn_interval:
                 enemies.append(Enemy(self.spawn_x, self.spawn_y))
