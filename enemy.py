@@ -17,7 +17,7 @@ class Enemy:
         self.health -= 1
         return self.health <= 0  # Return True if the enemy is dead
 
-    def move_towards_player(self, player_x, player_y, dt, dungeon_map):
+    def move_towards_player(self, player_x, player_y, dt, dungeon_map, player, enemies):
         start = (int(self.x // TILE_SIZE), int(self.y // TILE_SIZE))
         goal = (int(player_x // TILE_SIZE), int(player_y // TILE_SIZE))
 
@@ -40,5 +40,5 @@ class Enemy:
 
         # Check for collision with the player
         if abs(self.x - player_x) < TILE_SIZE // 2 and abs(self.y - player_y) < TILE_SIZE // 2:
-            # Handle collision with the player (e.g., reduce player health)
-            pass
+            player.health -= 1  # Reduce player's health by 1
+            enemies.remove(self)  # Remove enemy from the list

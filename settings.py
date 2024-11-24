@@ -9,6 +9,7 @@ BLACK = (0, 0, 0)
 PURPLE = (128, 0, 128)  # Color for the spawner
 BLUE = (0, 0, 255)  # Color for doors
 ORANGE = (255, 165, 0)  # Color for enemies
+GREEN = (0, 255, 0)
 MAP_WIDTH, MAP_HEIGHT = 50, 50  # in tiles
 WORLD_WIDTH, WORLD_HEIGHT = MAP_WIDTH * TILE_SIZE, MAP_HEIGHT * TILE_SIZE
 TARGET_FPS = 60

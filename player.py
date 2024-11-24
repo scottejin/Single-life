@@ -6,6 +6,7 @@ class Player:
         self.x = x
         self.y = y
         self.speed = speed
+        self.health = 5  # Add this line
 
     def move(self, dx, dy, dt, dungeon_map):
         new_x = self.x + dx * self.speed * dt

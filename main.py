@@ -2,7 +2,7 @@ import pygame
 import sys
 import random
 import time
-from settings import SCREEN_WIDTH, SCREEN_HEIGHT, TILE_SIZE, PLAYER_SIZE, ENEMY_SIZE, WHITE, RED, GRAY, BLACK, PURPLE, BLUE, ORANGE, MAP_WIDTH, MAP_HEIGHT, TARGET_FPS, player_speed
+from settings import SCREEN_WIDTH, SCREEN_HEIGHT, TILE_SIZE, PLAYER_SIZE, ENEMY_SIZE, WHITE, GREEN, RED, GRAY, BLACK, PURPLE, BLUE, ORANGE, MAP_WIDTH, MAP_HEIGHT, TARGET_FPS, player_speed
 from map import load_room_at, find_walkable_tile
 from player import Player
 from bullet import Bullet
@@ -171,31 +171,33 @@ while running:
             spawner.draw(screen, camera_x, camera_y)
 
         for enemy in enemies[:]:
-            enemy.move_towards_player(player_x, player_y, dt, current_room)
-            enemy_x, enemy_y = enemy.get_position()
-            if abs(enemy_x - player_x) < TILE_SIZE // 2 and abs(enemy_y - player_y) < TILE_SIZE // 2:
-                enemies.remove(enemy)
-            else:
-                # Draw enemy border
-                pygame.draw.rect(screen, ORANGE, (enemy_x - camera_x, enemy_y - camera_y, ENEMY_SIZE, ENEMY_SIZE))
+            if enemy in enemies:  # Check if the enemy is still in the list
+                enemy.move_towards_player(player_x, player_y, dt, current_room, player, enemies)
+                enemy_x, enemy_y = enemy.get_position()
+                if abs(enemy_x - player_x) < TILE_SIZE // 2 and abs(enemy_y - player_y) < TILE_SIZE // 2:
+                    if enemy in enemies:  # Double-check before removing
+                        enemies.remove(enemy)
+                else:
+                    # Draw enemy border
+                    pygame.draw.rect(screen, ORANGE, (enemy_x - camera_x, enemy_y - camera_y, ENEMY_SIZE, ENEMY_SIZE))
 
-                # Draw solid orange inside
-                pygame.draw.rect(screen, ORANGE, (enemy_x - camera_x + 2, enemy_y - camera_y + 2, ENEMY_SIZE - 4, ENEMY_SIZE - 4))
+                    # Draw solid orange inside
+                    pygame.draw.rect(screen, ORANGE, (enemy_x - camera_x + 2, enemy_y - camera_y + 2, ENEMY_SIZE - 4, ENEMY_SIZE - 4))
 
-                # Calculate damage ratio
-                damage_ratio = (enemy.max_health - enemy.health) / enemy.max_health
+                    # Calculate damage ratio
+                    damage_ratio = (enemy.max_health - enemy.health) / enemy.max_health
 
-                # Draw black rectangle proportional to damage taken
-                pygame.draw.rect(
-                    screen,
-                    BLACK,
-                    (
-                        enemy_x - camera_x + 2,
-                        enemy_y - camera_y + 2,
-                        ENEMY_SIZE - 4,
-                        (ENEMY_SIZE - 4) * damage_ratio  # Height increases as damage increases
+                    # Draw black rectangle proportional to damage taken
+                    pygame.draw.rect(
+                        screen,
+                        BLACK,
+                        (
+                            enemy_x - camera_x + 2,
+                            enemy_y - camera_y + 2,
+                            ENEMY_SIZE - 4,
+                            (ENEMY_SIZE - 4) * damage_ratio  # Height increases as damage increases
+                        )
                     )
-                )
 
         pygame.draw.rect(screen, RED, (SCREEN_WIDTH // 2 - PLAYER_SIZE // 2, SCREEN_HEIGHT // 2 - PLAYER_SIZE // 2, PLAYER_SIZE, PLAYER_SIZE))
 
@@ -203,6 +205,17 @@ while running:
         circle_position = (int(player_x - camera_x), int(player_y - camera_y))
         line_thickness = max(1, TILE_SIZE // 80)  # Ensure thickness is at least 1 pixel
         pygame.draw.circle(screen, BLUE, circle_position, circle_radius, line_thickness)
+
+        # Drawing the health bar
+        health_bar_width = 100
+        health_bar_height = 20
+        health_ratio = player.health / 5
+        pygame.draw.rect(screen, RED, (10, 10, health_bar_width, health_bar_height))  # Background
+        pygame.draw.rect(screen, GREEN, (10, 10, health_bar_width * health_ratio, health_bar_height))  # Current health
+
+        # After updating the player and enemies
+        if player.health <= 0:
+            running = False  # Exit the game loop
 
     else:
         menu.draw(screen)
