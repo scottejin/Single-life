@@ -1,7 +1,7 @@
 import pygame
 import time
 from enemy import Enemy
-from shielded_enemy import ShieldedEnemy
+from strong_enemy import StrongEnemy  # Updated import
 from settings import TILE_SIZE, ENEMY_SIZE, PURPLE, BLACK
 
 class EnemySpawner:
@@ -38,10 +38,10 @@ class EnemySpawner:
         if self.is_active and self.is_fully_within_blue_circle(player_x, player_y, radius):
             current_time = time.time()
             if not self.first_seen:
-                # Spawn a single ShieldedEnemy immediately
-                shielded_enemy = ShieldedEnemy(self.spawn_x, self.spawn_y)
-                enemies.append(shielded_enemy)
-                print(f"ShieldedEnemy spawned at ({self.spawn_x}, {self.spawn_y})")
+                # Spawn a single StrongEnemy immediately
+                strong_enemy = StrongEnemy(self.spawn_x, self.spawn_y)
+                enemies.append(strong_enemy)
+                print(f"StrongEnemy spawned at ({self.spawn_x}, {self.spawn_y})")
                 self.first_seen = True
                 self.last_spawn_time = current_time  # Start the 5-second timer
             else:

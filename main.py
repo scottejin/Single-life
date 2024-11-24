@@ -9,7 +9,7 @@ from bullet import Bullet
 from menu import Menu
 from main_menu import MainMenu
 from enemy import Enemy
-from shielded_enemy import ShieldedEnemy
+from strong_enemy import StrongEnemy  # Updated import
 from enemy_spawner import EnemySpawner
 from end_game import draw_end_game_screen, handle_end_game_events  # Import from end_game.py
 
@@ -109,9 +109,10 @@ while running:
                     mouse_x, mouse_y = pygame.mouse.get_pos()
                     direction = (mouse_x - SCREEN_WIDTH // 2, mouse_y - SCREEN_HEIGHT // 2)
                     direction_length = (direction[0]**2 + direction[1]**2)**0.5
-                    direction = (direction[0] / direction_length, direction[1] / direction_length)
-                    bullets.append(Bullet(player_x, player_y, direction, bullet_speed))
-                    last_shot_time = current_time
+                    if direction_length != 0:
+                        direction = (direction[0] / direction_length, direction[1] / direction_length)
+                        bullets.append(Bullet(player_x, player_y, direction, bullet_speed))
+                        last_shot_time = current_time
 
     if in_main_menu:
         main_menu.draw(screen)
@@ -188,7 +189,7 @@ while running:
                         print(f"Enemy at ({enemy_x}, {enemy_y}) collided with player.")
                 else:
                     # Draw enemy based on its type
-                    if isinstance(enemy, ShieldedEnemy):
+                    if isinstance(enemy, StrongEnemy):
                         enemy.draw(screen, camera_x, camera_y)
                     else:
                         # Draw enemy border
