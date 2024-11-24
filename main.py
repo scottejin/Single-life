@@ -172,7 +172,6 @@ while running:
             else:
                 pygame.draw.circle(screen, RED, (int(bullet_x - camera_x), int(bullet_y - camera_y)), 5)
 
-        # Update and draw enemies
         for spawner in spawners:
             spawner.update(enemies, player_x, player_y, circle_radius)
             spawner.draw(screen, camera_x, camera_y)
@@ -214,6 +213,9 @@ while running:
         health_ratio = player.health / 5
         pygame.draw.rect(screen, RED, (10, 10, health_bar_width, health_bar_height))  # Background
         pygame.draw.rect(screen, GREEN, (10, 10, health_bar_width * health_ratio, health_bar_height))  # Current health
+
+        # Draw the blue circle
+        pygame.draw.circle(screen, BLUE, (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2), circle_radius, 1)
 
         # After updating the player and enemies
         if player.health <= 0:
