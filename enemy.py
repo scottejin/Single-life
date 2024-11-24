@@ -38,6 +38,17 @@ class Enemy:
             if (int(self.x // TILE_SIZE), int(self.y // TILE_SIZE)) == next_tile:
                 self.path.pop(0)
 
+        # Fallback movement if pathfinding fails
+        else:
+            direction_x = player_x - self.x
+            direction_y = player_y - self.y
+            distance = (direction_x**2 + direction_y**2)**0.5
+            if distance > 0:
+                direction_x /= distance
+                direction_y /= distance
+                self.x += direction_x * self.speed * dt
+                self.y += direction_y * self.speed * dt
+
         # Check for collision with the player
         if abs(self.x - player_x) < TILE_SIZE // 2 and abs(self.y - player_y) < TILE_SIZE // 2:
             player.health -= 1  # Reduce player's health by 1
