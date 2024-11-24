@@ -1,5 +1,6 @@
 import pygame
 import time
+import random  # Ensure this is imported
 from enemy import Enemy
 from strong_enemy import StrongEnemy  # Updated import
 from settings import TILE_SIZE, ENEMY_SIZE, PURPLE, BLACK
@@ -15,7 +16,7 @@ class EnemySpawner:
         self.is_active = True
         self.width = int(ENEMY_SIZE * 1.5)
         self.height = int(ENEMY_SIZE * 1.5)
-        self.first_seen = False  # Flag to track if spawner is seen inside the blue radius for the first time
+        # Removed self.first_seen since it's no longer needed
 
     def is_fully_within_blue_circle(self, player_x, player_y, radius):
         """Check if all corners of the spawner are within the blue circle."""
@@ -37,20 +38,17 @@ class EnemySpawner:
         """Update spawner state and spawn enemies if within the blue circle."""
         if self.is_active and self.is_fully_within_blue_circle(player_x, player_y, radius):
             current_time = time.time()
-            if not self.first_seen:
-                # Spawn a single StrongEnemy immediately
-                strong_enemy = StrongEnemy(self.spawn_x, self.spawn_y)
-                enemies.append(strong_enemy)
-                print(f"StrongEnemy spawned at ({self.spawn_x}, {self.spawn_y})")
-                self.first_seen = True
-                self.last_spawn_time = current_time  # Start the 5-second timer
-            else:
-                # Spawn normal enemies every 5 seconds
-                if current_time - self.last_spawn_time >= self.spawn_interval:
+            if current_time - self.last_spawn_time >= self.spawn_interval:
+                # 10% chance to spawn StrongEnemy
+                if random.random() <= 0.10:
+                    new_enemy = StrongEnemy(self.spawn_x, self.spawn_y)
+                    print(f"StrongEnemy spawned at ({self.spawn_x}, {self.spawn_y})")
+                else:
                     new_enemy = Enemy(self.spawn_x, self.spawn_y)
-                    enemies.append(new_enemy)
                     print(f"Normal Enemy spawned at ({self.spawn_x}, {self.spawn_y})")
-                    self.last_spawn_time = current_time
+                
+                enemies.append(new_enemy)
+                self.last_spawn_time = current_time  # Reset the spawn timer
 
     def take_damage(self):
         """Handle spawner taking damage."""
