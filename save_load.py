@@ -9,8 +9,10 @@ SAVE_FOLDER = 'saves'
 if not os.path.exists(SAVE_FOLDER):
     os.makedirs(SAVE_FOLDER)
 
-def save_game(player_x, player_y, player, current_room_x, current_room_y, elapsed_time, xp_counter, seed):
-    game_state = {
+def save_game(player_x, player_y, player, current_room_x, current_room_y, elapsed_time, xp_counter, seed, slot):
+    if not os.path.exists(SAVE_FOLDER):
+        os.makedirs(SAVE_FOLDER)
+    save_data = {
         'player_x': player_x,
         'player_y': player_y,
         'player_health': player.health,
@@ -21,17 +23,25 @@ def save_game(player_x, player_y, player, current_room_x, current_room_y, elapse
         'seed': seed,
         # ...other game state data...
     }
-    save_file = os.path.join(SAVE_FOLDER, 'savegame.json')
+    save_file = os.path.join(SAVE_FOLDER, f'save_slot_{slot}.json')
     with open(save_file, 'w') as f:
-        json.dump(game_state, f)
+        json.dump(save_data, f)
 
-def load_game():
-    save_file = os.path.join(SAVE_FOLDER, 'savegame.json')
-    if not os.path.exists(save_file):
-        return None  # Indicate that there's no save file
-    with open(save_file, 'r') as f:
-        game_state = json.load(f)
-    return game_state
+def load_game(slot):
+    save_file = os.path.join(SAVE_FOLDER, f'save_slot_{slot}.json')
+    if os.path.exists(save_file):
+        with open(save_file, 'r') as f:
+            save_data = json.load(f)
+        return save_data
+    else:
+        return None
+
+def get_available_saves():
+    available_saves = {}
+    for slot in range(1, 4):  # Assuming 3 slots
+        save_file = os.path.join(SAVE_FOLDER, f'save_slot_{slot}.json')
+        available_saves[slot] = os.path.exists(save_file)
+    return available_saves
 
 def show_no_saves_screen(screen):
     no_saves_screen = True

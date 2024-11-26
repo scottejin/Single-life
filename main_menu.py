@@ -1,5 +1,6 @@
 import pygame
 from settings import SCREEN_WIDTH, SCREEN_HEIGHT, WHITE, BLACK, RED
+from save_load import get_available_saves
 
 class MainMenu:
     def __init__(self):
@@ -21,6 +22,45 @@ class MainMenu:
                 if button.rect.collidepoint(mouse_pos):
                     return button.text
         return None
+
+    def select_save_slot(self, screen, title):
+        available_saves = get_available_saves()
+        running = True
+        selected_slot = None
+
+        font = pygame.font.SysFont(None, 36)
+        while running:
+            screen.fill((0, 0, 0))
+            title_text = font.render(title, True, (255, 255, 255))
+            screen.blit(title_text, (screen.get_width() // 2 - title_text.get_width() // 2, 50))
+
+            slot_rects = []
+            for i in range(3):  # Assuming 3 slots
+                slot_num = i + 1
+                slot_status = "Occupied" if available_saves[slot_num] else "Empty"
+                slot_text = f"Slot {slot_num}: {slot_status}"
+                text_surface = font.render(slot_text, True, (255, 255, 255))
+                slot_rect = text_surface.get_rect(center=(screen.get_width() // 2, 150 + i * 50))
+                screen.blit(text_surface, slot_rect)
+                slot_rects.append((slot_rect, slot_num))
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                    return None
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    mouse_x, mouse_y = pygame.mouse.get_pos()
+                    for slot_rect, slot_num in slot_rects:
+                        if slot_rect.collidepoint(mouse_x, mouse_y):
+                            selected_slot = slot_num
+                            running = False
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        running = False
+                        return None
+
+            pygame.display.flip()
+        return selected_slot
 
 class Button:
     def __init__(self, text, position):

@@ -15,7 +15,7 @@ from strong_enemy import StrongEnemy  # Updated import
 from enemy_spawner import EnemySpawner
 from end_game import draw_end_game_screen, handle_end_game_events  # Import from end_game.py
 from xp_orb import XPOrb  # Ensure XPOrb is imported
-from save_load import save_game, load_game, show_no_saves_screen
+from save_load import save_game, load_game, show_no_saves_screen, get_available_saves  # Updated import
 
 pygame.init()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SCALED | pygame.DOUBLEBUF)
@@ -40,6 +40,8 @@ start_time = time.time()
 elapsed_time = 0
 xp_counter = 0    # XP collected
 
+selected_slot = None  # Holds the slot selected by the player
+
 # Define circle_radius before the game loop
 circle_radius = 6 * TILE_SIZE
 
@@ -60,7 +62,7 @@ if not os.path.exists(SAVE_FOLDER):
 available_saves = os.listdir(SAVE_FOLDER)
 
 def restart_game(seed):
-    global dungeon_rooms, bullets, player, player_x, player_y, current_room_x, current_room_y, enemies, spawners, start_time, elapsed_time, xp_orbs, xp_counter
+    global dungeon_rooms, bullets, player, player_x, player_y, current_room_x, current_room_y, enemies, spawners, start_time, elapsed_time, xp_orbs, xp_counter, selected_slot
     random.seed(seed)
     dungeon_rooms = {}
     bullets = []
@@ -75,6 +77,7 @@ def restart_game(seed):
     start_time = time.time()
     elapsed_time = 0
     xp_counter = 0
+    selected_slot = None  # Reset selected slot
 
 clock = pygame.time.Clock()
 running = True
@@ -88,29 +91,37 @@ while running:
         elif in_main_menu:
             action = main_menu.handle_event(event)
             if action == "New Game":
-                restart_game(seed)
-                in_main_menu = False
-                start_time = time.time()
-                elapsed_time = 0
-            elif action == "Load Game":
-                game_state = load_game()
-                if game_state:
-                    # Load the game state
-                    player_x = game_state['player_x']
-                    player_y = game_state['player_y']
-                    player = Player(player_x, player_y, player_speed)
-                    player.health = game_state['player_health']
-                    current_room_x = game_state['current_room_x']
-                    current_room_y = game_state['current_room_y']
-                    elapsed_time = game_state['elapsed_time']
-                    xp_counter = game_state['xp_counter']
-                    seed = game_state['seed']
-                    # ...load other game state data...
+                selected_slot = main_menu.select_save_slot(screen, "Select Slot to Save New Game")
+                if selected_slot is not None:
+                    restart_game(seed)
                     in_main_menu = False
-                    start_time = time.time() - elapsed_time
+                    start_time = time.time()
+                    elapsed_time = 0
                 else:
-                    show_no_saves_screen(screen)
-                    in_main_menu = True  # Return to main menu after showing the message
+                    in_main_menu = True  # Return to main menu if no slot selected
+            elif action == "Load Game":
+                selected_slot = main_menu.select_save_slot(screen, "Select Slot to Load Game")
+                if selected_slot is not None:
+                    game_state = load_game(selected_slot)
+                    if game_state:
+                        # Load the game state
+                        player_x = game_state['player_x']
+                        player_y = game_state['player_y']
+                        player = Player(player_x, player_y, player_speed)
+                        player.health = game_state['player_health']
+                        current_room_x = game_state['current_room_x']
+                        current_room_y = game_state['current_room_y']
+                        elapsed_time = game_state['elapsed_time']
+                        xp_counter = game_state['xp_counter']
+                        seed = game_state['seed']
+                        # ...load other game state data...
+                        in_main_menu = False
+                        start_time = time.time() - elapsed_time
+                    else:
+                        show_no_saves_screen(screen)
+                        in_main_menu = True  # Return to main menu after showing the message
+                else:
+                    in_main_menu = True  # Return to main menu if no slot selected
             elif action == "Exit":
                 running = False
         elif in_end_game:
@@ -133,9 +144,14 @@ while running:
             if action == "Resume":
                 is_paused = False
             elif action == "Save and Exit":
-                save_game(player_x, player_y, player, current_room_x, current_room_y, elapsed_time, xp_counter, seed)
-                in_main_menu = True
-                is_paused = False
+                if selected_slot is None:
+                    selected_slot = main_menu.select_save_slot(screen, "Select Slot to Save Game")
+                if selected_slot is not None:
+                    save_game(player_x, player_y, player, current_room_x, current_room_y, elapsed_time, xp_counter, seed, selected_slot)
+                    in_main_menu = True
+                    is_paused = False
+                else:
+                    is_paused = False  # Return to game if no slot selected
 
     if in_main_menu:
         main_menu.draw(screen)
