@@ -5,11 +5,11 @@ from settings import TILE_SIZE, ORANGE, BLACK, DARK_ORANGE
 from xp_orb import XPOrb  # Ensure XPOrb is imported
 
 class StrongEnemy(Enemy):
-    def __init__(self, x, y, health=10, max_health=10, strength=2, speed=50):
-        super().__init__(x, y, health, max_health, speed)
-        self.strength = strength
-        self.max_health = 5  # Set base health to 5
-        self.health = self.max_health
+    def __init__(self, x, y, speed):
+        super().__init__(x, y, speed)
+        self.health = 2  # Set default health to 2
+        self.max_health = 2  # Set max_health to 2
+        self.strength = 2
         self.speed = 50  # Pixels per second
         self.path = []
 

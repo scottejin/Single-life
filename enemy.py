@@ -4,7 +4,7 @@ from settings import TILE_SIZE
 from xp_orb import XPOrb  # Ensure XPOrb is imported
 
 class Enemy:
-    def __init__(self, x, y, max_health=10, health=None, speed=50):
+    def __init__(self, x, y, max_health=2, health=2, speed=50):
         self.x = x
         self.y = y
         self.max_health = max_health

@@ -60,7 +60,7 @@ class EnemySpawner:
             new_enemy = StrongEnemy(self.spawn_x, self.spawn_y, health=10, max_health=10, strength=2)
             print(f"StrongEnemy spawned at ({self.spawn_x}, {self.spawn_y})")
         else:
-            new_enemy = Enemy(self.spawn_x, self.spawn_y, health=5, max_health=5)
+            new_enemy = Enemy(self.spawn_x, self.spawn_y, health=2, max_health=2)
             print(f"Normal Enemy spawned at ({self.spawn_x}, {self.spawn_y})")
         enemies.append(new_enemy)
         # Removed self.current_enemy to allow multiple enemies
