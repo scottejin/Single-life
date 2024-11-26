@@ -2,6 +2,8 @@ import pygame
 import sys
 import random
 import time
+import os
+import json
 from settings import SCREEN_WIDTH, SCREEN_HEIGHT, TILE_SIZE, PLAYER_SIZE, ENEMY_SIZE, WHITE, GREEN, RED, GRAY, BLACK, PURPLE, BLUE, ORANGE, MAP_WIDTH, MAP_HEIGHT, TARGET_FPS, player_speed, DARK_ORANGE
 from map import load_room_at, find_walkable_tile
 from player import Player
@@ -48,6 +50,48 @@ initial_room = load_room_at(current_room_x, current_room_y, dungeon_rooms, enemi
 player_x, player_y = find_walkable_tile(initial_room)
 player = Player(player_x, player_y, player_speed)
 
+# Define where to save the game files
+SAVE_FOLDER = 'saves'
+
+# Ensure the save folder exists and cache available saves
+if not os.path.exists(SAVE_FOLDER):
+    os.makedirs(SAVE_FOLDER)
+available_saves = os.listdir(SAVE_FOLDER)
+
+def save_game():
+    # Save the game state to a file
+    game_state = {
+        'player_x': player_x,
+        'player_y': player_y,
+        'player_health': player.health,
+        'current_room_x': current_room_x,
+        'current_room_y': current_room_y,
+        'elapsed_time': elapsed_time,
+        'xp_counter': xp_counter,
+        'seed': seed,
+        # Add other game state data as needed
+    }
+    save_file = os.path.join(SAVE_FOLDER, 'savegame.json')
+    with open(save_file, 'w') as f:
+        json.dump(game_state, f)
+
+def load_game():
+    # Load the game state from a file
+    global player_x, player_y, player, current_room_x, current_room_y, elapsed_time, xp_counter, seed
+    save_file = os.path.join(SAVE_FOLDER, 'savegame.json')
+    with open(save_file, 'r') as f:
+        game_state = json.load(f)
+    player_x = game_state['player_x']
+    player_y = game_state['player_y']
+    player = Player(player_x, player_y, player_speed)
+    player.health = game_state['player_health']
+    current_room_x = game_state['current_room_x']
+    current_room_y = game_state['current_room_y']
+    elapsed_time = game_state['elapsed_time']
+    xp_counter = game_state['xp_counter']
+    seed = game_state['seed']
+    # Load other game state data as needed
+
 def restart_game(seed):
     global dungeon_rooms, bullets, player, player_x, player_y, current_room_x, current_room_y, enemies, spawners, start_time, elapsed_time, xp_orbs, xp_counter
     random.seed(seed)
@@ -76,7 +120,18 @@ while running:
             running = False
         elif in_main_menu:
             action = main_menu.handle_event(event)
-            if action == "Start Game":
+            if action == "New Game":
+                restart_game(seed)
+                in_main_menu = False
+                start_time = time.time()
+                elapsed_time = 0
+            elif action == "Load Game":
+                load_game()
+                in_main_menu = False
+                start_time = time.time() - elapsed_time  # Continue from saved time
+            elif action == "Exit":
+                running = False
+            elif action == "Start Game":
                 in_main_menu = False
                 start_time = time.time()
                 elapsed_time = 0
@@ -98,7 +153,11 @@ while running:
                 is_paused = not is_paused
             elif is_paused:
                 action = menu.handle_event(event)
-                if action == "Restart":
+                if action == "Save and Exit":
+                    save_game()
+                    in_main_menu = True
+                    is_paused = False
+                elif action == "Restart":
                     restart_game(seed)
                     is_paused = False
                 elif action == "Exit":
@@ -245,6 +304,7 @@ while running:
 
         # After updating the player and enemies
         if player.health <= 0:
+            save_game()  # Optionally save game state
             in_end_game = True  # Enter the end game state
             print("Player has died. Entering end game state.")
 
