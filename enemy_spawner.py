@@ -18,6 +18,7 @@ class EnemySpawner:
         self.width = int(ENEMY_SIZE * 1.5)
         self.height = int(ENEMY_SIZE * 1.5)
         self.has_spawned_in_circle = False  # Add this line
+        # Removed self.current_enemy to allow multiple active enemies
         # Removed self.first_seen since it's no longer needed
 
     def is_fully_within_blue_circle(self, player_x, player_y, radius):
@@ -39,6 +40,10 @@ class EnemySpawner:
     def update(self, enemies, player_x, player_y, radius):
         """Update spawner state and spawn enemies if within the blue circle."""
         if self.is_active and self.is_fully_within_blue_circle(player_x, player_y, radius):
+            # Remove the current_enemy check
+            # if self.current_enemy not in enemies:
+                # self.current_enemy = None
+
             if not self.has_spawned_in_circle:
                 # Instant spawn when first entering the blue circle
                 self.spawn_enemy(enemies)
@@ -58,6 +63,7 @@ class EnemySpawner:
             new_enemy = Enemy(self.spawn_x, self.spawn_y)
             print(f"Normal Enemy spawned at ({self.spawn_x}, {self.spawn_y})")
         enemies.append(new_enemy)
+        # Removed self.current_enemy to allow multiple enemies
 
     def take_damage(self, xp_orbs):
         """Handle spawner taking damage."""
