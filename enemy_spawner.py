@@ -17,6 +17,7 @@ class EnemySpawner:
         self.is_active = True
         self.width = int(ENEMY_SIZE * 1.5)
         self.height = int(ENEMY_SIZE * 1.5)
+        self.has_spawned_in_circle = False  # Add this line
         # Removed self.first_seen since it's no longer needed
 
     def is_fully_within_blue_circle(self, player_x, player_y, radius):
@@ -38,18 +39,25 @@ class EnemySpawner:
     def update(self, enemies, player_x, player_y, radius):
         """Update spawner state and spawn enemies if within the blue circle."""
         if self.is_active and self.is_fully_within_blue_circle(player_x, player_y, radius):
+            if not self.has_spawned_in_circle:
+                # Instant spawn when first entering the blue circle
+                self.spawn_enemy(enemies)
+                self.has_spawned_in_circle = True
+
             current_time = time.time()
             if current_time - self.last_spawn_time >= self.spawn_interval:
-                # 10% chance to spawn StrongEnemy
-                if random.random() <= 0.10:
-                    new_enemy = StrongEnemy(self.spawn_x, self.spawn_y)
-                    print(f"StrongEnemy spawned at ({self.spawn_x}, {self.spawn_y})")
-                else:
-                    new_enemy = Enemy(self.spawn_x, self.spawn_y)
-                    print(f"Normal Enemy spawned at ({self.spawn_x}, {self.spawn_y})")
-                
-                enemies.append(new_enemy)
+                self.spawn_enemy(enemies)
                 self.last_spawn_time = current_time  # Reset the spawn timer
+
+    def spawn_enemy(self, enemies):
+        """Spawn an enemy with a 10% chance of being a StrongEnemy."""
+        if random.random() <= 0.10:
+            new_enemy = StrongEnemy(self.spawn_x, self.spawn_y)
+            print(f"StrongEnemy spawned at ({self.spawn_x}, {self.spawn_y})")
+        else:
+            new_enemy = Enemy(self.spawn_x, self.spawn_y)
+            print(f"Normal Enemy spawned at ({self.spawn_x}, {self.spawn_y})")
+        enemies.append(new_enemy)
 
     def take_damage(self, xp_orbs):
         """Handle spawner taking damage."""
