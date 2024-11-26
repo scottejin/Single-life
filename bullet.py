@@ -1,12 +1,12 @@
 from settings import TILE_SIZE
 
 class Bullet:
-    def __init__(self, x, y, direction, speed):
+    def __init__(self, x, y, direction, speed, is_broken=False):
         self.x = x
         self.y = y
         self.direction = direction
         self.speed = speed
-        self.is_broken = False
+        self.is_broken = is_broken
 
     def move(self, dt):
         if not self.is_broken:
@@ -39,4 +39,22 @@ class Bullet:
 
     def break_bullet(self):
         self.is_broken = True
-        self.is_broken = True
+
+    def to_dict(self):
+        return {
+            'x': self.x,
+            'y': self.y,
+            'direction': self.direction,
+            'speed': self.speed,
+            'is_broken': self.is_broken,
+        }
+
+    @staticmethod
+    def from_dict(data):
+        return Bullet(
+            x=data['x'],
+            y=data['y'],
+            direction=tuple(data['direction']),
+            speed=data['speed'],
+            is_broken=data['is_broken']
+        )

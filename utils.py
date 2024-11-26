@@ -1,4 +1,5 @@
 from settings import TILE_SIZE
+import pygame
 
 def count_white_spaces(dungeon_map, x, y):
     white_spaces = 0
@@ -16,3 +17,31 @@ def is_walkable(x, y, dungeon_map):
     if map_x < 0 or map_x >= len(dungeon_map[0]) or map_y < 0 or map_y >= len(dungeon_map):
         return False
     return dungeon_map[map_y][map_x] == 0
+
+def render_wrapped_text(text, font, color, surface, x, y, max_width):
+    """
+    Renders text onto a surface with dynamic wrapping based on max_width.
+
+    :param text: The text string to render.
+    :param font: Pygame font object.
+    :param color: Color of the text.
+    :param surface: Pygame surface to render the text on.
+    :param x: x-coordinate for text rendering.
+    :param y: y-coordinate for text rendering.
+    :param max_width: Maximum width in pixels before wrapping text.
+    """
+    words = text.split(' ')
+    lines = []
+    current_line = ""
+    for word in words:
+        test_line = f"{current_line} {word}".strip()
+        if font.size(test_line)[0] <= max_width:
+            current_line = test_line
+        else:
+            lines.append(current_line)
+            current_line = word
+    lines.append(current_line)
+
+    for idx, line in enumerate(lines):
+        rendered_text = font.render(line, True, color)
+        surface.blit(rendered_text, (x, y + idx * (font.get_height() + 5)))

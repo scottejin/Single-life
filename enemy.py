@@ -4,12 +4,12 @@ from settings import TILE_SIZE
 from xp_orb import XPOrb  # Ensure XPOrb is imported
 
 class Enemy:
-    def __init__(self, x, y):
+    def __init__(self, x, y, max_health=2, health=2, speed=50):
         self.x = x
         self.y = y
-        self.max_health = 2  # Set maximum health
-        self.health = self.max_health
-        self.speed = 50  # Pixels per second
+        self.max_health = max_health
+        self.health = health if health is not None else max_health
+        self.speed = speed  # Pixels per second
         self.path = []
 
     def get_position(self):
@@ -64,3 +64,50 @@ class Enemy:
 
     def get_collision_radius(self):
         return TILE_SIZE // 2  # Default collision radius for Enemy
+
+    def to_dict(self):
+        return {
+            'type': 'Enemy',
+            'x': self.x,
+            'y': self.y,
+            'health': self.health,
+            'max_health': self.max_health,
+            'speed': self.speed,
+            # ...other attributes...
+        }
+
+    @staticmethod
+    def from_dict(data):
+        return Enemy(
+            x=data['x'],
+            y=data['y'],
+            health=data['health'],
+            max_health=data['max_health'],
+            speed=data['speed'],
+            # ...other attributes...
+        )
+
+class StrongEnemy(Enemy):
+    def __init__(self, x, y, max_health=20, health=None, strength=2, speed=50):
+        super().__init__(x=x, y=y, max_health=max_health, health=health, speed=speed)
+        self.strength = strength
+        # ...other attributes...
+
+    def to_dict(self):
+        data = super().to_dict()
+        data['type'] = 'StrongEnemy'
+        data['strength'] = self.strength
+        # ...other attributes...
+        return data
+
+    @staticmethod
+    def from_dict(data):
+        return StrongEnemy(
+            x=data['x'],
+            y=data['y'],
+            health=data['health'],
+            max_health=data['max_health'],
+            strength=data.get('strength', 2),
+            speed=data.get('speed', 50),
+            # ...other attributes...
+        )
