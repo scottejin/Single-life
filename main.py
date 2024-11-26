@@ -76,9 +76,11 @@ def save_game():
         json.dump(game_state, f)
 
 def load_game():
-    # Load the game state from a file
-    global player_x, player_y, player, current_room_x, current_room_y, elapsed_time, xp_counter, seed
+    global player_x, player_y, player, current_room_x, current_room_y, elapsed_time, xp_counter, seed, in_main_menu, running
     save_file = os.path.join(SAVE_FOLDER, 'savegame.json')
+    if not os.path.exists(save_file):
+        show_no_saves_screen()
+        return
     with open(save_file, 'r') as f:
         game_state = json.load(f)
     player_x = game_state['player_x']
@@ -91,6 +93,33 @@ def load_game():
     xp_counter = game_state['xp_counter']
     seed = game_state['seed']
     # Load other game state data as needed
+
+def show_no_saves_screen():
+    global running, in_main_menu
+    no_saves_screen = True
+    font = pygame.font.SysFont(None, 50)
+    arrow_font = pygame.font.SysFont(None, 36)
+    while no_saves_screen:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+                no_saves_screen = False
+            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                mouse_pos = pygame.mouse.get_pos()
+                # Check if the return arrow is clicked
+                if return_arrow_rect.collidepoint(mouse_pos):
+                    no_saves_screen = False  # Return to main menu
+                    in_main_menu = True
+        screen.fill(BLACK)
+        text = font.render("[No saves]", True, WHITE)
+        text_rect = text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
+        screen.blit(text, text_rect)
+        # Draw return arrow at top-left corner
+        arrow_text = arrow_font.render("←", True, WHITE)
+        return_arrow_rect = arrow_text.get_rect(topleft=(10, 10))
+        screen.blit(arrow_text, return_arrow_rect)
+        pygame.display.flip()
+    # After exiting the no saves screen, back to main menu
 
 def restart_game(seed):
     global dungeon_rooms, bullets, player, player_x, player_y, current_room_x, current_room_y, enemies, spawners, start_time, elapsed_time, xp_orbs, xp_counter
@@ -153,7 +182,9 @@ while running:
                 is_paused = not is_paused
             elif is_paused:
                 action = menu.handle_event(event)
-                if action == "Save and Exit":
+                if action == "Resume":
+                    is_paused = False
+                elif action == "Save and Exit":
                     save_game()
                     in_main_menu = True
                     is_paused = False
@@ -162,10 +193,6 @@ while running:
                     is_paused = False
                 elif action == "Exit":
                     in_main_menu = True
-                    is_paused = False
-                elif action == "Seed":
-                    seed = menu.seed
-                    restart_game(seed)
                     is_paused = False
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 current_time = time.time()
