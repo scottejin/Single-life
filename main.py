@@ -30,7 +30,7 @@ enemies = []
 spawners = []
 xp_orbs = []      # List to hold XP orbs
 last_shot_time = 0
-bullet_speed = 300  # Pdixels per second
+bullet_speed = 300  # Pixels per second
 menu = Menu(seed)
 main_menu = MainMenu()
 is_paused = False
@@ -58,6 +58,23 @@ SAVE_FOLDER = 'saves'
 if not os.path.exists(SAVE_FOLDER):
     os.makedirs(SAVE_FOLDER)
 available_saves = os.listdir(SAVE_FOLDER)
+
+def restart_game(seed):
+    global dungeon_rooms, bullets, player, player_x, player_y, current_room_x, current_room_y, enemies, spawners, start_time, elapsed_time, xp_orbs, xp_counter
+    random.seed(seed)
+    dungeon_rooms = {}
+    bullets = []
+    enemies = []
+    spawners = []
+    xp_orbs = []
+    current_room_x, current_room_y = 0, 0
+
+    initial_room = load_room_at(0, 0, dungeon_rooms, enemies, spawners)
+    player_x, player_y = find_walkable_tile(initial_room)
+    player = Player(player_x, player_y, player_speed)
+    start_time = time.time()
+    elapsed_time = 0
+    xp_counter = 0
 
 clock = pygame.time.Clock()
 running = True
@@ -96,40 +113,11 @@ while running:
                     in_main_menu = True  # Return to main menu after showing the message
             elif action == "Exit":
                 running = False
-            elif action == "Start Game":
-                in_main_menu = False
-                start_time = time.time()
-                elapsed_time = 0
-            elif action == "Options":
-                # Handle options menu
-                pass
-            elif action == "Instructions":
-                # Handle instructions screen
-                pass
-            elif action == "Credits":
-                # Handle credits screen
-                pass
-            elif action == "Exit":
-                running = False
         elif in_end_game:
             in_end_game, in_main_menu = handle_end_game_events(event, in_end_game, in_main_menu)
         elif not is_paused:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                is_paused = not is_paused
-            elif is_paused:
-                action = menu.handle_event(event)
-                if action == "Resume":
-                    is_paused = False
-                elif action == "Save and Exit":
-                    save_game(player_x, player_y, player, current_room_x, current_room_y, elapsed_time, xp_counter, seed)
-                    in_main_menu = True
-                    is_paused = False
-                elif action == "Restart":
-                    restart_game(seed)
-                    is_paused = False
-                elif action == "Exit":
-                    in_main_menu = True
-                    is_paused = False
+                is_paused = True
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 current_time = time.time()
                 if current_time - last_shot_time >= 0.5:  # Limit to 2 bullets per second
@@ -140,6 +128,14 @@ while running:
                         direction = (direction[0] / direction_length, direction[1] / direction_length)
                         bullets.append(Bullet(player_x, player_y, direction, bullet_speed))
                         last_shot_time = current_time
+        elif is_paused:
+            action = menu.handle_event(event)
+            if action == "Resume":
+                is_paused = False
+            elif action == "Save and Exit":
+                save_game(player_x, player_y, player, current_room_x, current_room_y, elapsed_time, xp_counter, seed)
+                in_main_menu = True
+                is_paused = False
 
     if in_main_menu:
         main_menu.draw(screen)
@@ -267,7 +263,7 @@ while running:
 
         # After updating the player and enemies
         if player.health <= 0:
-            save_game()  # Optionally save game state
+            save_game(player_x, player_y, player, current_room_x, current_room_y, elapsed_time, xp_counter, seed)  # Optionally save game state
             in_end_game = True  # Enter the end game state
             print("Player has died. Entering end game state.")
 
@@ -275,9 +271,6 @@ while running:
         menu.draw(screen)
 
     pygame.display.flip()
-
-pygame.quit()
-sys.exit()
 
 pygame.quit()
 sys.exit()
