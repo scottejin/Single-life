@@ -88,7 +88,7 @@ class Enemy:
         )
 
 class StrongEnemy(Enemy):
-    def __init__(self, x, y, health, max_health, strength, speed=50):
+    def __init__(self, x, y, health=10, max_health=10, strength=2, speed=50):
         super().__init__(x, y, health, max_health, speed)
         self.strength = strength
         # ...other attributes...
@@ -107,7 +107,7 @@ class StrongEnemy(Enemy):
             y=data['y'],
             health=data['health'],
             max_health=data['max_health'],
-            strength=data['strength'],
-            speed=data['speed'],
+            strength=data.get('strength', 2),
+            speed=data.get('speed', 50),
             # ...other attributes...
         )

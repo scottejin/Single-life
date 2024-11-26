@@ -111,10 +111,17 @@ def show_no_saves_screen(screen):
         pygame.display.flip()
 
 def delete_save_slot(slot):
-    """Deletes the specified save slot."""
+    """Deletes the specified save slot with robust error handling."""
     save_file = os.path.join(SAVE_FOLDER, f'save_slot_{slot}.json')
-    if os.path.exists(save_file):
-        os.remove(save_file)
-        print(f"Save slot {slot} has been deleted.")
-    else:
-        print(f"Save slot {slot} does not exist.")
+    try:
+        if os.path.exists(save_file):
+            os.remove(save_file)
+            print(f"Save slot {slot} has been deleted.")
+        else:
+            print(f"Save slot {slot} does not exist.")
+    except PermissionError:
+        print(f"Permission denied: Cannot delete save slot {slot}.")
+        # Optionally, notify the user through the UI
+    except Exception as e:
+        print(f"An error occurred while deleting save slot {slot}: {e}")
+        # Optionally, notify the user through the UI
