@@ -22,6 +22,15 @@ pygame.mixer.init()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SCALED | pygame.DOUBLEBUF)
 pygame.display.set_caption("Endless Dungeon Explorer")
 
+bullet_sound = None
+try:
+    sound_file = os.path.join('sounds', 'gun.wav')
+    if os.path.exists(sound_file):
+        bullet_sound = pygame.mixer.Sound(sound_file)
+        bullet_sound.set_volume(0.3)
+except (pygame.error, FileNotFoundError) as e:
+    print(f"Warning: Could not load bullet sound: {e}")
+
 seed = str(random.randint(0, 1000000))
 random.seed(seed)
 
@@ -150,6 +159,8 @@ while running:
                         direction = (direction[0] / direction_length, direction[1] / direction_length)
                         new_bullet = Bullet(player_x, player_y, direction, bullet_speed)
                         bullets.append(new_bullet)
+                        if bullet_sound:
+                            bullet_sound.play()
                         last_shot_time = current_time
         elif is_paused:
             action = menu.handle_event(event)
