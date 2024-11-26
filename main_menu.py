@@ -53,7 +53,7 @@ class MainMenu:
                 slot_rects.append((slot_rect, slot_num, slot_status))
 
             if confirmation and self.confirmation_dialog:
-                self.confirmation_dialog.draw(screen)
+                self.confirmation_dialog.draw()  # Changed: removed 'screen' argument
             else:
                 self.confirmation_dialog = None  # Reset if not in confirmation
 

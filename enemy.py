@@ -4,11 +4,11 @@ from settings import TILE_SIZE
 from xp_orb import XPOrb  # Ensure XPOrb is imported
 
 class Enemy:
-    def __init__(self, x, y, health, max_health, speed=50):
+    def __init__(self, x, y, max_health=10, health=None, speed=50):
         self.x = x
         self.y = y
-        self.health = health
         self.max_health = max_health
+        self.health = health if health is not None else max_health
         self.speed = speed  # Pixels per second
         self.path = []
 
@@ -88,8 +88,8 @@ class Enemy:
         )
 
 class StrongEnemy(Enemy):
-    def __init__(self, x, y, health=10, max_health=10, strength=2, speed=50):
-        super().__init__(x, y, health, max_health, speed)
+    def __init__(self, x, y, max_health=20, health=None, strength=2, speed=50):
+        super().__init__(x=x, y=y, max_health=max_health, health=health, speed=speed)
         self.strength = strength
         # ...other attributes...
 

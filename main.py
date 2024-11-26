@@ -72,6 +72,8 @@ def restart_game(seed):
     current_room_x, current_room_y = 0, 0
 
     initial_room = load_room_at(0, 0, dungeon_rooms, enemies, spawners)
+    for enemy in enemies:
+        enemy.health = 2  # Set enemy health to 2
     player_x, player_y = find_walkable_tile(initial_room)
     player = Player(player_x, player_y, player_speed)
     start_time = time.time()
@@ -114,6 +116,8 @@ while running:
                         seed = game_state['seed']
                         dungeon_rooms = game_state['dungeon_rooms']
                         enemies = game_state['enemies']
+                        for enemy in enemies:
+                            enemy.health = 2  # Set enemy health to 2
                         spawners = game_state['spawners']
                         bullets = game_state['bullets']
                         xp_orbs = game_state['xp_orbs']
