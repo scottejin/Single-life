@@ -18,7 +18,7 @@ class StrongEnemy(Enemy):
         print(f"StrongEnemy at ({self.x}, {self.y}) took damage! Remaining health: {self.health}")
         return self.health <= 0  # Return True if the enemy is dead
 
-    def die(self):
+    def die(self, xp_orbs):
         # ...existing death logic...
         xp_orb = XPOrb(self.x, self.y)  # Create an XP orb at enemy's position
         xp_orbs.append(xp_orb)  # Add XP orb to the global list

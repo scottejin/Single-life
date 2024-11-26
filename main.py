@@ -171,7 +171,7 @@ while running:
         for bullet in bullets[:]:
             if not bullet.is_broken:
                 bullet.move(dt)
-                if bullet.check_collision(current_room, enemies, spawners):
+                if bullet.check_collision(current_room, enemies, spawners, xp_orbs):
                     bullet.break_bullet()
             bullet_x, bullet_y = bullet.get_position()
             if bullet.is_broken:
@@ -238,10 +238,10 @@ while running:
         for xp_orb in xp_orbs:
             xp_orb.draw(screen, camera_x, camera_y)
 
-        # Draw XP counter in top-left corner
-        font = pygame.font.SysFont(None, 36)
+        # Draw XP counter below the health bar
+        font = pygame.font.SysFont(None, 24)
         xp_text = font.render(f"XP: {xp_counter}", True, (255, 255, 255))
-        screen.blit(xp_text, (10, 10))
+        screen.blit(xp_text, (10, 10 + health_bar_height + 5))
 
         # After updating the player and enemies
         if player.health <= 0:
@@ -252,6 +252,9 @@ while running:
         menu.draw(screen)
 
     pygame.display.flip()
+
+pygame.quit()
+sys.exit()
 
 pygame.quit()
 sys.exit()

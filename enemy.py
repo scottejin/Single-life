@@ -58,7 +58,7 @@ class Enemy:
             enemies.remove(self)  # Remove enemy from the list
             print(f"Enemy collided with player! Player health: {player.health}")
 
-    def die(self):
+    def die(self, xp_orbs):
         # ...existing death logic...
         xp_orb = XPOrb(self.x, self.y)  # Create an XP orb at enemy's position
         xp_orbs.append(xp_orb)  # Add XP orb to the global list

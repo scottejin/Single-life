@@ -51,7 +51,7 @@ class EnemySpawner:
                 enemies.append(new_enemy)
                 self.last_spawn_time = current_time  # Reset the spawn timer
 
-    def take_damage(self):
+    def take_damage(self, xp_orbs):
         """Handle spawner taking damage."""
         if self.is_active:
             self.health -= 1
@@ -62,7 +62,7 @@ class EnemySpawner:
                 # Drop 5 XP orbs, 1.5 times the normal size
                 for _ in range(5):
                     xp_orb = XPOrb(self.spawn_x, self.spawn_y, size=int(10 * 1.5))
-                    xp_orbs.append(xp_orb)  # Add XP orb to the global list
+                    xp_orbs.append(xp_orb)
 
     def draw(self, screen, camera_x, camera_y):
         """Draw the spawner and its health bar."""
