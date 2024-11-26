@@ -190,7 +190,7 @@ while running:
                 enemy_x, enemy_y = enemy.get_position()
                 if abs(enemy_x - player_x) < TILE_SIZE // 2 and abs(enemy_y - player_y) < TILE_SIZE // 2:
                     if enemy in enemies:  # Double-check before removing
-                        enemies.remove(enemy)
+                        enemies.remove(enemy)  # Remove enemy here
                         print(f"Enemy at ({enemy_x}, {enemy_y}) collided with player.")
                 else:
                     # Draw enemy based on its type
@@ -220,7 +220,7 @@ while running:
 
         for xp_orb in xp_orbs[:]:
             if xp_orb.update(player.rect):
-                xp_counter += 1
+                xp_counter += 1  # Increment XP by 1 per orb collected
                 xp_orbs.remove(xp_orb)
 
         pygame.draw.rect(screen, RED, (SCREEN_WIDTH // 2 - PLAYER_SIZE // 2, SCREEN_HEIGHT // 2 - PLAYER_SIZE // 2, PLAYER_SIZE, PLAYER_SIZE))

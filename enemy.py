@@ -55,10 +55,12 @@ class Enemy:
         # Check for collision with the player
         if abs(self.x - player_x) < TILE_SIZE // 2 and abs(self.y - player_y) < TILE_SIZE // 2:
             player.health -= 1  # Reduce player's health by 1
-            enemies.remove(self)  # Remove enemy from the list
             print(f"Enemy collided with player! Player health: {player.health}")
 
     def die(self, xp_orbs):
         # ...existing death logic...
         xp_orb = XPOrb(self.x, self.y)  # Create an XP orb at enemy's position
         xp_orbs.append(xp_orb)  # Add XP orb to the global list
+
+    def get_collision_radius(self):
+        return TILE_SIZE // 2  # Default collision radius for Enemy

@@ -23,13 +23,13 @@ class StrongEnemy(Enemy):
         # Override collision damage to deal an additional 1 damage (total 2)
         if abs(self.x - player_x) < TILE_SIZE // 2 and abs(self.y - player_y) < TILE_SIZE // 2:
             player.health -= 1  # Deal an additional 1 damage
-            # enemies.remove(self)  # Remove this line to prevent double removal
+            # Ensure this is removed to prevent double removal
             print(f"StrongEnemy collided with player! Player health: {player.health}")
 
     def die(self, xp_orbs):
         # ...existing death logic...
         for _ in range(3):  # Drop 3 XP orbs
-            xp_orb = XPOrb(self.x, self.y)
+            xp_orb = XPOrb(self.x, self.y, size=int(10 * 1.5))  # Set size to match EnemySpawner's orbs
             xp_orbs.append(xp_orb)
 
     def draw(self, screen, camera_x, camera_y):

@@ -24,7 +24,8 @@ class Bullet:
             return True
         for enemy in enemies:
             enemy_x, enemy_y = enemy.get_position()
-            if abs(self.x - enemy_x) < TILE_SIZE // 2 and abs(self.y - enemy_y) < TILE_SIZE // 2:
+            collision_radius = enemy.get_collision_radius()  # Get dynamic collision radius
+            if abs(self.x - enemy_x) < collision_radius and abs(self.y - enemy_y) < collision_radius:
                 if enemy.take_damage():
                     enemy.die(xp_orbs)
                     enemies.remove(enemy)
