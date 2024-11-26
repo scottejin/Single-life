@@ -59,7 +59,7 @@ SAVE_FOLDER = 'saves'
 # Ensure the save folder exists and cache available saves
 if not os.path.exists(SAVE_FOLDER):
     os.makedirs(SAVE_FOLDER)
-available_saves = os.listdir(SAVE_FOLDER)
+available_saves = get_available_saves()
 
 def restart_game(seed):
     global dungeon_rooms, bullets, player, player_x, player_y, current_room_x, current_room_y, enemies, spawners, start_time, elapsed_time, xp_orbs, xp_counter, selected_slot
@@ -105,15 +105,18 @@ while running:
                     game_state = load_game(selected_slot)
                     if game_state:
                         # Load the game state
-                        player_x = game_state['player_x']
-                        player_y = game_state['player_y']
-                        player = Player(player_x, player_y, player_speed)
-                        player.health = game_state['player_health']
+                        player = game_state['player']
+                        player_x, player_y = player.get_position()
                         current_room_x = game_state['current_room_x']
                         current_room_y = game_state['current_room_y']
                         elapsed_time = game_state['elapsed_time']
                         xp_counter = game_state['xp_counter']
                         seed = game_state['seed']
+                        dungeon_rooms = game_state['dungeon_rooms']
+                        enemies = game_state['enemies']
+                        spawners = game_state['spawners']
+                        bullets = game_state['bullets']
+                        xp_orbs = game_state['xp_orbs']
                         # ...load other game state data...
                         in_main_menu = False
                         start_time = time.time() - elapsed_time
@@ -147,7 +150,14 @@ while running:
                 if selected_slot is None:
                     selected_slot = main_menu.select_save_slot(screen, "Select Slot to Save Game")
                 if selected_slot is not None:
-                    save_game(player_x, player_y, player, current_room_x, current_room_y, elapsed_time, xp_counter, seed, selected_slot)
+                    save_game(
+                        player_x, player_y, player,
+                        current_room_x, current_room_y,
+                        elapsed_time, xp_counter, seed,
+                        selected_slot,
+                        dungeon_rooms, enemies, spawners,
+                        bullets, xp_orbs
+                    )
                     in_main_menu = True
                     is_paused = False
                 else:
@@ -279,7 +289,18 @@ while running:
 
         # After updating the player and enemies
         if player.health <= 0:
-            save_game(player_x, player_y, player, current_room_x, current_room_y, elapsed_time, xp_counter, seed)  # Optionally save game state
+            # Use a specific save slot, e.g., slot 1
+            save_game(
+                player_x, player_y, player,
+                current_room_x, current_room_y,
+                elapsed_time, xp_counter, seed,
+                slot=1,  # Specify the slot
+                dungeon_rooms=dungeon_rooms,
+                enemies=enemies,
+                spawners=spawners,
+                bullets=bullets,
+                xp_orbs=xp_orbs
+            )
             in_end_game = True  # Enter the end game state
             print("Player has died. Entering end game state.")
 

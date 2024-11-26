@@ -37,7 +37,7 @@ class MainMenu:
             slot_rects = []
             for i in range(3):  # Assuming 3 slots
                 slot_num = i + 1
-                slot_status = "Occupied" if available_saves[slot_num] else "Empty"
+                slot_status = "Occupied" if available_saves.get(slot_num, False) else "Empty"
                 slot_text = f"Slot {slot_num}: {slot_status}"
                 text_surface = font.render(slot_text, True, (255, 255, 255))
                 slot_rect = text_surface.get_rect(center=(screen.get_width() // 2, 150 + i * 50))
