@@ -6,8 +6,7 @@ class MainMenu:
         self.buttons = [
             Button("New Game", position=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 90)),
             Button("Load Game", position=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 30)),
-            Button("Options", position=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 30)),
-            Button("Exit", position=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 90))
+            Button("Exit", position=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 30))
         ]
 
     def draw(self, screen):

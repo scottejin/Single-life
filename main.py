@@ -15,6 +15,7 @@ from strong_enemy import StrongEnemy  # Updated import
 from enemy_spawner import EnemySpawner
 from end_game import draw_end_game_screen, handle_end_game_events  # Import from end_game.py
 from xp_orb import XPOrb  # Ensure XPOrb is imported
+from save_load import save_game, load_game, show_no_saves_screen
 
 pygame.init()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SCALED | pygame.DOUBLEBUF)
@@ -58,86 +59,6 @@ if not os.path.exists(SAVE_FOLDER):
     os.makedirs(SAVE_FOLDER)
 available_saves = os.listdir(SAVE_FOLDER)
 
-def save_game():
-    # Save the game state to a file
-    game_state = {
-        'player_x': player_x,
-        'player_y': player_y,
-        'player_health': player.health,
-        'current_room_x': current_room_x,
-        'current_room_y': current_room_y,
-        'elapsed_time': elapsed_time,
-        'xp_counter': xp_counter,
-        'seed': seed,
-        # Add other game state data as needed
-    }
-    save_file = os.path.join(SAVE_FOLDER, 'savegame.json')
-    with open(save_file, 'w') as f:
-        json.dump(game_state, f)
-
-def load_game():
-    global player_x, player_y, player, current_room_x, current_room_y, elapsed_time, xp_counter, seed, in_main_menu, running
-    save_file = os.path.join(SAVE_FOLDER, 'savegame.json')
-    if not os.path.exists(save_file):
-        show_no_saves_screen()
-        return
-    with open(save_file, 'r') as f:
-        game_state = json.load(f)
-    player_x = game_state['player_x']
-    player_y = game_state['player_y']
-    player = Player(player_x, player_y, player_speed)
-    player.health = game_state['player_health']
-    current_room_x = game_state['current_room_x']
-    current_room_y = game_state['current_room_y']
-    elapsed_time = game_state['elapsed_time']
-    xp_counter = game_state['xp_counter']
-    seed = game_state['seed']
-    # Load other game state data as needed
-
-def show_no_saves_screen():
-    global running, in_main_menu
-    no_saves_screen = True
-    font = pygame.font.SysFont(None, 50)
-    arrow_font = pygame.font.SysFont(None, 36)
-    while no_saves_screen:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-                no_saves_screen = False
-            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                mouse_pos = pygame.mouse.get_pos()
-                # Check if the return arrow is clicked
-                if return_arrow_rect.collidepoint(mouse_pos):
-                    no_saves_screen = False  # Return to main menu
-                    in_main_menu = True
-        screen.fill(BLACK)
-        text = font.render("[No saves]", True, WHITE)
-        text_rect = text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
-        screen.blit(text, text_rect)
-        # Draw return arrow at top-left corner
-        arrow_text = arrow_font.render("←", True, WHITE)
-        return_arrow_rect = arrow_text.get_rect(topleft=(10, 10))
-        screen.blit(arrow_text, return_arrow_rect)
-        pygame.display.flip()
-    # After exiting the no saves screen, back to main menu
-
-def restart_game(seed):
-    global dungeon_rooms, bullets, player, player_x, player_y, current_room_x, current_room_y, enemies, spawners, start_time, elapsed_time, xp_orbs, xp_counter
-    random.seed(seed)
-    dungeon_rooms = {}
-    bullets = []
-    enemies = []
-    spawners = []
-    xp_orbs = []
-    current_room_x, current_room_y = 0, 0
-
-    initial_room = load_room_at(0, 0, dungeon_rooms, enemies, spawners)
-    player_x, player_y = find_walkable_tile(initial_room)
-    player = Player(player_x, player_y, player_speed)
-    start_time = time.time()
-    elapsed_time = 0
-    xp_counter = 0
-
 clock = pygame.time.Clock()
 running = True
 
@@ -155,9 +76,24 @@ while running:
                 start_time = time.time()
                 elapsed_time = 0
             elif action == "Load Game":
-                load_game()
-                in_main_menu = False
-                start_time = time.time() - elapsed_time  # Continue from saved time
+                game_state = load_game()
+                if game_state:
+                    # Load the game state
+                    player_x = game_state['player_x']
+                    player_y = game_state['player_y']
+                    player = Player(player_x, player_y, player_speed)
+                    player.health = game_state['player_health']
+                    current_room_x = game_state['current_room_x']
+                    current_room_y = game_state['current_room_y']
+                    elapsed_time = game_state['elapsed_time']
+                    xp_counter = game_state['xp_counter']
+                    seed = game_state['seed']
+                    # ...load other game state data...
+                    in_main_menu = False
+                    start_time = time.time() - elapsed_time
+                else:
+                    show_no_saves_screen(screen)
+                    in_main_menu = True  # Return to main menu after showing the message
             elif action == "Exit":
                 running = False
             elif action == "Start Game":
@@ -185,7 +121,7 @@ while running:
                 if action == "Resume":
                     is_paused = False
                 elif action == "Save and Exit":
-                    save_game()
+                    save_game(player_x, player_y, player, current_room_x, current_room_y, elapsed_time, xp_counter, seed)
                     in_main_menu = True
                     is_paused = False
                 elif action == "Restart":
