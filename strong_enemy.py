@@ -2,6 +2,7 @@
 import pygame
 from enemy import Enemy
 from settings import TILE_SIZE, ORANGE, BLACK, DARK_ORANGE
+from xp_orb import XPOrb  # Ensure XPOrb is imported
 
 class StrongEnemy(Enemy):
     def __init__(self, x, y):
@@ -16,6 +17,11 @@ class StrongEnemy(Enemy):
         self.health -= 1
         print(f"StrongEnemy at ({self.x}, {self.y}) took damage! Remaining health: {self.health}")
         return self.health <= 0  # Return True if the enemy is dead
+
+    def die(self):
+        # ...existing death logic...
+        xp_orb = XPOrb(self.x, self.y)  # Create an XP orb at enemy's position
+        xp_orbs.append(xp_orb)  # Add XP orb to the global list
 
     def draw(self, screen, camera_x, camera_y):
         """Draw the StrongEnemy with health visualization."""

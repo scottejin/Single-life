@@ -12,6 +12,7 @@ from enemy import Enemy
 from strong_enemy import StrongEnemy  # Updated import
 from enemy_spawner import EnemySpawner
 from end_game import draw_end_game_screen, handle_end_game_events  # Import from end_game.py
+from xp_orb import XPOrb  # Ensure XPOrb is imported
 
 pygame.init()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SCALED | pygame.DOUBLEBUF)
@@ -24,8 +25,9 @@ dungeon_rooms = {}
 bullets = []
 enemies = []
 spawners = []
+xp_orbs = []      # List to hold XP orbs
 last_shot_time = 0
-bullet_speed = 300  # Pixels per second
+bullet_speed = 300  # Pdixels per second
 menu = Menu(seed)
 main_menu = MainMenu()
 is_paused = False
@@ -33,6 +35,7 @@ in_main_menu = True
 in_end_game = False
 start_time = time.time()
 elapsed_time = 0
+xp_counter = 0    # XP collected
 
 # Define circle_radius before the game loop
 circle_radius = 6 * TILE_SIZE
@@ -46,12 +49,13 @@ player_x, player_y = find_walkable_tile(initial_room)
 player = Player(player_x, player_y, player_speed)
 
 def restart_game(seed):
-    global dungeon_rooms, bullets, player, player_x, player_y, current_room_x, current_room_y, enemies, spawners, start_time, elapsed_time
+    global dungeon_rooms, bullets, player, player_x, player_y, current_room_x, current_room_y, enemies, spawners, start_time, elapsed_time, xp_orbs, xp_counter
     random.seed(seed)
     dungeon_rooms = {}
     bullets = []
     enemies = []
     spawners = []
+    xp_orbs = []
     current_room_x, current_room_y = 0, 0
 
     initial_room = load_room_at(0, 0, dungeon_rooms, enemies, spawners)
@@ -59,6 +63,7 @@ def restart_game(seed):
     player = Player(player_x, player_y, player_speed)
     start_time = time.time()
     elapsed_time = 0
+    xp_counter = 0
 
 clock = pygame.time.Clock()
 running = True
@@ -213,6 +218,11 @@ while running:
                             )
                         )
 
+        for xp_orb in xp_orbs[:]:
+            if xp_orb.update(player.rect):
+                xp_counter += 1
+                xp_orbs.remove(xp_orb)
+
         pygame.draw.rect(screen, RED, (SCREEN_WIDTH // 2 - PLAYER_SIZE // 2, SCREEN_HEIGHT // 2 - PLAYER_SIZE // 2, PLAYER_SIZE, PLAYER_SIZE))
 
         # Drawing the health bar
@@ -224,6 +234,14 @@ while running:
 
         # Draw the blue circle
         pygame.draw.circle(screen, BLUE, (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2), circle_radius, 1)
+
+        for xp_orb in xp_orbs:
+            xp_orb.draw(screen, camera_x, camera_y)
+
+        # Draw XP counter in top-left corner
+        font = pygame.font.SysFont(None, 36)
+        xp_text = font.render(f"XP: {xp_counter}", True, (255, 255, 255))
+        screen.blit(xp_text, (10, 10))
 
         # After updating the player and enemies
         if player.health <= 0:

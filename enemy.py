@@ -1,6 +1,7 @@
 # enemy.py
 from astar import astar
 from settings import TILE_SIZE
+from xp_orb import XPOrb  # Ensure XPOrb is imported
 
 class Enemy:
     def __init__(self, x, y):
@@ -56,3 +57,8 @@ class Enemy:
             player.health -= 1  # Reduce player's health by 1
             enemies.remove(self)  # Remove enemy from the list
             print(f"Enemy collided with player! Player health: {player.health}")
+
+    def die(self):
+        # ...existing death logic...
+        xp_orb = XPOrb(self.x, self.y)  # Create an XP orb at enemy's position
+        xp_orbs.append(xp_orb)  # Add XP orb to the global list

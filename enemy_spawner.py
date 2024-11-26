@@ -4,6 +4,7 @@ import random  # Ensure this is imported
 from enemy import Enemy
 from strong_enemy import StrongEnemy  # Updated import
 from settings import TILE_SIZE, ENEMY_SIZE, PURPLE, BLACK
+from xp_orb import XPOrb  # Ensure XPOrb is imported
 
 class EnemySpawner:
     def __init__(self, spawn_x, spawn_y, spawn_interval=5):
@@ -55,9 +56,13 @@ class EnemySpawner:
         if self.is_active:
             self.health -= 1
             print(f"EnemySpawner at ({self.spawn_x}, {self.spawn_y}) took damage! Remaining health: {self.health}")
-            if self.health <= 0:
+            if self.health <= 0 and self.is_active:
                 self.is_active = False
                 print(f"EnemySpawner at ({self.spawn_x}, {self.spawn_y}) destroyed!")
+                # Drop 5 XP orbs, 1.5 times the normal size
+                for _ in range(5):
+                    xp_orb = XPOrb(self.spawn_x, self.spawn_y, size=int(10 * 1.5))
+                    xp_orbs.append(xp_orb)  # Add XP orb to the global list
 
     def draw(self, screen, camera_x, camera_y):
         """Draw the spawner and its health bar."""
