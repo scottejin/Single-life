@@ -13,9 +13,9 @@ from main_menu import MainMenu
 from enemy import Enemy
 from strong_enemy import StrongEnemy  # Updated import
 from enemy_spawner import EnemySpawner
-from end_game import draw_end_game_screen, handle_end_game_events  # Import from end_game.py
 from xp_orb import XPOrb  # Ensure XPOrb is imported
 from save_load import save_game, load_game, show_no_saves_screen, get_available_saves  # Updated import
+from end_game import draw_death_screen, handle_death_screen_events
 
 pygame.init()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SCALED | pygame.DOUBLEBUF)
@@ -132,7 +132,10 @@ while running:
             elif action == "Exit":
                 running = False
         elif in_end_game:
-            in_end_game, in_main_menu = handle_end_game_events(event, in_end_game, in_main_menu)
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                in_end_game = False
+                in_main_menu = True
+                restart_game(seed)
         elif not is_paused:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 is_paused = True
@@ -170,7 +173,7 @@ while running:
     if in_main_menu:
         main_menu.draw(screen)
     elif in_end_game:
-        draw_end_game_screen(screen, elapsed_time, seed)
+        draw_death_screen(screen, elapsed_time, xp_counter, seed, selected_slot)
     elif not is_paused:
         elapsed_time = time.time() - start_time
         current_room = load_room_at(current_room_x, current_room_y, dungeon_rooms, enemies, spawners)
@@ -293,20 +296,22 @@ while running:
 
         # After updating the player and enemies
         if player.health <= 0:
-            # Use a specific save slot, e.g., slot 1
-            save_game(
-                player_x, player_y, player,
-                current_room_x, current_room_y,
-                elapsed_time, xp_counter, seed,
-                slot=1,  # Specify the slot
-                dungeon_rooms=dungeon_rooms,
-                enemies=enemies,
-                spawners=spawners,
-                bullets=bullets,
-                xp_orbs=xp_orbs
-            )
-            in_end_game = True  # Enter the end game state
-            print("Player has died. Entering end game state.")
+            in_end_game = True
+            screen.fill(BLACK)
+            draw_death_screen(screen, elapsed_time, xp_counter, seed, selected_slot)
+            pygame.display.flip()
+            
+            # Handle death screen events
+            waiting_for_input = True
+            while waiting_for_input:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        sys.exit()
+                    if handle_death_screen_events(event, selected_slot):
+                        waiting_for_input = False
+                        in_main_menu = True
+                        restart_game(seed)  # Reset game state
 
     else:
         menu.draw(screen)

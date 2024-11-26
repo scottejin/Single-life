@@ -22,10 +22,10 @@ def save_game(player_x, player_y, player, current_room_x, current_room_y, elapse
         'xp_counter': xp_counter,
         'seed': seed,
         'dungeon_rooms': {f"{k[0]},{k[1]}": v.to_dict() for k, v in dungeon_rooms.items()},  # Convert tuple keys to strings
-        'enemies': [enemy.to_dict() for enemy in enemies],
-        'spawners': [spawner.to_dict() for spawner in spawners],
-        'bullets': [bullet.to_dict() for bullet in bullets],
-        'xp_orbs': [orb.to_dict() for orb in xp_orbs],
+        'enemies': [enemy.to_dict() for enemy in enemies if hasattr(enemy, 'to_dict')],
+        'spawners': [spawner.to_dict() for spawner in spawners if hasattr(spawner, 'to_dict')],
+        'bullets': [bullet.to_dict() for bullet in bullets if hasattr(bullet, 'to_dict')],
+        'xp_orbs': [orb.to_dict() for orb in xp_orbs if hasattr(orb, 'to_dict')],
         # ...other game state data...
     }
     save_file = os.path.join(SAVE_FOLDER, f'save_slot_{slot}.json')
