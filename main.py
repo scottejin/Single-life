@@ -100,6 +100,14 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+            if is_paused:
+                is_paused = False  # Return to game
+            elif not in_main_menu and not in_end_game:
+                is_paused = True  # Open pause menu
+            elif in_end_game:
+                in_end_game = False
+                in_main_menu = True  # Return to main menu
         elif in_main_menu:
             action = main_menu.handle_event(event)
             if action == "New Game":

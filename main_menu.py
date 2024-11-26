@@ -24,6 +24,8 @@ class MainMenu:
             for button in self.buttons:
                 if button.rect.collidepoint(mouse_pos):
                     return button.text
+        elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+            return "Exit"  # Treat Escape as Exit button
         return None
 
     def select_save_slot(self, screen, title):
@@ -61,6 +63,15 @@ class MainMenu:
                 if event.type == pygame.QUIT:
                     running = False
                     return None
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        if confirmation:
+                            confirmation = False
+                            self.confirmation_dialog = None
+                            slot_to_delete = None
+                        else:
+                            running = False
+                            return None  # Return to previous menu
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     mouse_x, mouse_y = pygame.mouse.get_pos()
                     if confirmation and self.confirmation_dialog:
