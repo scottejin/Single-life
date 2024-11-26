@@ -1,7 +1,13 @@
 import os
 import json
 import pygame
-from settings import SCREEN_WIDTH, SCREEN_HEIGHT, WHITE, BLACK
+import random
+from player import Player
+from bullet import Bullet
+from enemy import Enemy
+from strong_enemy import StrongEnemy
+from xp_orb import XPOrb
+from settings import SCREEN_WIDTH, SCREEN_HEIGHT, WHITE, BLACK, player_speed
 
 SAVE_FOLDER = 'saves'
 
@@ -41,30 +47,26 @@ def load_game(slot):
             save_data = json.load(f)
         
         # Reconstruct player
-        player_x = save_data['player_x']
-        player_y = save_data['player_y']
-        player_health = save_data['player_health']
-        # Assume Player class has a from_dict method or similar
+        player_x = save_data.get('player_x', 0)
+        player_y = save_data.get('player_y', 0)
+        player_health = save_data.get('player_health', 5)
         player = Player(player_x, player_y, player_speed)
         player.health = player_health
-        # ...load other player attributes...
         
         # Reconstruct other game state
-        current_room_x = save_data['current_room_x']
-        current_room_y = save_data['current_room_y']
-        elapsed_time = save_data['elapsed_time']
-        xp_counter = save_data['xp_counter']
-        seed = save_data['seed']
-        # Convert string keys back to tuples and load room data directly
+        current_room_x = save_data.get('current_room_x', 0)
+        current_room_y = save_data.get('current_room_y', 0)
+        elapsed_time = save_data.get('elapsed_time', 0)
+        xp_counter = save_data.get('xp_counter', 0)
+        seed = save_data.get('seed', str(random.randint(0, 1000000)))
+        
         dungeon_rooms = {tuple(map(int, k.split(','))): save_data['dungeon_rooms'][k]
-                        for k in save_data['dungeon_rooms']}
+                         for k in save_data.get('dungeon_rooms', {})}
         
-        enemies = [Enemy.from_dict(e) for e in save_data['enemies']]
-        spawners = [EnemySpawner.from_dict(s) for s in save_data['spawners']]
-        bullets = [Bullet.from_dict(b) for b in save_data['bullets']]
-        xp_orbs = [XPOrb.from_dict(o) for o in save_data['xp_orbs']]
-        
-        # ...load other game state data...
+        enemies = [Enemy.from_dict(e) for e in save_data.get('enemies', [])]
+        spawners = [EnemySpawner.from_dict(s) for s in save_data.get('spawners', [])]
+        bullets = [Bullet.from_dict(b) for b in save_data.get('bullets', [])]
+        xp_orbs = [XPOrb.from_dict(o) for o in save_data.get('xp_orbs', [])]
         
         return {
             'player': player,
@@ -78,7 +80,6 @@ def load_game(slot):
             'spawners': spawners,
             'bullets': bullets,
             'xp_orbs': xp_orbs,
-            # ...other game state data...
         }
     else:
         return None

@@ -72,7 +72,7 @@ if not os.path.exists(SAVE_FOLDER):
 available_saves = get_available_saves()
 
 def restart_game(seed):
-    global dungeon_rooms, bullets, player, player_x, player_y, current_room_x, current_room_y, enemies, spawners, start_time, elapsed_time, xp_orbs, xp_counter, selected_slot
+    global dungeon_rooms, bullets, player, player_x, player_y, current_room_x, current_room_y, enemies, spawners, start_time, elapsed_time, xp_orbs, xp_counter
     random.seed(seed)
     dungeon_rooms = {}
     bullets = []
@@ -89,7 +89,6 @@ def restart_game(seed):
     start_time = time.time()
     elapsed_time = 0
     xp_counter = 0
-    selected_slot = None  # Reset selected slot
 
 clock = pygame.time.Clock()
 running = True
@@ -111,7 +110,7 @@ while running:
         elif in_main_menu:
             action = main_menu.handle_event(event)
             if action == "New Game":
-                selected_slot = main_menu.select_save_slot(screen, "Select Slot to Save New Game")
+                selected_slot = main_menu.select_save_slot(screen, "Select Slot to Save New Game", mode="save")
                 if selected_slot is not None:
                     restart_game(seed)
                     in_main_menu = False
@@ -120,7 +119,7 @@ while running:
                 else:
                     in_main_menu = True  # Return to main menu if no slot selected
             elif action == "Load Game":
-                selected_slot = main_menu.select_save_slot(screen, "Select Slot to Load Game")
+                selected_slot = main_menu.select_save_slot(screen, "Select Slot to Load Game", mode="load")
                 if selected_slot is not None:
                     game_state = load_game(selected_slot)
                     if game_state:
