@@ -1,4 +1,6 @@
 from settings import TILE_SIZE
+import pygame
+import os
 
 class Bullet:
     def __init__(self, x, y, direction, speed, is_broken=False):
@@ -7,6 +9,20 @@ class Bullet:
         self.direction = direction
         self.speed = speed
         self.is_broken = is_broken
+        self.sound = None
+        try:
+            sound_file = os.path.join('sounds', 'bullet.wav')
+            if os.path.exists(sound_file):
+                self.sound = pygame.mixer.Sound(sound_file)
+                self.sound.set_volume(0.3)  # Adjust volume (0.0 to 1.0)
+                self.play_sound()
+        except (pygame.error, FileNotFoundError) as e:
+            print(f"Warning: Could not load bullet sound: {e}")
+
+    def play_sound(self):
+        """Play the bullet sound effect if available."""
+        if self.sound:
+            self.sound.play()
 
     def move(self, dt):
         if not self.is_broken:

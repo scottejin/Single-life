@@ -18,6 +18,7 @@ from save_load import save_game, load_game, show_no_saves_screen, get_available_
 from end_game import draw_death_screen, handle_death_screen_events
 
 pygame.init()
+pygame.mixer.init()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SCALED | pygame.DOUBLEBUF)
 pygame.display.set_caption("Endless Dungeon Explorer")
 
@@ -147,7 +148,8 @@ while running:
                     direction_length = (direction[0]**2 + direction[1]**2)**0.5
                     if direction_length != 0:
                         direction = (direction[0] / direction_length, direction[1] / direction_length)
-                        bullets.append(Bullet(player_x, player_y, direction, bullet_speed))
+                        new_bullet = Bullet(player_x, player_y, direction, bullet_speed)
+                        bullets.append(new_bullet)
                         last_shot_time = current_time
         elif is_paused:
             action = menu.handle_event(event)
