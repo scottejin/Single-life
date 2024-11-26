@@ -32,7 +32,7 @@ class Bullet:
                 return True
         for spawner in spawners:
             if spawner.is_active and abs(self.x - spawner.spawn_x) < TILE_SIZE // 2 and abs(self.y - spawner.spawn_y) < TILE_SIZE // 2:
-                spawner.take_damage()
+                spawner.take_damage(xp_orbs)  # Pass xp_orbs as an argument
                 return True
         return False
 
