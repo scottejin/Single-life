@@ -1,0 +1,11 @@
+{
+    "player_x": 1236.2000000000035,
+    "player_y": 1107.7999999999984,
+    "player_health": 0,
+    "current_room_x": 0,
+    "current_room_y": 0,
+    "elapsed_time": 207.94224500656128,
+    "xp_counter": 38,
+    "seed": "438205",
+    "dungeon_rooms": {
+        

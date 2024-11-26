@@ -21,7 +21,7 @@ def save_game(player_x, player_y, player, current_room_x, current_room_y, elapse
         'elapsed_time': elapsed_time,
         'xp_counter': xp_counter,
         'seed': seed,
-        'dungeon_rooms': dungeon_rooms,
+        'dungeon_rooms': {f"{k[0]},{k[1]}": v.to_dict() for k, v in dungeon_rooms.items()},  # Convert tuple keys to strings
         'enemies': [enemy.to_dict() for enemy in enemies],
         'spawners': [spawner.to_dict() for spawner in spawners],
         'bullets': [bullet.to_dict() for bullet in bullets],
@@ -53,7 +53,8 @@ def load_game(slot):
         elapsed_time = save_data['elapsed_time']
         xp_counter = save_data['xp_counter']
         seed = save_data['seed']
-        dungeon_rooms = save_data['dungeon_rooms']
+        # Convert string keys back to tuples
+        dungeon_rooms = {tuple(map(int, k.split(','))): load_room_from_dict(v) for k, v in save_data['dungeon_rooms'].items()}
         
         enemies = [Enemy.from_dict(e) for e in save_data['enemies']]
         spawners = [EnemySpawner.from_dict(s) for s in save_data['spawners']]

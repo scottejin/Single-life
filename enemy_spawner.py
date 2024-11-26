@@ -57,7 +57,7 @@ class EnemySpawner:
     def spawn_enemy(self, enemies):
         """Spawn an enemy with a 10% chance of being a StrongEnemy."""
         if random.random() <= 0.10:
-            new_enemy = StrongEnemy(self.spawn_x, self.spawn_y, health=10, max_health=10, strength=2)
+            new_enemy =StrongEnemy(self.spawn_x, self.spawn_y, health=10, max_health=10, strength=2)
             print(f"StrongEnemy spawned at ({self.spawn_x}, {self.spawn_y})")
         else:
             new_enemy = Enemy(self.spawn_x, self.spawn_y, health=2, max_health=2)
