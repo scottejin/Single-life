@@ -109,3 +109,12 @@ def show_no_saves_screen(screen):
         return_arrow_rect = arrow_text.get_rect(topleft=(10, 10))
         screen.blit(arrow_text, return_arrow_rect)
         pygame.display.flip()
+
+def delete_save_slot(slot):
+    """Deletes the specified save slot."""
+    save_file = os.path.join(SAVE_FOLDER, f'save_slot_{slot}.json')
+    if os.path.exists(save_file):
+        os.remove(save_file)
+        print(f"Save slot {slot} has been deleted.")
+    else:
+        print(f"Save slot {slot} does not exist.")

@@ -27,8 +27,11 @@ class MainMenu:
         available_saves = get_available_saves()
         running = True
         selected_slot = None
+        confirmation = False
+        slot_to_delete = None
 
         font = pygame.font.SysFont(None, 36)
+        button_font = pygame.font.SysFont(None, 30)
         while running:
             screen.fill((0, 0, 0))
             title_text = font.render(title, True, (255, 255, 255))
@@ -39,10 +42,41 @@ class MainMenu:
                 slot_num = i + 1
                 slot_status = "Occupied" if available_saves.get(slot_num, False) else "Empty"
                 slot_text = f"Slot {slot_num}: {slot_status}"
-                text_surface = font.render(slot_text, True, (255, 255, 255))
+                text_color = (255, 0, 0) if slot_status == "Occupied" else (255, 255, 255)
+                text_surface = font.render(slot_text, True, text_color)
                 slot_rect = text_surface.get_rect(center=(screen.get_width() // 2, 150 + i * 50))
                 screen.blit(text_surface, slot_rect)
-                slot_rects.append((slot_rect, slot_num))
+                slot_rects.append((slot_rect, slot_num, slot_status))
+
+            if confirmation:
+                # Draw confirmation window overlay
+                overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
+                overlay.fill((0, 0, 0, 180))  # Semi-transparent overlay
+                screen.blit(overlay, (0, 0))
+
+                # Confirmation message
+                confirm_text = font.render(
+                    "Slot occupied! Are you sure you want to delete all information inside?",
+                    True, (255, 0, 0)
+                )
+                joke_text = font.render(
+                    "Deleting is like forgetting where you hid the remote—irrevocable and slightly tragic!",
+                    True, (255, 0, 0)
+                )
+                screen.blit(
+                    confirm_text,
+                    (screen.get_width() // 2 - confirm_text.get_width() // 2, SCREEN_HEIGHT // 2 - 60)
+                )
+                screen.blit(
+                    joke_text,
+                    (screen.get_width() // 2 - joke_text.get_width() // 2, SCREEN_HEIGHT // 2 - 20)
+                )
+
+                # Yes and No buttons
+                yes_button = Button("Yes", position=(screen.get_width() // 2 - 100, SCREEN_HEIGHT // 2 + 40))
+                no_button = Button("No", position=(screen.get_width() // 2 + 100, SCREEN_HEIGHT // 2 + 40))
+                yes_button.draw(screen)
+                no_button.draw(screen)
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -50,14 +84,30 @@ class MainMenu:
                     return None
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     mouse_x, mouse_y = pygame.mouse.get_pos()
-                    for slot_rect, slot_num in slot_rects:
-                        if slot_rect.collidepoint(mouse_x, mouse_y):
-                            selected_slot = slot_num
-                            running = False
+                    if confirmation:
+                        if yes_button.rect.collidepoint((mouse_x, mouse_y)):
+                            # Delete the save slot
+                            if slot_to_delete:
+                                # Implement deletion logic here
+                                delete_save_slot(slot_to_delete)  # You need to define this function
+                                selected_slot = slot_to_delete
+                                running = False
+                        elif no_button.rect.collidepoint((mouse_x, mouse_y)):
+                            confirmation = False
+                            slot_to_delete = None
+                    else:
+                        for slot_rect, slot_num, slot_status in slot_rects:
+                            if slot_rect.collidepoint((mouse_x, mouse_y)):
+                                if slot_status == "Occupied":
+                                    confirmation = True
+                                    slot_to_delete = slot_num
+                                else:
+                                    selected_slot = slot_num
+                                    running = False
                 elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
-                        running = False
-                        return None
+                    if event.key == pygame.K_ESCAPE and confirmation:
+                        confirmation = False
+                        slot_to_delete = None
 
             pygame.display.flip()
         return selected_slot
