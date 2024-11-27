@@ -2,6 +2,7 @@ import pygame
 import sys
 import os
 import itertools
+import music  # Import the music module
 
 def draw_victory_screen(screen, elapsed_time, xp_counter, seed):
     screen.fill((0, 0, 0))  # Fill the screen with black
@@ -27,6 +28,8 @@ def draw_victory_screen(screen, elapsed_time, xp_counter, seed):
         pygame.mixer.music.load(os.path.join('music', 'victory.wav'))
         pygame.mixer.music.set_volume(0.5)
         pygame.mixer.music.play()
+        pygame.mixer.music.set_endevent(pygame.USEREVENT)  # Set event for track end
+        music.is_victory_mode = True  # Set victory mode flag
     except pygame.error as e:
         print(f"Error loading or playing victory music: {e}")
 
@@ -48,6 +51,9 @@ def draw_victory_screen(screen, elapsed_time, xp_counter, seed):
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE or event.key == pygame.K_ESCAPE:
                     waiting_for_input = False
+                elif event.key == pygame.K_m:
+                    music.next_track()
+                    waiting_for_input = False
 
         if not pygame.mixer.music.get_busy() and song_playing:
             song_playing = False
@@ -61,3 +67,6 @@ def draw_victory_screen(screen, elapsed_time, xp_counter, seed):
             screen.blit(victory_text, (screen.get_width() // 2 - victory_text.get_width() // 2, screen.get_height() // 2 - 100))
             pygame.display.flip()
             pygame.time.delay(100)  # Delay to control the speed of color change
+
+        # Update the music track display
+        music.update_track_display(screen)
