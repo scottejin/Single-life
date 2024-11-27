@@ -20,7 +20,7 @@ class Menu:
             mouse_pos = pygame.mouse.get_pos()
             for button in self.buttons:
                 if button.rect.collidepoint(mouse_pos):
-                    return button.text  # Return the text of the clicked button
+                    return button.text
         elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
             return "Resume"  # Treat Escape as Resume button
         return None

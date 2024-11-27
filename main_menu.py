@@ -89,7 +89,6 @@ class MainMenu:
                                     if slot_status == "Occupied":
                                         selected_slot = slot_num
                                         running = False
-                                    # Do nothing if empty slot is clicked in load mode
                                 elif mode == "save":
                                     if slot_status == "Occupied":
                                         confirm_message = ["Slot is occupied! Do you want to overwrite it?"]
@@ -105,9 +104,11 @@ class MainMenu:
                                     else:
                                         selected_slot = slot_num
                                         running = False
+            # Add this line to set the previous_slot after selection
+            previous_slot = selected_slot
 
             pygame.display.flip()
-        return selected_slot
+        return selected_slot  # Add this line to store the selected slot
 
 class Button:
     def __init__(self, text, position, font_size=50, base_color=WHITE, hover_color=BLUE):

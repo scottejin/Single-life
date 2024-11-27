@@ -55,21 +55,45 @@ class Bullet:
         screen.blit(self.sprite, (self.x - camera_x, self.y - camera_y))
 
     def to_dict(self):
+        """Convert bullet to serializable dictionary"""
         return {
             'x': self.x,
             'y': self.y,
-            'direction': self.direction,
+            'direction': list(self.direction),  # Convert tuple to list
             'speed': self.speed,
-            'is_broken': self.is_broken,
+            'is_broken': self.is_broken
         }
 
     @staticmethod
-    def from_dict(data):
+    def from_dict(data, sprite=None):
+        """Create a bullet from dictionary with optional sprite override"""
+        if sprite is None:
+            from sprites import get_sprite  # Import here to avoid circular import
+            direction = data['direction']
+            # Determine sprite based on direction
+            angle = math.degrees(math.atan2(-direction[1], direction[0])) % 360
+            if 22.5 <= angle < 67.5:
+                sprite = get_sprite(25, 8)  # northeast
+            elif 67.5 <= angle < 112.5:
+                sprite = get_sprite(25, 7)  # north
+            elif 112.5 <= angle < 157.5:
+                sprite = get_sprite(25, 14)  # northwest
+            elif 157.5 <= angle < 202.5:
+                sprite = get_sprite(25, 13)  # west
+            elif 202.5 <= angle < 247.5:
+                sprite = get_sprite(25, 12)  # southwest
+            elif 247.5 <= angle < 292.5:
+                sprite = get_sprite(25, 11)  # south
+            elif 292.5 <= angle < 337.5:
+                sprite = get_sprite(25, 10)  # southeast
+            else:
+                sprite = get_sprite(25, 9)  # east
+
         return Bullet(
             x=data['x'],
             y=data['y'],
             direction=tuple(data['direction']),
             speed=data['speed'],
-            sprite=None,  # Placeholder for sprite, should be set appropriately
+            sprite=sprite,
             is_broken=data['is_broken']
         )

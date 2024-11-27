@@ -54,6 +54,7 @@ elapsed_time = 0
 xp_counter = 0    # XP collected
 
 selected_slot = None  # Holds the slot selected by the player
+previous_slot = None  # Add this line to track the previous save slot
 
 # Define circle_radius before the game loop
 circle_radius = 6 * TILE_SIZE
@@ -156,6 +157,26 @@ def create_enemy(x, y):
     new_enemy = Enemy(x, y, enemy_sprite)
     enemies.append(new_enemy)
 
+def handle_save_and_exit():
+    if selected_slot is not None:
+        save_game(selected_slot, {
+            'player_x': player_x,
+            'player_y': player_y,
+            'player_health': player.health,
+            'current_room_x': current_room_x,
+            'current_room_y': current_room_y,
+            'elapsed_time': elapsed_time,
+            'xp_counter': xp_counter,
+            'seed': seed,
+            'dungeon_rooms': dungeon_rooms,
+            'enemies': enemies,
+            'spawners': spawners,
+            'bullets': bullets,
+            'xp_orbs': xp_orbs
+        })
+        pygame.quit()
+        sys.exit()
+
 while running:
     dt = clock.tick(TARGET_FPS) / 1000.0
 
@@ -215,6 +236,8 @@ while running:
                         in_main_menu = True  # Return to main menu after showing the message
                 else:
                     in_main_menu = True  # Return to main menu if no slot selected
+            elif action == "Save and Exit":
+                handle_save_and_exit()
             elif action == "Exit":
                 running = False
         elif in_end_game:
@@ -227,6 +250,12 @@ while running:
                 is_paused = True
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left click
                 create_bullet()
+        elif is_paused:
+            action = menu.handle_event(event)
+            if action == "Save and Exit":
+                handle_save_and_exit()
+            elif action == "Resume":
+                is_paused = False
 
     if in_main_menu:
         main_menu.draw(screen)

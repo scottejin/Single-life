@@ -70,14 +70,14 @@ class Enemy:
         return TILE_SIZE // 2  # Default collision radius for Enemy
 
     def to_dict(self):
+        """Convert enemy to serializable dictionary"""
         return {
-            'type': 'Enemy',
             'x': self.x,
             'y': self.y,
             'health': self.health,
             'max_health': self.max_health,
             'speed': self.speed,
-            # ...other attributes...
+            'type': self.__class__.__name__
         }
 
     @classmethod

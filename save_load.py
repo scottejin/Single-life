@@ -18,41 +18,92 @@ SAVE_FOLDER = 'saves'
 if not os.path.exists(SAVE_FOLDER):
     os.makedirs(SAVE_FOLDER)
 
-def save_game(player_x, player_y, player, current_room_x, current_room_y, elapsed_time, xp_counter, seed, slot, dungeon_rooms, enemies, spawners, bullets, xp_orbs):
-    if not os.path.exists(SAVE_FOLDER):
-        os.makedirs(SAVE_FOLDER)
-    save_data = {
-        'player_x': player_x,
-        'player_y': player_y,
-        'player_health': player.health,
-        'current_room_x': current_room_x,
-        'current_room_y': current_room_y,
-        'elapsed_time': elapsed_time,
-        'xp_counter': xp_counter,
-        'seed': seed,
-        # Convert room data (2D lists) to serializable format
-        'dungeon_rooms': {f"{k[0]},{k[1]}": room.tolist() if hasattr(room, 'tolist') else room 
-                         for k, room in dungeon_rooms.items()},
-        'enemies': [enemy.to_dict() for enemy in enemies if hasattr(enemy, 'to_dict')],
-        'spawners': [spawner.to_dict() for spawner in spawners if hasattr(spawner, 'to_dict')],
-        'bullets': [bullet.to_dict() for bullet in bullets if hasattr(bullet, 'to_dict')],
-        'xp_orbs': [orb.to_dict() for orb in xp_orbs if hasattr(orb, 'to_dict')],
-        # ...other game state data...
+def convert_dict_keys_to_str(d):
+    """Convert tuple keys to string representation for JSON serialization"""
+    if isinstance(d, dict):
+        return {str(k): v for k, v in d.items()}
+    return d
+
+def object_to_dict(obj):
+    """Convert an object to a serializable dictionary"""
+    if hasattr(obj, 'to_dict'):
+        return obj.to_dict()
+    elif isinstance(obj, pygame.Surface):
+        return None  # Skip pygame surfaces
+    elif hasattr(obj, '__dict__'):
+        return obj.__dict__
+    return obj
+
+def make_serializable(obj):
+    """Convert complex objects to serializable format"""
+    if isinstance(obj, (pygame.Surface, pygame.sprite.Sprite)):
+        return None
+    elif isinstance(obj, tuple):
+        return list(obj)
+    elif hasattr(obj, 'to_dict'):
+        return obj.to_dict()
+    elif hasattr(obj, '__dict__'):
+        return {k: v for k, v in obj.__dict__.items() if not isinstance(v, (pygame.Surface, pygame.sprite.Sprite))}
+    return obj
+
+def save_game(slot, game_state):
+    save_path = os.path.join(SAVE_FOLDER, f'save_slot_{slot}.json')
+    
+    # Convert game state to serializable format
+    serializable_state = {
+        'player_x': game_state['player_x'],
+        'player_y': game_state['player_y'],
+        'player_health': game_state['player_health'],
+        'current_room_x': game_state['current_room_x'],
+        'current_room_y': game_state['current_room_y'],
+        'elapsed_time': game_state['elapsed_time'],
+        'xp_counter': game_state['xp_counter'],
+        'seed': game_state['seed'],
+        'dungeon_rooms': {str(k): v for k, v in game_state['dungeon_rooms'].items()},
+        'enemies': [make_serializable(e) for e in game_state['enemies']],
+        'spawners': [make_serializable(s) for s in game_state['spawners']],
+        'bullets': [make_serializable(b) for b in game_state['bullets']],
+        'xp_orbs': [make_serializable(o) for o in game_state['xp_orbs']]
     }
-    save_file = os.path.join(SAVE_FOLDER, f'save_slot_{slot}.json')
-    with open(save_file, 'w') as f:
-        json.dump(save_data, f, indent=4)
+    
+    with open(save_path, 'w') as f:
+        json.dump(serializable_state, f)
 
 def load_game(slot):
     save_file = os.path.join(SAVE_FOLDER, f'save_slot_{slot}.json')
     if os.path.exists(save_file):
         with open(save_file, 'r') as f:
-            save_data = json.load(f)
-        
+            try:
+                save_data = json.load(f)
+            except json.JSONDecodeError:
+                print("Error: Save file is corrupted")
+                return None
+
         # Get sprites
-        player_sprite = get_sprite(78, 7)  # Default to left-facing sprite
+        player_sprite = get_sprite(78, 7)
         enemy_sprite = load_sprite_sheet_image().subsurface((8 * 32, 78 * 32, 32, 32))
-        
+
+        # Load bullet sprites for all directions
+        bullet_sprites = {
+            'north': get_sprite(25,7),
+            'northeast': get_sprite(25,8),
+            'east': get_sprite(25,9),
+            'southeast': get_sprite(25,10),
+            'south': get_sprite(25,11),
+            'southwest': get_sprite(25,12),
+            'west': get_sprite(25,13),
+            'northwest': get_sprite(25,14)
+        }
+
+        # Convert string keys back to tuples for dungeon_rooms
+        dungeon_rooms = {}
+        for key_str, room_data in save_data.get('dungeon_rooms', {}).items():
+            try:
+                key = tuple(map(int, key_str.strip('()').split(',')))
+                dungeon_rooms[key] = room_data
+            except ValueError:
+                continue
+
         # Reconstruct player
         player_x = save_data.get('player_x', 0)
         player_y = save_data.get('player_y', 0)
@@ -67,12 +118,6 @@ def load_game(slot):
         xp_counter = save_data.get('xp_counter', 0)
         seed = save_data.get('seed', str(random.randint(0, 1000000)))
         
-        dungeon_rooms = {}
-        for key_str, room_data in save_data.get('dungeon_rooms', {}).items():
-            key = tuple(map(int, key_str.split(',')))
-            # Use room_data directly as a list
-            dungeon_rooms[key] = room_data
-        
         # Load enemies with proper sprites based on their type
         enemies = []
         for e in save_data.get('enemies', []):
@@ -82,7 +127,9 @@ def load_game(slot):
                 enemies.append(Enemy.from_dict(e))
 
         spawners = [EnemySpawner.from_dict(s) for s in save_data.get('spawners', [])]
-        bullets = [Bullet.from_dict(b) for b in save_data.get('bullets', [])]
+        bullets = []
+        for b in save_data.get('bullets', []):
+            bullets.append(Bullet.from_dict(b))  # Let from_dict handle sprite selection
         xp_orbs = [XPOrb.from_dict(o) for o in save_data.get('xp_orbs', [])]
         
         return {
@@ -92,7 +139,7 @@ def load_game(slot):
             'elapsed_time': elapsed_time,
             'xp_counter': xp_counter,
             'seed': seed,
-            'dungeon_rooms': dungeon_rooms,
+            'dungeon_rooms': dungeon_rooms,  # Use the converted dungeon_rooms
             'enemies': enemies,
             'spawners': spawners,
             'bullets': bullets,
