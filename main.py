@@ -16,6 +16,7 @@ from enemy_spawner import EnemySpawner
 from xp_orb import XPOrb  # Ensure XPOrb is imported
 from save_load import save_game, load_game, show_no_saves_screen, get_available_saves  # Updated import
 from end_game import draw_death_screen, handle_death_screen_events
+from sprites import load_sprite_sheet
 
 pygame.init()
 pygame.mixer.init()
@@ -61,7 +62,18 @@ current_room_x, current_room_y = 0, 0
 # Load the initial room and find a walkable tile for the player
 initial_room = load_room_at(current_room_x, current_room_y, dungeon_rooms, enemies, spawners)
 player_x, player_y = find_walkable_tile(initial_room)
-player = Player(player_x, player_y, player_speed)
+
+# Load the sprite sheet
+sprite_sheet_file = os.path.join('assets', 'sprite_sheet.png')  # Update the path as needed
+all_sprites = load_sprite_sheet(sprite_sheet_file, 32, 32)
+
+# Assign sprites to entities
+player_sprite = all_sprites[0]  # Update indices based on your sprite sheet
+enemy_sprite = all_sprites[1]
+bullet_sprite = all_sprites[2]
+
+# Update player initialization
+player = Player(player_x, player_y, player_speed, player_sprite)
 
 # Define where to save the game files
 SAVE_FOLDER = 'saves'
@@ -85,13 +97,32 @@ def restart_game(seed):
     for enemy in enemies:
         enemy.health = 2  # Set enemy health to 2
     player_x, player_y = find_walkable_tile(initial_room)
-    player = Player(player_x, player_y, player_speed)
+    player = Player(player_x, player_y, player_speed, player_sprite)
     start_time = time.time()
     elapsed_time = 0
     xp_counter = 0
 
 clock = pygame.time.Clock()
 running = True
+
+def create_bullet():
+    global last_shot_time
+    current_time = time.time()
+    if current_time - last_shot_time >= 0.5:  # Limit to 2 bullets per second
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        direction = (mouse_x - SCREEN_WIDTH // 2, mouse_y - SCREEN_HEIGHT // 2)
+        direction_length = (direction[0]**2 + direction[1]**2)**0.5
+        if direction_length != 0:
+            direction = (direction[0] / direction_length, direction[1] / direction_length)
+            new_bullet = Bullet(player_x, player_y, direction, bullet_speed, bullet_sprite)
+            bullets.append(new_bullet)
+            if bullet_sound:
+                bullet_sound.play()
+            last_shot_time = current_time
+
+def create_enemy(x, y):
+    new_enemy = Enemy(x, y, enemy_sprite)
+    enemies.append(new_enemy)
 
 while running:
     dt = clock.tick(TARGET_FPS) / 1000.0
@@ -163,18 +194,7 @@ while running:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 is_paused = True
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                current_time = time.time()
-                if current_time - last_shot_time >= 0.5:  # Limit to 2 bullets per second
-                    mouse_x, mouse_y = pygame.mouse.get_pos()
-                    direction = (mouse_x - SCREEN_WIDTH // 2, mouse_y - SCREEN_HEIGHT // 2)
-                    direction_length = (direction[0]**2 + direction[1]**2)**0.5
-                    if direction_length != 0:
-                        direction = (direction[0] / direction_length, direction[1] / direction_length)
-                        new_bullet = Bullet(player_x, player_y, direction, bullet_speed)
-                        bullets.append(new_bullet)
-                        if bullet_sound:
-                            bullet_sound.play()
-                        last_shot_time = current_time
+                create_bullet()
         elif is_paused:
             action = menu.handle_event(event)
             if action == "Resume":
@@ -255,7 +275,7 @@ while running:
                 pygame.draw.circle(screen, (255, 255, 0), (int(bullet_x - camera_x), int(bullet_y - camera_y)), 5)  # Yellow for breaking animation
                 bullets.remove(bullet)
             else:
-                pygame.draw.circle(screen, RED, (int(bullet_x - camera_x), int(bullet_y - camera_y)), 5)
+                bullet.draw(screen, camera_x, camera_y)
 
         for spawner in spawners:
             spawner.update(enemies, player_x, player_y, circle_radius)
@@ -300,7 +320,7 @@ while running:
                 xp_counter += 1  # Increment XP by 1 per orb collected
                 xp_orbs.remove(xp_orb)
 
-        pygame.draw.rect(screen, RED, (SCREEN_WIDTH // 2 - PLAYER_SIZE // 2, SCREEN_HEIGHT // 2 - PLAYER_SIZE // 2, PLAYER_SIZE, PLAYER_SIZE))
+        player.draw(screen, camera_x, camera_y)
 
         # Drawing the health bar
         health_bar_width = 100
