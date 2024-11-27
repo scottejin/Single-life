@@ -1,5 +1,6 @@
 import pygame
 from assets.sprite_sheet import load_sprite_sheet_image  # Import the function
+from assets.sprite_sheet import get_sprite
 
 def load_sprite_sheet(sprite_width, sprite_height):
     try:

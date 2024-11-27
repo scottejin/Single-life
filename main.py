@@ -22,7 +22,7 @@ pygame.mixer.init()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SCALED | pygame.DOUBLEBUF)
 pygame.display.set_caption("Endless Dungeon Explorer")
 
-from sprites import load_sprite_sheet  # Import after initializing pygame.display
+from sprites import load_sprite_sheet, load_sprite_sheet_image, get_sprite  # Import get_sprite
 
 bullet_sound = None
 try:
@@ -62,8 +62,8 @@ current_room_x, current_room_y = 0, 0
 
 # Update the call to load_sprite_sheet and assign sprites before loading the initial room
 all_sprites = load_sprite_sheet(32, 32)
-player_sprite = all_sprites[0]  # Update indices based on your sprite sheet
-enemy_sprite = all_sprites[1]
+player_sprite = get_sprite(78, 8)  # Select sprite at row 78, column 8
+enemy_sprite = load_sprite_sheet_image().subsurface((8 * 32, 78 * 32, 32, 32))  # Select sprite at row 78, column 8
 bullet_sprite = all_sprites[2]
 
 # Load the initial room and find a walkable tile for the player
