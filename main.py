@@ -102,7 +102,7 @@ for row in range(MAP_HEIGHT):
             sprite = random.choice(wall_sprites)
             row_sprites.append(sprite)
         else:
-            row_sprites.append(None)
+            row_sprites.append(pygame.Surface((TILE_SIZE, TILE_SIZE)))  # Ensure non-wall tiles have a surface
     wall_tile_sprites.append(row_sprites)
 
 # Update player initialization
@@ -296,12 +296,13 @@ while running:
 
                 if current_room[row][col] == 1:
                     sprite = wall_tile_sprites[row][col]
-                    screen.blit(sprite, (tile_x, tile_y))
+                    if sprite:  # Ensure sprite is not None
+                        screen.blit(sprite, (tile_x, tile_y))
                 elif current_room[row][col] == 0:
                     pygame.draw.rect(screen, WHITE, (tile_x, tile_y, TILE_SIZE, TILE_SIZE))
+                else:
+                    pygame.draw.rect(screen, GRAY, (tile_x, tile_y, TILE_SIZE, TILE_SIZE))  # Assign a default color for other tiles
 
-        # Remove the mouse_buttons check that was here
-        
         keys = pygame.key.get_pressed()
         dx, dy = 0, 0
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:
@@ -342,9 +343,12 @@ while running:
 
                 if current_room[row][col] == 1:
                     sprite = wall_tile_sprites[row][col]
-                    screen.blit(sprite, (tile_x, tile_y))
+                    if sprite:  # Ensure sprite is not None
+                        screen.blit(sprite, (tile_x, tile_y))
                 elif current_room[row][col] == 0:
                     pygame.draw.rect(screen, WHITE, (tile_x, tile_y, TILE_SIZE, TILE_SIZE))
+                else:
+                    pygame.draw.rect(screen, GRAY, (tile_x, tile_y, TILE_SIZE, TILE_SIZE))  # Assign a default color for other tiles
 
         for bullet in bullets[:]:
             if not bullet.is_broken:
