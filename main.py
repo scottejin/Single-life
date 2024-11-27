@@ -67,6 +67,7 @@ all_sprites = load_sprite_sheet(32, 32)
 player_sprite = get_sprite(78, 7)  # Select sprite at row 78, column 7 for left movement
 player_sprite_right = get_sprite(78, 8)  # Select sprite at row 78, column 8 for right movement
 enemy_sprite = load_sprite_sheet_image().subsurface((8 * 32, 78 * 32, 32, 32))  # Select sprite at row 78, column 8
+wall_sprite = get_sprite(15, 23)  # Add this line to load wall sprite
 
 # Load bullet sprites for all directions
 bullet_sprites = {
@@ -306,7 +307,7 @@ while running:
                 tile_y = row * TILE_SIZE - camera_y
 
                 if current_room[row][col] == 1:
-                    pygame.draw.rect(screen, GRAY, (tile_x, tile_y, TILE_SIZE, TILE_SIZE))
+                    screen.blit(wall_sprite, (tile_x, tile_y))
                 elif current_room[row][col] == 0:
                     pygame.draw.rect(screen, WHITE, (tile_x, tile_y, TILE_SIZE, TILE_SIZE))
 
