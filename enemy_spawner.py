@@ -10,9 +10,9 @@ class EnemySpawner:
     def __init__(self, x, y, spawn_interval=5, max_enemies=3, sprite=None, health=10):
         self.x = x
         self.y = y
-        self.spawn_interval = spawn_interval
+        self.spawn_interval = 5.0  # Fixed: Now a float instead of Surface
         self.max_enemies = max_enemies
-        self.last_spawn_time = 0
+        self.last_spawn_time = pygame.time.get_ticks() / 1000.0  # Convert to seconds
         self.health = health
         self.sprite = sprite
         self.max_health = 10  # Set maximum health
@@ -51,7 +51,7 @@ class EnemySpawner:
                 self.spawn_enemy(enemies)
                 self.has_spawned_in_circle = True
 
-            current_time = time.time()
+            current_time = pygame.time.get_ticks() / 1000.0  # Convert to seconds
             if current_time - self.last_spawn_time >= self.spawn_interval:
                 self.spawn_enemy(enemies)
                 self.last_spawn_time = current_time  # Reset the spawn timer
