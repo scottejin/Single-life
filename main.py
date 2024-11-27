@@ -131,14 +131,20 @@ while running:
                         elapsed_time = game_state['elapsed_time']
                         xp_counter = game_state['xp_counter']
                         seed = game_state['seed']
+                        random.seed(seed)  # Reset the random seed
                         dungeon_rooms = game_state['dungeon_rooms']
                         enemies = game_state['enemies']
-                        for enemy in enemies:
-                            enemy.health = 2  # Set enemy health to 2
                         spawners = game_state['spawners']
                         bullets = game_state['bullets']
                         xp_orbs = game_state['xp_orbs']
-                        # ...load other game state data...
+                        # Reconstruct the current room
+                        current_room = load_room_at(current_room_x, current_room_y, dungeon_rooms, enemies, spawners)
+                        # Ensure player is on a walkable tile
+                        tile_x = int(player_x // TILE_SIZE)
+                        tile_y = int(player_y // TILE_SIZE)
+                        if current_room[tile_y][tile_x] == 1:  # If tile is a wall
+                            player_x, player_y = find_walkable_tile(current_room)
+                            player.set_position(player_x, player_y)
                         in_main_menu = False
                         start_time = time.time() - elapsed_time
                     else:

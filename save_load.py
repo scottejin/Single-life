@@ -2,12 +2,14 @@ import os
 import json
 import pygame
 import random
+# import numpy as np  # Remove this import if you're using NumPy arrays
 from player import Player
 from bullet import Bullet
 from enemy import Enemy
 from strong_enemy import StrongEnemy
 from xp_orb import XPOrb
 from settings import SCREEN_WIDTH, SCREEN_HEIGHT, WHITE, BLACK, player_speed
+from enemy_spawner import EnemySpawner
 
 SAVE_FOLDER = 'saves'
 
@@ -60,8 +62,11 @@ def load_game(slot):
         xp_counter = save_data.get('xp_counter', 0)
         seed = save_data.get('seed', str(random.randint(0, 1000000)))
         
-        dungeon_rooms = {tuple(map(int, k.split(','))): save_data['dungeon_rooms'][k]
-                         for k in save_data.get('dungeon_rooms', {})}
+        dungeon_rooms = {}
+        for key_str, room_data in save_data.get('dungeon_rooms', {}).items():
+            key = tuple(map(int, key_str.split(',')))
+            # Use room_data directly as a list
+            dungeon_rooms[key] = room_data
         
         enemies = [Enemy.from_dict(e) for e in save_data.get('enemies', [])]
         spawners = [EnemySpawner.from_dict(s) for s in save_data.get('spawners', [])]
