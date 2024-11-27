@@ -18,7 +18,7 @@ class MainMenu:
         screen.fill(BLACK)
         for button in self.buttons:
             button.draw(screen)
-        music.update_track_display(screen)  # Update the music track display
+        music.update_track_display(screen, right_side=True)  # Update the music track display
 
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
@@ -109,7 +109,7 @@ class MainMenu:
             # Add this line to set the previous_slot after selection
             previous_slot = selected_slot
 
-            music.update_track_display(screen)  # Update the music track display
+            music.update_track_display(screen, right_side=True)  # Update the music track display
 
             pygame.display.flip()
         return selected_slot  # Add this line to store the selected slot

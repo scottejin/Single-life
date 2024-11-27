@@ -288,10 +288,10 @@ while running:
 
     if (in_main_menu):
         main_menu.draw(screen)
-        music.update_track_display(screen)
+        music.update_track_display(screen, right_side=True)
     elif (in_end_game):
         draw_death_screen(screen, elapsed_time, xp_counter, seed, selected_slot)
-        music.update_track_display(screen)
+        music.update_track_display(screen, right_side=True)
     elif (not is_paused):
         elapsed_time = time.time() - start_time
         current_room = load_room_at(current_room_x, current_room_y, dungeon_rooms, enemies, spawners, enemy_sprite)
@@ -478,11 +478,11 @@ while running:
                         restart_game(seed)  # Reset game state
 
         # Update the music track display
-        music.update_track_display(screen)
+        music.update_track_display(screen, right_side=True)
 
     else:
         menu.draw(screen)
-        music.update_track_display(screen)
+        music.update_track_display(screen, right_side=True)
 
     pygame.display.flip()
 

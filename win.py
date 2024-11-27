@@ -68,5 +68,5 @@ def draw_victory_screen(screen, elapsed_time, xp_counter, seed):
             pygame.display.flip()
             pygame.time.delay(100)  # Delay to control the speed of color change
 
-        # Update the music track display
-        music.update_track_display(screen)
+        # Update the music track display with flashing rainbow colors
+        music.update_track_display(screen, right_side=True, rainbow=True)
