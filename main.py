@@ -66,19 +66,19 @@ current_room_x, current_room_y = 0, 0
 all_sprites = load_sprite_sheet(32, 32)
 player_sprite = get_sprite(78, 7)  # Select sprite at row 78, column 7 for left movement
 player_sprite_right = get_sprite(78, 8)  # Select sprite at row 78, column 8 for right movement
-enemy_sprite = load_sprite_sheet_image().subsurface((8 * 32, 78 * 32, 32, 32))  # Select sprite at row 78, column 8
-wall_sprite = get_sprite(15, 23)  # Add this line to load wall sprite
+enemy_sprite = get_sprite(78, 8)  # Select sprite at row 78, column 8
+wall_sprite = get_sprite(14, 23)  # Update this line to load wall sprite from row 14, column 23
 
 # Load bullet sprites for all directions
 bullet_sprites = {
-    'north': get_sprite(25,7),
-    'northeast': get_sprite(25,8),
-    'east': get_sprite(25,9),
-    'southeast': get_sprite(25,10),
-    'south': get_sprite(25,11),
-    'southwest': get_sprite(25,12),
-    'west': get_sprite(25,13),
-    'northwest': get_sprite(25,14)
+    'north': get_sprite(25, 7),
+    'northeast': get_sprite(25, 8),
+    'east': get_sprite(25, 9),
+    'southeast': get_sprite(25, 10),
+    'south': get_sprite(25, 11),
+    'southwest': get_sprite(25, 12),
+    'west': get_sprite(25, 13),
+    'northwest': get_sprite(25, 14)
 }
 # Remove the old bullet_sprite assignment
 # bullet_sprite = get_sprite(25, 8)
