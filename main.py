@@ -17,6 +17,7 @@ from enemy_spawner import EnemySpawner
 from xp_orb import XPOrb  # Ensure XPOrb is imported
 from save_load import save_game, load_game, show_no_saves_screen, get_available_saves  # Updated import
 from end_game import draw_death_screen, handle_death_screen_events
+import music  # Import the music module
 
 pygame.init()
 pygame.mixer.init()
@@ -197,6 +198,9 @@ def handle_save_and_exit():
         pygame.quit()
         sys.exit()
 
+# Ensure the music starts playing when the game starts
+music.play_music()
+
 while running:
     dt = clock.tick(TARGET_FPS) / 1000.0
 
@@ -211,6 +215,8 @@ while running:
             elif in_end_game:
                 in_end_game = False
                 in_main_menu = True  # Return to main menu
+        elif event.type == pygame.KEYDOWN and event.key == pygame.K_m:
+            music.next_track()
         elif in_main_menu:
             action = main_menu.handle_event(event)
             if action == "New Game":
@@ -443,6 +449,9 @@ while running:
                         waiting_for_input = False
                         in_main_menu = True
                         restart_game(seed)  # Reset game state
+
+        # Update the music track display
+        music.update_track_display(screen)
 
     else:
         menu.draw(screen)
