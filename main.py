@@ -4,6 +4,7 @@ import random
 import time
 import os
 import json
+import math  # Import math module
 from settings import SCREEN_WIDTH, SCREEN_HEIGHT, TILE_SIZE, PLAYER_SIZE, ENEMY_SIZE, WHITE, GREEN, RED, GRAY, BLACK, PURPLE, BLUE, ORANGE, MAP_WIDTH, MAP_HEIGHT, TARGET_FPS, player_speed, DARK_ORANGE
 from map import load_room_at, find_walkable_tile
 from player import Player
@@ -65,7 +66,20 @@ all_sprites = load_sprite_sheet(32, 32)
 player_sprite = get_sprite(78, 7)  # Select sprite at row 78, column 7 for left movement
 player_sprite_right = get_sprite(78, 8)  # Select sprite at row 78, column 8 for right movement
 enemy_sprite = load_sprite_sheet_image().subsurface((8 * 32, 78 * 32, 32, 32))  # Select sprite at row 78, column 8
-bullet_sprite = all_sprites[2]
+
+# Load bullet sprites for all directions
+bullet_sprites = {
+    'north': get_sprite(25,7),
+    'northeast': get_sprite(25,8),
+    'east': get_sprite(25,9),
+    'southeast': get_sprite(25,10),
+    'south': get_sprite(25,11),
+    'southwest': get_sprite(25,12),
+    'west': get_sprite(25,13),
+    'northwest': get_sprite(25,14)
+}
+# Remove the old bullet_sprite assignment
+# bullet_sprite = get_sprite(25, 8)
 
 # Load the initial room and find a walkable tile for the player
 initial_room = load_room_at(current_room_x, current_room_y, dungeon_rooms, enemies, spawners, enemy_sprite)
@@ -113,7 +127,25 @@ def create_bullet():
         direction_length = (direction[0]**2 + direction[1]**2)**0.5
         if direction_length != 0:
             direction = (direction[0] / direction_length, direction[1] / direction_length)
-            new_bullet = Bullet(player_x, player_y, direction, bullet_speed, bullet_sprite)
+            angle = math.degrees(math.atan2(-direction[1], direction[0])) % 360  # Invert y for screen coordinates
+            if 22.5 <= angle < 67.5:
+                direction_name = 'northeast'
+            elif 67.5 <= angle < 112.5:
+                direction_name = 'north'
+            elif 112.5 <= angle < 157.5:
+                direction_name = 'northwest'
+            elif 157.5 <= angle < 202.5:
+                direction_name = 'west'
+            elif 202.5 <= angle < 247.5:
+                direction_name = 'southwest'
+            elif 247.5 <= angle < 292.5:
+                direction_name = 'south'
+            elif 292.5 <= angle < 337.5:
+                direction_name = 'southeast'
+            else:
+                direction_name = 'east'
+            selected_sprite = bullet_sprites[direction_name]
+            new_bullet = Bullet(player_x, player_y, direction, bullet_speed, selected_sprite)
             bullets.append(new_bullet)
             if bullet_sound:
                 bullet_sound.play()
