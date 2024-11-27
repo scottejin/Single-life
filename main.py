@@ -60,17 +60,15 @@ circle_radius = 6 * TILE_SIZE
 # Initialize current_room_x and current_room_y
 current_room_x, current_room_y = 0, 0
 
-# Load the initial room and find a walkable tile for the player
-initial_room = load_room_at(current_room_x, current_room_y, dungeon_rooms, enemies, spawners, enemy_sprite)
-player_x, player_y = find_walkable_tile(initial_room)
-
-# Update the call to load_sprite_sheet
+# Update the call to load_sprite_sheet and assign sprites before loading the initial room
 all_sprites = load_sprite_sheet(32, 32)
-
-# Assign sprites to entities
 player_sprite = all_sprites[0]  # Update indices based on your sprite sheet
 enemy_sprite = all_sprites[1]
 bullet_sprite = all_sprites[2]
+
+# Load the initial room and find a walkable tile for the player
+initial_room = load_room_at(current_room_x, current_room_y, dungeon_rooms, enemies, spawners, enemy_sprite)
+player_x, player_y = find_walkable_tile(initial_room)
 
 # Update player initialization
 player = Player(player_x, player_y, player_speed, player_sprite)
@@ -169,7 +167,7 @@ while running:
                         bullets = game_state['bullets']
                         xp_orbs = game_state['xp_orbs']
                         # Reconstruct the current room
-                        current_room = load_room_at(current_room_x, current_room_y, dungeon_rooms, enemies, spawners)
+                        current_room = load_room_at(current_room_x, current_room_y, dungeon_rooms, enemies, spawners, enemy_sprite)
                         # Ensure player is on a walkable tile
                         tile_x = int(player_x // TILE_SIZE)
                         tile_y = int(player_y // TILE_SIZE)
@@ -222,7 +220,7 @@ while running:
         draw_death_screen(screen, elapsed_time, xp_counter, seed, selected_slot)
     elif not is_paused:
         elapsed_time = time.time() - start_time
-        current_room = load_room_at(current_room_x, current_room_y, dungeon_rooms, enemies, spawners)
+        current_room = load_room_at(current_room_x, current_room_y, dungeon_rooms, enemies, spawners, enemy_sprite)
 
         keys = pygame.key.get_pressed()
         dx, dy = 0, 0

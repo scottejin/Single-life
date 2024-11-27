@@ -70,7 +70,7 @@ class EnemySpawner:
         """Handle spawner taking damage."""
         if self.is_active:
             self.health -= 1
-            print(f"EnemySpawner at ({self.spawn_x}, self.spawn_y}) took damage! Remaining health: {self.health}")
+            print(f"EnemySpawner at ({self.spawn_x}, {self.spawn_y}) took damage! Remaining health: {self.health}")
             if self.health <= 0 and self.is_active:
                 self.is_active = False
                 print(f"EnemySpawner at ({self.spawn_x}, {self.spawn_y}) destroyed!")
