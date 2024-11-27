@@ -3,11 +3,12 @@ import pygame
 import os
 
 class Bullet:
-    def __init__(self, x, y, direction, speed, is_broken=False):
+    def __init__(self, x, y, direction, speed, sprite, is_broken=False):
         self.x = x
         self.y = y
         self.direction = direction
         self.speed = speed
+        self.sprite = sprite
         self.is_broken = is_broken
 
     def play_sound(self):
@@ -46,6 +47,9 @@ class Bullet:
     def break_bullet(self):
         self.is_broken = True
 
+    def draw(self, screen, camera_x, camera_y):
+        screen.blit(self.sprite, (self.x - camera_x, self.y - camera_y))
+
     def to_dict(self):
         return {
             'x': self.x,
@@ -62,5 +66,6 @@ class Bullet:
             y=data['y'],
             direction=tuple(data['direction']),
             speed=data['speed'],
+            sprite=None,  # Placeholder for sprite, should be set appropriately
             is_broken=data['is_broken']
         )

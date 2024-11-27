@@ -28,12 +28,12 @@ class MainMenu:
             return "Exit"  # Treat Escape as Exit button
         return None
 
-    def select_save_slot(self, screen, title):
+    def select_save_slot(self, screen, title, mode):
         available_saves = get_available_saves()
         running = True
         selected_slot = None
         confirmation = False
-        slot_to_delete = None
+        slot_to_overwrite = None  # Renamed variable for clarity
 
         font = pygame.font.SysFont(None, 36)
         small_font = pygame.font.SysFont(None, 28)
@@ -68,7 +68,7 @@ class MainMenu:
                         if confirmation:
                             confirmation = False
                             self.confirmation_dialog = None
-                            slot_to_delete = None
+                            slot_to_overwrite = None
                         else:
                             running = False
                             return None  # Return to previous menu
@@ -77,46 +77,46 @@ class MainMenu:
                     if confirmation and self.confirmation_dialog:
                         result = self.confirmation_dialog.handle_event(event)
                         if result == "Yes":
+                            if mode == "save":
+                                selected_slot = slot_to_overwrite
+                                running = False
                             try:
-                                delete_save_slot(slot_to_delete)
-                                selected_slot = slot_to_delete
+                                delete_save_slot(slot_to_overwrite)
+                                selected_slot = slot_to_overwrite
                                 running = False
                             except Exception as e:
-                                print(f"Error deleting save slot {slot_to_delete}: {e}")
+                                print(f"Error deleting save slot {slot_to_overwrite}: {e}")
                                 # Optionally, display an error message to the user
                         elif result == "No":
                             confirmation = False
-                            slot_to_delete = None
+                            slot_to_overwrite = None
                     else:
                         for slot_rect, slot_num, slot_status in slot_rects:
                             if slot_rect.collidepoint((mouse_x, mouse_y)):
-                                if slot_status == "Occupied":
-                                    # Initialize confirmation dialog
-                                    confirm_message = [
-                                        "Slot occupied! Are you sure you want to",
-                                        "delete all information inside?"
-                                    ]
-                                    joke_message = [
-                                        "Deleting is like losing your",
-                                        "keys in a haystack—frustrating and confusing!"
-                                    ]
-                                    self.confirmation_dialog = ConfirmationDialog(
-                                        screen,
-                                        confirm_message,
-                                        joke_message,
-                                        ("Yes", "No"),
-                                        position=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
-                                    )
-                                    confirmation = True
-                                    slot_to_delete = slot_num
-                                else:
-                                    selected_slot = slot_num
-                                    running = False
+                                if mode == "load":
+                                    if slot_status == "Occupied":
+                                        selected_slot = slot_num
+                                        running = False
+                                elif mode == "save":
+                                    if slot_status == "Occupied":
+                                        confirm_message = ["Slot is occupied! Do you want to overwrite it?"]
+                                        self.confirmation_dialog = ConfirmationDialog(
+                                            screen,
+                                            confirm_message,
+                                            [],
+                                            ("Yes", "No"),
+                                            position=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
+                                        )
+                                        confirmation = True
+                                        slot_to_overwrite = slot_num
+                                    else:
+                                        selected_slot = slot_num
+                                        running = False
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE and confirmation:
                         confirmation = False
                         self.confirmation_dialog = None
-                        slot_to_delete = None
+                        slot_to_overwrite = None
 
             pygame.display.flip()
         return selected_slot

@@ -60,7 +60,7 @@ def is_connected(dungeon_map, start_x, start_y):
                 return False
     return True
 
-def generate_room_at(dungeon_map, origin_x, origin_y, enemies, spawners):
+def generate_room_at(dungeon_map, origin_x, origin_y, enemies, spawners, enemy_sprite):
     max_rooms = 10
     min_room_size = 4
     max_room_size = 8
@@ -100,21 +100,21 @@ def generate_room_at(dungeon_map, origin_x, origin_y, enemies, spawners):
             # Spawn an enemy spawner in the room
             spawn_x = new_room.x + new_room.width // 2
             spawn_y = new_room.y + new_room.height // 2
-            spawners.append(EnemySpawner(spawn_x * TILE_SIZE, spawn_y * TILE_SIZE))
+            spawners.append(EnemySpawner(spawn_x * TILE_SIZE, spawn_y * TILE_SIZE, enemy_sprite))
 
             rooms.append(new_room)
 
     # Validate connectivity
     start_x, start_y = rooms[0].center()
     if not is_connected(dungeon_map, start_x, start_y):
-        return generate_room_at([[1 for _ in range(MAP_WIDTH)] for _ in range(MAP_HEIGHT)], origin_x, origin_y, enemies, spawners)
+        return generate_room_at([[1 for _ in range(MAP_WIDTH)] for _ in range(MAP_HEIGHT)], origin_x, origin_y, enemies, spawners, enemy_sprite)
 
     return dungeon_map
 
-def load_room_at(x, y, dungeon_rooms, enemies, spawners):
+def load_room_at(x, y, dungeon_rooms, enemies, spawners, enemy_sprite):
     if (x, y) not in dungeon_rooms:
         dungeon_map = [[1 for _ in range(MAP_WIDTH)] for _ in range(MAP_HEIGHT)]
-        dungeon_map = generate_room_at(dungeon_map, x, y, enemies, spawners)
+        dungeon_map = generate_room_at(dungeon_map, x, y, enemies, spawners, enemy_sprite)
         dungeon_rooms[(x, y)] = dungeon_map
     return dungeon_rooms[(x, y)]
 

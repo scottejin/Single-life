@@ -7,9 +7,10 @@ from settings import TILE_SIZE, ENEMY_SIZE, PURPLE, BLACK
 from xp_orb import XPOrb  # Ensure XPOrb is imported
 
 class EnemySpawner:
-    def __init__(self, spawn_x, spawn_y, spawn_interval=5):
+    def __init__(self, spawn_x, spawn_y, enemy_sprite, spawn_interval=5):
         self.spawn_x = spawn_x
         self.spawn_y = spawn_y
+        self.enemy_sprite = enemy_sprite
         self.spawn_interval = spawn_interval  # Interval in seconds
         self.last_spawn_time = time.time()
         self.max_health = 10  # Set maximum health
@@ -60,7 +61,7 @@ class EnemySpawner:
             new_enemy =StrongEnemy(self.spawn_x, self.spawn_y, health=10, max_health=10, strength=2)
             print(f"StrongEnemy spawned at ({self.spawn_x}, {self.spawn_y})")
         else:
-            new_enemy = Enemy(self.spawn_x, self.spawn_y, health=2, max_health=2)
+            new_enemy = Enemy(self.spawn_x, self.spawn_y, self.enemy_sprite, health=2, max_health=2)
             print(f"Normal Enemy spawned at ({self.spawn_x}, {self.spawn_y})")
         enemies.append(new_enemy)
         # Removed self.current_enemy to allow multiple enemies

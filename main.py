@@ -22,6 +22,8 @@ pygame.mixer.init()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SCALED | pygame.DOUBLEBUF)
 pygame.display.set_caption("Endless Dungeon Explorer")
 
+from sprites import load_sprite_sheet, load_sprite_sheet_image, get_sprite  # Import get_sprite
+
 bullet_sound = None
 try:
     sound_file = os.path.join('sounds', 'gun.wav')
@@ -58,10 +60,18 @@ circle_radius = 6 * TILE_SIZE
 # Initialize current_room_x and current_room_y
 current_room_x, current_room_y = 0, 0
 
+# Update the call to load_sprite_sheet and assign sprites before loading the initial room
+all_sprites = load_sprite_sheet(32, 32)
+player_sprite = get_sprite(78, 8)  # Select sprite at row 78, column 8
+enemy_sprite = load_sprite_sheet_image().subsurface((8 * 32, 78 * 32, 32, 32))  # Select sprite at row 78, column 8
+bullet_sprite = all_sprites[2]
+
 # Load the initial room and find a walkable tile for the player
-initial_room = load_room_at(current_room_x, current_room_y, dungeon_rooms, enemies, spawners)
+initial_room = load_room_at(current_room_x, current_room_y, dungeon_rooms, enemies, spawners, enemy_sprite)
 player_x, player_y = find_walkable_tile(initial_room)
-player = Player(player_x, player_y, player_speed)
+
+# Update player initialization
+player = Player(player_x, player_y, player_speed, player_sprite)
 
 # Define where to save the game files
 SAVE_FOLDER = 'saves'
@@ -72,7 +82,7 @@ if not os.path.exists(SAVE_FOLDER):
 available_saves = get_available_saves()
 
 def restart_game(seed):
-    global dungeon_rooms, bullets, player, player_x, player_y, current_room_x, current_room_y, enemies, spawners, start_time, elapsed_time, xp_orbs, xp_counter, selected_slot
+    global dungeon_rooms, bullets, player, player_x, player_y, current_room_x, current_room_y, enemies, spawners, start_time, elapsed_time, xp_orbs, xp_counter
     random.seed(seed)
     dungeon_rooms = {}
     bullets = []
@@ -81,18 +91,36 @@ def restart_game(seed):
     xp_orbs = []
     current_room_x, current_room_y = 0, 0
 
-    initial_room = load_room_at(0, 0, dungeon_rooms, enemies, spawners)
+    initial_room = load_room_at(0, 0, dungeon_rooms, enemies, spawners, enemy_sprite)
     for enemy in enemies:
         enemy.health = 2  # Set enemy health to 2
     player_x, player_y = find_walkable_tile(initial_room)
-    player = Player(player_x, player_y, player_speed)
+    player = Player(player_x, player_y, player_speed, player_sprite)
     start_time = time.time()
     elapsed_time = 0
     xp_counter = 0
-    selected_slot = None  # Reset selected slot
 
 clock = pygame.time.Clock()
 running = True
+
+def create_bullet():
+    global last_shot_time
+    current_time = time.time()
+    if current_time - last_shot_time >= 0.5:  # Limit to 2 bullets per second
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        direction = (mouse_x - SCREEN_WIDTH // 2, mouse_y - SCREEN_HEIGHT // 2)
+        direction_length = (direction[0]**2 + direction[1]**2)**0.5
+        if direction_length != 0:
+            direction = (direction[0] / direction_length, direction[1] / direction_length)
+            new_bullet = Bullet(player_x, player_y, direction, bullet_speed, bullet_sprite)
+            bullets.append(new_bullet)
+            if bullet_sound:
+                bullet_sound.play()
+            last_shot_time = current_time
+
+def create_enemy(x, y):
+    new_enemy = Enemy(x, y, enemy_sprite)
+    enemies.append(new_enemy)
 
 while running:
     dt = clock.tick(TARGET_FPS) / 1000.0
@@ -111,7 +139,7 @@ while running:
         elif in_main_menu:
             action = main_menu.handle_event(event)
             if action == "New Game":
-                selected_slot = main_menu.select_save_slot(screen, "Select Slot to Save New Game")
+                selected_slot = main_menu.select_save_slot(screen, "Select Slot to Save New Game", mode="save")
                 if selected_slot is not None:
                     restart_game(seed)
                     in_main_menu = False
@@ -120,7 +148,7 @@ while running:
                 else:
                     in_main_menu = True  # Return to main menu if no slot selected
             elif action == "Load Game":
-                selected_slot = main_menu.select_save_slot(screen, "Select Slot to Load Game")
+                selected_slot = main_menu.select_save_slot(screen, "Select Slot to Load Game", mode="load")
                 if selected_slot is not None:
                     game_state = load_game(selected_slot)
                     if game_state:
@@ -132,14 +160,20 @@ while running:
                         elapsed_time = game_state['elapsed_time']
                         xp_counter = game_state['xp_counter']
                         seed = game_state['seed']
+                        random.seed(seed)  # Reset the random seed
                         dungeon_rooms = game_state['dungeon_rooms']
                         enemies = game_state['enemies']
-                        for enemy in enemies:
-                            enemy.health = 2  # Set enemy health to 2
                         spawners = game_state['spawners']
                         bullets = game_state['bullets']
                         xp_orbs = game_state['xp_orbs']
-                        # ...load other game state data...
+                        # Reconstruct the current room
+                        current_room = load_room_at(current_room_x, current_room_y, dungeon_rooms, enemies, spawners, enemy_sprite)
+                        # Ensure player is on a walkable tile
+                        tile_x = int(player_x // TILE_SIZE)
+                        tile_y = int(player_y // TILE_SIZE)
+                        if current_room[tile_y][tile_x] == 1:  # If tile is a wall
+                            player_x, player_y = find_walkable_tile(current_room)
+                            player.set_position(player_x, player_y)
                         in_main_menu = False
                         start_time = time.time() - elapsed_time
                     else:
@@ -158,18 +192,7 @@ while running:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 is_paused = True
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                current_time = time.time()
-                if current_time - last_shot_time >= 0.5:  # Limit to 2 bullets per second
-                    mouse_x, mouse_y = pygame.mouse.get_pos()
-                    direction = (mouse_x - SCREEN_WIDTH // 2, mouse_y - SCREEN_HEIGHT // 2)
-                    direction_length = (direction[0]**2 + direction[1]**2)**0.5
-                    if direction_length != 0:
-                        direction = (direction[0] / direction_length, direction[1] / direction_length)
-                        new_bullet = Bullet(player_x, player_y, direction, bullet_speed)
-                        bullets.append(new_bullet)
-                        if bullet_sound:
-                            bullet_sound.play()
-                        last_shot_time = current_time
+                create_bullet()
         elif is_paused:
             action = menu.handle_event(event)
             if action == "Resume":
@@ -197,7 +220,7 @@ while running:
         draw_death_screen(screen, elapsed_time, xp_counter, seed, selected_slot)
     elif not is_paused:
         elapsed_time = time.time() - start_time
-        current_room = load_room_at(current_room_x, current_room_y, dungeon_rooms, enemies, spawners)
+        current_room = load_room_at(current_room_x, current_room_y, dungeon_rooms, enemies, spawners, enemy_sprite)
 
         keys = pygame.key.get_pressed()
         dx, dy = 0, 0
@@ -250,7 +273,7 @@ while running:
                 pygame.draw.circle(screen, (255, 255, 0), (int(bullet_x - camera_x), int(bullet_y - camera_y)), 5)  # Yellow for breaking animation
                 bullets.remove(bullet)
             else:
-                pygame.draw.circle(screen, RED, (int(bullet_x - camera_x), int(bullet_y - camera_y)), 5)
+                bullet.draw(screen, camera_x, camera_y)
 
         for spawner in spawners:
             spawner.update(enemies, player_x, player_y, circle_radius)
@@ -295,7 +318,7 @@ while running:
                 xp_counter += 1  # Increment XP by 1 per orb collected
                 xp_orbs.remove(xp_orb)
 
-        pygame.draw.rect(screen, RED, (SCREEN_WIDTH // 2 - PLAYER_SIZE // 2, SCREEN_HEIGHT // 2 - PLAYER_SIZE // 2, PLAYER_SIZE, PLAYER_SIZE))
+        player.draw(screen, camera_x, camera_y)
 
         # Drawing the health bar
         health_bar_width = 100
