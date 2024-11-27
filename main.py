@@ -224,28 +224,8 @@ while running:
         elif not is_paused:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 is_paused = True
-            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left click
                 create_bullet()
-        elif is_paused:
-            action = menu.handle_event(event)
-            if action == "Resume":
-                is_paused = False
-            elif action == "Save and Exit":
-                if selected_slot is None:
-                    selected_slot = main_menu.select_save_slot(screen, "Select Slot to Save Game")
-                if selected_slot is not None:
-                    save_game(
-                        player_x, player_y, player,
-                        current_room_x, current_room_y,
-                        elapsed_time, xp_counter, seed,
-                        selected_slot,
-                        dungeon_rooms, enemies, spawners,
-                        bullets, xp_orbs
-                    )
-                    in_main_menu = True
-                    is_paused = False
-                else:
-                    is_paused = False  # Return to game if no slot selected
 
     if in_main_menu:
         main_menu.draw(screen)
@@ -255,6 +235,8 @@ while running:
         elapsed_time = time.time() - start_time
         current_room = load_room_at(current_room_x, current_room_y, dungeon_rooms, enemies, spawners, enemy_sprite)
 
+        # Remove the mouse_buttons check that was here
+        
         keys = pygame.key.get_pressed()
         dx, dy = 0, 0
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:
