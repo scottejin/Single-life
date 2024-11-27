@@ -307,7 +307,9 @@ while running:
                 tile_y = row * TILE_SIZE - camera_y
 
                 if current_room[row][col] == 1:
-                    screen.blit(wall_sprite, (tile_x, tile_y))
+                    random_col = random.randint(21, 28)
+                    random_sprite = pygame.transform.scale(get_sprite(14, random_col), (TILE_SIZE, TILE_SIZE))
+                    screen.blit(random_sprite, (tile_x, tile_y))
                 elif current_room[row][col] == 0:
                     pygame.draw.rect(screen, WHITE, (tile_x, tile_y, TILE_SIZE, TILE_SIZE))
 
