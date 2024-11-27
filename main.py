@@ -83,15 +83,27 @@ bullet_sprites = {
 # Remove the old bullet_sprite assignment
 # bullet_sprite = get_sprite(25, 8)
 
-# Preload and cache wall sprites
+# Preload and cache wall sprites from row 14, columns 23 to 29
 wall_sprites = [
     pygame.transform.scale(get_sprite(14, col), (TILE_SIZE, TILE_SIZE))
-    for col in range(21, 29)
+    for col in range(23, 30)
 ]
 
 # Load the initial room and find a walkable tile for the player
 initial_room = load_room_at(current_room_x, current_room_y, dungeon_rooms, enemies, spawners, enemy_sprite)
 player_x, player_y = find_walkable_tile(initial_room)
+
+# Assign a random sprite to each wall tile once during level setup
+wall_tile_sprites = []
+for row in range(MAP_HEIGHT):
+    row_sprites = []
+    for col in range(MAP_WIDTH):
+        if initial_room[row][col] == 1:
+            sprite = random.choice(wall_sprites)
+            row_sprites.append(sprite)
+        else:
+            row_sprites.append(None)
+    wall_tile_sprites.append(row_sprites)
 
 # Update player initialization
 player = Player(player_x, player_y, player_speed, player_sprite)
@@ -272,6 +284,18 @@ while running:
         elapsed_time = time.time() - start_time
         current_room = load_room_at(current_room_x, current_room_y, dungeon_rooms, enemies, spawners, enemy_sprite)
 
+        # Assign a random sprite to each wall tile once during level setup
+        wall_tile_sprites = []
+        for row in range(MAP_HEIGHT):
+            row_sprites = []
+            for col in range(MAP_WIDTH):
+                if current_room[row][col] == 1:
+                    sprite = random.choice(wall_sprites)
+                    row_sprites.append(sprite)
+                else:
+                    row_sprites.append(None)
+            wall_tile_sprites.append(row_sprites)
+
         # Remove the mouse_buttons check that was here
         
         keys = pygame.key.get_pressed()
@@ -313,8 +337,8 @@ while running:
                 tile_y = row * TILE_SIZE - camera_y
 
                 if current_room[row][col] == 1:
-                    random_sprite = random.choice(wall_sprites)
-                    screen.blit(random_sprite, (tile_x, tile_y))
+                    sprite = wall_tile_sprites[row][col]
+                    screen.blit(sprite, (tile_x, tile_y))
                 elif current_room[row][col] == 0:
                     pygame.draw.rect(screen, WHITE, (tile_x, tile_y, TILE_SIZE, TILE_SIZE))
 
