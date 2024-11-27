@@ -33,3 +33,7 @@ def load_sprite_sheet(sprite_width, sprite_height):
         sprites.append(bullet_sprite)
         
         return sprites
+
+def get_sprite(row, col, width=32, height=32):
+    sprite_sheet = load_sprite_sheet_image()
+    return sprite_sheet.subsurface((col * width, row * height, width, height))

@@ -63,6 +63,7 @@ current_room_x, current_room_y = 0, 0
 # Update the call to load_sprite_sheet and assign sprites before loading the initial room
 all_sprites = load_sprite_sheet(32, 32)
 player_sprite = get_sprite(78, 8)  # Select sprite at row 78, column 8
+player_sprite_right = get_sprite(78, 9)  # Select sprite at row 78, column 9
 enemy_sprite = load_sprite_sheet_image().subsurface((8 * 32, 78 * 32, 32, 32))  # Select sprite at row 78, column 8
 bullet_sprite = all_sprites[2]
 
@@ -226,8 +227,10 @@ while running:
         dx, dy = 0, 0
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:
             dx = -1
+            player.sprite = player_sprite  # Change to left-facing sprite
         if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
             dx = 1
+            player.sprite = player_sprite_right  # Change to right-facing sprite
         if keys[pygame.K_UP] or keys[pygame.K_w]:
             dy = -1
         if keys[pygame.K_DOWN] or keys[pygame.K_s]:

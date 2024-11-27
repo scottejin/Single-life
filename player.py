@@ -25,5 +25,10 @@ class Player:
     def get_position(self):
         return self.x, self.y
 
+    def set_position(self, x, y):
+        self.x = x
+        self.y = y
+        self.rect.topleft = (self.x, self.y)
+
     def draw(self, screen, camera_x, camera_y):
         screen.blit(self.sprite, (self.x - camera_x, self.y - camera_y))
