@@ -1,18 +1,19 @@
 import pygame
+from assets.sprite_sheet import load_sprite_sheet_image  # Import the function
 
-def load_sprite_sheet(file_name, sprite_width, sprite_height):
+def load_sprite_sheet(sprite_width, sprite_height):
     try:
-        sprite_sheet = pygame.image.load(file_name).convert_alpha()
-        sheet_width, sheet_height = sprite_sheet.get_size()
+        sprite_sheet_image = load_sprite_sheet_image()  # Load the image here
+        sheet_width, sheet_height = sprite_sheet_image.get_size()
         sprites = []
         for y in range(0, sheet_height, sprite_height):
             for x in range(0, sheet_width, sprite_width):
                 rect = pygame.Rect(x, y, sprite_width, sprite_height)
-                image = sprite_sheet.subsurface(rect)
+                image = sprite_sheet_image.subsurface(rect)
                 sprites.append(image)
         return sprites
     except (FileNotFoundError, pygame.error):
-        print(f"Warning: Could not load sprite sheet '{file_name}'. Using colored rectangles instead.")
+        print(f"Warning: Could not load sprite sheet. Using colored rectangles instead.")
         # Create default colored surfaces for each entity
         sprites = []
         # Player sprite (blue)

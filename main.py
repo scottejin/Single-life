@@ -16,12 +16,13 @@ from enemy_spawner import EnemySpawner
 from xp_orb import XPOrb  # Ensure XPOrb is imported
 from save_load import save_game, load_game, show_no_saves_screen, get_available_saves  # Updated import
 from end_game import draw_death_screen, handle_death_screen_events
-from sprites import load_sprite_sheet
 
 pygame.init()
 pygame.mixer.init()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SCALED | pygame.DOUBLEBUF)
 pygame.display.set_caption("Endless Dungeon Explorer")
+
+from sprites import load_sprite_sheet  # Import after initializing pygame.display
 
 bullet_sound = None
 try:
@@ -60,12 +61,11 @@ circle_radius = 6 * TILE_SIZE
 current_room_x, current_room_y = 0, 0
 
 # Load the initial room and find a walkable tile for the player
-initial_room = load_room_at(current_room_x, current_room_y, dungeon_rooms, enemies, spawners)
+initial_room = load_room_at(current_room_x, current_room_y, dungeon_rooms, enemies, spawners, enemy_sprite)
 player_x, player_y = find_walkable_tile(initial_room)
 
-# Load the sprite sheet
-sprite_sheet_file = os.path.join('assets', 'sprite_sheet.png')  # Update the path as needed
-all_sprites = load_sprite_sheet(sprite_sheet_file, 32, 32)
+# Update the call to load_sprite_sheet
+all_sprites = load_sprite_sheet(32, 32)
 
 # Assign sprites to entities
 player_sprite = all_sprites[0]  # Update indices based on your sprite sheet
@@ -93,7 +93,7 @@ def restart_game(seed):
     xp_orbs = []
     current_room_x, current_room_y = 0, 0
 
-    initial_room = load_room_at(0, 0, dungeon_rooms, enemies, spawners)
+    initial_room = load_room_at(0, 0, dungeon_rooms, enemies, spawners, enemy_sprite)
     for enemy in enemies:
         enemy.health = 2  # Set enemy health to 2
     player_x, player_y = find_walkable_tile(initial_room)
