@@ -121,7 +121,7 @@ running = True
 def create_bullet():
     global last_shot_time
     current_time = time.time()
-    if current_time - last_shot_time < 0.5:  # Limit to 2 bullets per second
+    if current_time - last_shot_time < 0.5:  # Limit to one bullet every 500 ms
         return
     last_shot_time = current_time
     mouse_x, mouse_y = pygame.mouse.get_pos()
