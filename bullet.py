@@ -24,24 +24,28 @@ class Bullet:
         return self.x, self.y
 
     def check_collision(self, dungeon_map, enemies, spawners, xp_orbs):
-        map_x, map_y = int(self.x // TILE_SIZE), int(self.y // TILE_SIZE)
-        if map_x < 0 or map_x >= len(dungeon_map[0]) or map_y < 0 or map_y >= len(dungeon_map):
+        # Check wall collision
+        tile_x = int(self.x // TILE_SIZE)
+        tile_y = int(self.y // TILE_SIZE)
+        if tile_x < 0 or tile_x >= len(dungeon_map[0]) or tile_y < 0 or tile_y >= len(dungeon_map):
             return True
-        if dungeon_map[map_y][map_x] == 1:
+        if dungeon_map[tile_y][tile_x] == 1:
             return True
-        for enemy in enemies:
-            enemy_x, enemy_y = enemy.get_position()
-            collision_radius = enemy.get_collision_radius()  # Get dynamic collision radius
-            if abs(self.x - enemy_x) < collision_radius and abs(self.y - enemy_y) < collision_radius:
+
+        # Check enemy collision
+        for enemy in enemies[:]:  # Use slice to avoid modifying list while iterating
+            if abs(self.x - enemy.x) < TILE_SIZE // 2 and abs(self.y - enemy.y) < TILE_SIZE // 2:
                 if enemy.take_damage():
-                    enemy.die(xp_orbs)
+                    enemy.die(xp_orbs)  # Call die method to drop XP orb
                     enemies.remove(enemy)
-                    print(f"Enemy at ({enemy_x}, {enemy_y}) killed.")
                 return True
-        for spawner in spawners:
-            if spawner.is_active and abs(self.x - spawner.spawn_x) < TILE_SIZE // 2 and abs(self.y - spawner.spawn_y) < TILE_SIZE // 2:
-                spawner.take_damage(xp_orbs)  # Pass xp_orbs as an argument
+
+        # Check spawner collision - Updated to use x and y instead of spawn_x and spawn_y
+        for spawner in spawners[:]:
+            if spawner.is_active and abs(self.x - spawner.x) < TILE_SIZE // 2 and abs(self.y - spawner.y) < TILE_SIZE // 2:
+                spawner.take_damage(xp_orbs)
                 return True
+
         return False
 
     def break_bullet(self):

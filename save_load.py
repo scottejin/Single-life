@@ -10,6 +10,7 @@ from strong_enemy import StrongEnemy
 from xp_orb import XPOrb
 from settings import SCREEN_WIDTH, SCREEN_HEIGHT, WHITE, BLACK, player_speed
 from enemy_spawner import EnemySpawner
+from sprites import get_sprite, load_sprite_sheet_image  # Add this import
 
 SAVE_FOLDER = 'saves'
 
@@ -48,11 +49,15 @@ def load_game(slot):
         with open(save_file, 'r') as f:
             save_data = json.load(f)
         
+        # Get sprites
+        player_sprite = get_sprite(78, 7)  # Default to left-facing sprite
+        enemy_sprite = load_sprite_sheet_image().subsurface((8 * 32, 78 * 32, 32, 32))
+        
         # Reconstruct player
         player_x = save_data.get('player_x', 0)
         player_y = save_data.get('player_y', 0)
         player_health = save_data.get('player_health', 5)
-        player = Player(player_x, player_y, player_speed)
+        player = Player(player_x, player_y, player_speed, player_sprite)
         player.health = player_health
         
         # Reconstruct other game state
@@ -68,7 +73,14 @@ def load_game(slot):
             # Use room_data directly as a list
             dungeon_rooms[key] = room_data
         
-        enemies = [Enemy.from_dict(e) for e in save_data.get('enemies', [])]
+        # Load enemies with proper sprites based on their type
+        enemies = []
+        for e in save_data.get('enemies', []):
+            if e.get('type') == 'StrongEnemy':
+                enemies.append(StrongEnemy.from_dict(e))
+            else:
+                enemies.append(Enemy.from_dict(e))
+
         spawners = [EnemySpawner.from_dict(s) for s in save_data.get('spawners', [])]
         bullets = [Bullet.from_dict(b) for b in save_data.get('bullets', [])]
         xp_orbs = [XPOrb.from_dict(o) for o in save_data.get('xp_orbs', [])]

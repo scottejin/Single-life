@@ -15,10 +15,25 @@ class Player:
         new_x = self.x + dx * self.speed * dt
         new_y = self.y + dy * self.speed * dt
 
-        if is_walkable(new_x, self.y, dungeon_map):
-            self.x = new_x
-        if is_walkable(self.x, new_y, dungeon_map):
-            self.y = new_y
+        # Check both left and right edges when moving horizontally
+        if dx > 0:  # Moving right
+            if (is_walkable(new_x + PLAYER_SIZE, self.y, dungeon_map) and 
+                is_walkable(new_x + PLAYER_SIZE, self.y + PLAYER_SIZE - 1, dungeon_map)):
+                self.x = new_x
+        elif dx < 0:  # Moving left
+            if (is_walkable(new_x, self.y, dungeon_map) and 
+                is_walkable(new_x, self.y + PLAYER_SIZE - 1, dungeon_map)):
+                self.x = new_x
+
+        # Check both top and bottom edges when moving vertically
+        if dy > 0:  # Moving down
+            if (is_walkable(self.x, new_y + PLAYER_SIZE, dungeon_map) and 
+                is_walkable(self.x + PLAYER_SIZE - 1, new_y + PLAYER_SIZE, dungeon_map)):
+                self.y = new_y
+        elif dy < 0:  # Moving up
+            if (is_walkable(self.x, new_y, dungeon_map) and 
+                is_walkable(self.x + PLAYER_SIZE - 1, new_y, dungeon_map)):
+                self.y = new_y
 
         self.rect.topleft = (self.x, self.y)  # Update the player's rect position
 

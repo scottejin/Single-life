@@ -1,4 +1,7 @@
 # enemy.py
+import pygame
+from settings import ENEMY_SIZE, WHITE, BLACK
+from sprites import get_sprite  # Add this import
 from astar import astar
 from settings import TILE_SIZE
 from xp_orb import XPOrb  # Ensure XPOrb is imported
@@ -77,15 +80,14 @@ class Enemy:
             # ...other attributes...
         }
 
-    @staticmethod
-    def from_dict(data):
-        return Enemy(
+    @classmethod
+    def from_dict(cls, data):
+        # Get enemy sprite
+        enemy_sprite = get_sprite(78, 8)  # Use the standard enemy sprite
+        return cls(
             x=data['x'],
             y=data['y'],
-            health=data['health'],
-            max_health=data['max_health'],
-            speed=data['speed'],
-            # ...other attributes...
+            sprite=enemy_sprite  # Add sprite parameter
         )
 
     def draw(self, screen, camera_x, camera_y):

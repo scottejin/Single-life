@@ -7,14 +7,15 @@ from settings import TILE_SIZE, ENEMY_SIZE, PURPLE, BLACK
 from xp_orb import XPOrb  # Ensure XPOrb is imported
 
 class EnemySpawner:
-    def __init__(self, spawn_x, spawn_y, enemy_sprite, spawn_interval=5):
-        self.spawn_x = spawn_x
-        self.spawn_y = spawn_y
-        self.enemy_sprite = enemy_sprite
-        self.spawn_interval = spawn_interval  # Interval in seconds
-        self.last_spawn_time = time.time()
+    def __init__(self, x, y, spawn_interval=5, max_enemies=3, sprite=None, health=10):
+        self.x = x
+        self.y = y
+        self.spawn_interval = spawn_interval
+        self.max_enemies = max_enemies
+        self.last_spawn_time = 0
+        self.health = health
+        self.sprite = sprite
         self.max_health = 10  # Set maximum health
-        self.health = self.max_health
         self.is_active = True
         self.width = int(ENEMY_SIZE * 1.5)
         self.height = int(ENEMY_SIZE * 1.5)
@@ -25,10 +26,10 @@ class EnemySpawner:
     def is_fully_within_blue_circle(self, player_x, player_y, radius):
         """Check if all corners of the spawner are within the blue circle."""
         spawner_corners = [
-            (self.spawn_x, self.spawn_y),
-            (self.spawn_x + self.width, self.spawn_y),
-            (self.spawn_x, self.spawn_y + self.height),
-            (self.spawn_x + self.width, self.spawn_y + self.height),
+            (self.x, self.y),
+            (self.x + self.width, self.y),
+            (self.x, self.y + self.height),
+            (self.x + self.width, self.y + self.height),
         ]
 
         for corner_x, corner_y in spawner_corners:
@@ -58,11 +59,11 @@ class EnemySpawner:
     def spawn_enemy(self, enemies):
         """Spawn an enemy with a 10% chance of being a StrongEnemy."""
         if random.random() <= 0.10:
-            new_enemy =StrongEnemy(self.spawn_x, self.spawn_y, health=10, max_health=10, strength=2)
-            print(f"StrongEnemy spawned at ({self.spawn_x}, {self.spawn_y})")
+            new_enemy =StrongEnemy(self.x, self.y, health=10, max_health=10, strength=2)
+            print(f"StrongEnemy spawned at ({self.x}, {self.y})")
         else:
-            new_enemy = Enemy(self.spawn_x, self.spawn_y, self.enemy_sprite, health=2, max_health=2)
-            print(f"Normal Enemy spawned at ({self.spawn_x}, {self.spawn_y})")
+            new_enemy = Enemy(self.x, self.y, self.sprite, health=2, max_health=2)
+            print(f"Normal Enemy spawned at ({self.x}, {self.y})")
         enemies.append(new_enemy)
         # Removed self.current_enemy to allow multiple enemies
 
@@ -70,19 +71,19 @@ class EnemySpawner:
         """Handle spawner taking damage."""
         if self.is_active:
             self.health -= 1
-            print(f"EnemySpawner at ({self.spawn_x}, {self.spawn_y}) took damage! Remaining health: {self.health}")
+            print(f"EnemySpawner at ({self.x}, {self.y}) took damage! Remaining health: {self.health}")
             if self.health <= 0 and self.is_active:
                 self.is_active = False
-                print(f"EnemySpawner at ({self.spawn_x}, {self.spawn_y}) destroyed!")
+                print(f"EnemySpawner at ({self.x}, {self.y}) destroyed!")
                 # Drop 5 XP orbs, 1.5 times the normal size
                 for _ in range(5):
-                    xp_orb = XPOrb(self.spawn_x, self.spawn_y, size=int(10 * 1.5))
+                    xp_orb = XPOrb(self.x, self.y, size=int(10 * 1.5))
                     xp_orbs.append(xp_orb)
 
     def draw(self, screen, camera_x, camera_y):
         """Draw the spawner and its health bar."""
-        spawner_x = self.spawn_x - camera_x
-        spawner_y = self.spawn_y - camera_y
+        spawner_x = self.x - camera_x
+        spawner_y = self.y - camera_y
 
         # Draw spawner border
         pygame.draw.rect(screen, PURPLE, (spawner_x, spawner_y, self.width, self.height))
@@ -107,21 +108,23 @@ class EnemySpawner:
 
     def to_dict(self):
         return {
-            'x': self.spawn_x,
-            'y': self.spawn_y,
+            'x': self.x,
+            'y': self.y,
+            'spawn_interval': self.spawn_interval,
+            'max_enemies': self.max_enemies,
             'health': self.health,
-            'max_health': self.max_health,
-            'spawn_rate': self.spawn_interval,
-            # ...other attributes...
+            'last_spawn_time': self.last_spawn_time
         }
 
-    @staticmethod
-    def from_dict(data):
-        return EnemySpawner(
-            spawn_x=data['x'],
-            spawn_y=data['y'],
-            health=data['health'],
-            max_health=data['max_health'],
-            spawn_interval=data['spawn_rate'],
-            # ...other attributes...
+    @classmethod
+    def from_dict(cls, data):
+        # Get spawner sprite
+        spawner = cls(
+            x=data['x'],
+            y=data['y'],
+            spawn_interval=data.get('spawn_interval', 5),
+            max_enemies=data.get('max_enemies', 3),
+            health=data.get('health', 10)
         )
+        spawner.last_spawn_time = data.get('last_spawn_time', 0)
+        return spawner

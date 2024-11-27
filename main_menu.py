@@ -77,16 +77,8 @@ class MainMenu:
                     if confirmation and self.confirmation_dialog:
                         result = self.confirmation_dialog.handle_event(event)
                         if result == "Yes":
-                            if mode == "save":
-                                selected_slot = slot_to_overwrite
-                                running = False
-                            try:
-                                delete_save_slot(slot_to_overwrite)
-                                selected_slot = slot_to_overwrite
-                                running = False
-                            except Exception as e:
-                                print(f"Error deleting save slot {slot_to_overwrite}: {e}")
-                                # Optionally, display an error message to the user
+                            selected_slot = slot_to_overwrite
+                            running = False
                         elif result == "No":
                             confirmation = False
                             slot_to_overwrite = None
@@ -97,6 +89,7 @@ class MainMenu:
                                     if slot_status == "Occupied":
                                         selected_slot = slot_num
                                         running = False
+                                    # Do nothing if empty slot is clicked in load mode
                                 elif mode == "save":
                                     if slot_status == "Occupied":
                                         confirm_message = ["Slot is occupied! Do you want to overwrite it?"]
@@ -112,11 +105,6 @@ class MainMenu:
                                     else:
                                         selected_slot = slot_num
                                         running = False
-                elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE and confirmation:
-                        confirmation = False
-                        self.confirmation_dialog = None
-                        slot_to_overwrite = None
 
             pygame.display.flip()
         return selected_slot

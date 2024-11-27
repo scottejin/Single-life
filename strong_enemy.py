@@ -3,6 +3,7 @@ import pygame
 from enemy import Enemy
 from settings import TILE_SIZE, ORANGE, BLACK, DARK_ORANGE
 from xp_orb import XPOrb  # Ensure XPOrb is imported
+from sprites import get_sprite  # Add this import
 
 class StrongEnemy(Enemy):
     def __init__(self, x, y, speed=50, health=2, max_health=2, strength=2):
@@ -12,6 +13,16 @@ class StrongEnemy(Enemy):
         self.strength = strength
         self.speed = 50  # Pixels per second
         self.path = []
+
+    @classmethod
+    def from_dict(cls, data):
+        # Get strong enemy sprite
+        strong_enemy_sprite = get_sprite(78, 9)  # Use a different sprite for strong enemy
+        return cls(
+            x=data['x'],
+            y=data['y'],
+            sprite=strong_enemy_sprite  # Add sprite parameter
+        )
 
     def take_damage(self):
         """Handle taking damage by reducing health."""
