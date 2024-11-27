@@ -435,6 +435,10 @@ while running:
         xp_text = font.render(f"XP: {xp_counter}", True, (255, 255, 255))
         screen.blit(xp_text, (10, 10 + health_bar_height + 5))
 
+        # Check if player health is 1 and play boss music
+        if player.health == 1 and not music.is_boss_mode:
+            music.play_boss_music()
+
         # After updating the player and enemies
         if (player.health <= 0):
             in_end_game = True
