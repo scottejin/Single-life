@@ -119,37 +119,34 @@ clock = pygame.time.Clock()
 running = True
 
 def create_bullet():
-    global last_shot_time
-    current_time = time.time()
-    if current_time - last_shot_time >= 0.5:  # Limit to 2 bullets per second
-        mouse_x, mouse_y = pygame.mouse.get_pos()
-        direction = (mouse_x - SCREEN_WIDTH // 2, mouse_y - SCREEN_HEIGHT // 2)
-        direction_length = (direction[0]**2 + direction[1]**2)**0.5
-        if direction_length != 0:
-            direction = (direction[0] / direction_length, direction[1] / direction_length)
-            angle = math.degrees(math.atan2(-direction[1], direction[0])) % 360  # Invert y for screen coordinates
-            if 22.5 <= angle < 67.5:
-                direction_name = 'northeast'
-            elif 67.5 <= angle < 112.5:
-                direction_name = 'north'
-            elif 112.5 <= angle < 157.5:
-                direction_name = 'northwest'
-            elif 157.5 <= angle < 202.5:
-                direction_name = 'west'
-            elif 202.5 <= angle < 247.5:
-                direction_name = 'southwest'
-            elif 247.5 <= angle < 292.5:
-                direction_name = 'south'
-            elif 292.5 <= angle < 337.5:
-                direction_name = 'southeast'
-            else:
-                direction_name = 'east'
-            selected_sprite = bullet_sprites[direction_name]
-            new_bullet = Bullet(player_x, player_y, direction, bullet_speed, selected_sprite)
-            bullets.append(new_bullet)
-            if bullet_sound:
-                bullet_sound.play()
-            last_shot_time = current_time
+    # Remove rate limiting to allow shooting a bullet per single left click
+    mouse_x, mouse_y = pygame.mouse.get_pos()
+    direction = (mouse_x - SCREEN_WIDTH // 2, mouse_y - SCREEN_HEIGHT // 2)
+    direction_length = (direction[0]**2 + direction[1]**2)**0.5
+    if direction_length != 0:
+        direction = (direction[0] / direction_length, direction[1] / direction_length)
+        angle = math.degrees(math.atan2(-direction[1], direction[0])) % 360  # Invert y for screen coordinates
+        if 22.5 <= angle < 67.5:
+            direction_name = 'northeast'
+        elif 67.5 <= angle < 112.5:
+            direction_name = 'north'
+        elif 112.5 <= angle < 157.5:
+            direction_name = 'northwest'
+        elif 157.5 <= angle < 202.5:
+            direction_name = 'west'
+        elif 202.5 <= angle < 247.5:
+            direction_name = 'southwest'
+        elif 247.5 <= angle < 292.5:
+            direction_name = 'south'
+        elif 292.5 <= angle < 337.5:
+            direction_name = 'southeast'
+        else:
+            direction_name = 'east'
+        selected_sprite = bullet_sprites[direction_name]
+        new_bullet = Bullet(player_x, player_y, direction, bullet_speed, selected_sprite)
+        bullets.append(new_bullet)
+        if bullet_sound:
+            bullet_sound.play()
 
 def create_enemy(x, y):
     new_enemy = Enemy(x, y, enemy_sprite)
