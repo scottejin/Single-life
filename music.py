@@ -27,7 +27,7 @@ def update_track_display(screen):
 
 def draw_equalizer(screen, x, y):
     bar_width = 5
-    bar_height = 20
+    bar_height = 15  # Reduce the maximum height of the bars
     num_bars = 10
     for i in range(num_bars):
         height = random.randint(5, bar_height)
