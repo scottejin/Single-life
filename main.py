@@ -83,6 +83,12 @@ bullet_sprites = {
 # Remove the old bullet_sprite assignment
 # bullet_sprite = get_sprite(25, 8)
 
+# Preload and cache wall sprites
+wall_sprites = [
+    pygame.transform.scale(get_sprite(14, col), (TILE_SIZE, TILE_SIZE))
+    for col in range(21, 29)
+]
+
 # Load the initial room and find a walkable tile for the player
 initial_room = load_room_at(current_room_x, current_room_y, dungeon_rooms, enemies, spawners, enemy_sprite)
 player_x, player_y = find_walkable_tile(initial_room)
@@ -307,8 +313,7 @@ while running:
                 tile_y = row * TILE_SIZE - camera_y
 
                 if current_room[row][col] == 1:
-                    random_col = random.randint(21, 28)
-                    random_sprite = pygame.transform.scale(get_sprite(14, random_col), (TILE_SIZE, TILE_SIZE))
+                    random_sprite = random.choice(wall_sprites)
                     screen.blit(random_sprite, (tile_x, tile_y))
                 elif current_room[row][col] == 0:
                     pygame.draw.rect(screen, WHITE, (tile_x, tile_y, TILE_SIZE, TILE_SIZE))
