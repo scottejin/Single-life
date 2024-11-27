@@ -134,6 +134,7 @@ def restart_game(seed):
     start_time = time.time()
     elapsed_time = 0
     xp_counter = 0
+    wall_tile_sprites = []  # Initialize wall_tile_sprites
 
 clock = pygame.time.Clock()
 running = True
@@ -284,17 +285,20 @@ while running:
         elapsed_time = time.time() - start_time
         current_room = load_room_at(current_room_x, current_room_y, dungeon_rooms, enemies, spawners, enemy_sprite)
 
-        # Assign a random sprite to each wall tile once during level setup
-        wall_tile_sprites = []
+        # Define camera_x and camera_y before using them
+        camera_x = int(player_x - SCREEN_WIDTH // 2)
+        camera_y = int(player_y - SCREEN_HEIGHT // 2)
+
         for row in range(MAP_HEIGHT):
-            row_sprites = []
             for col in range(MAP_WIDTH):
+                tile_x = col * TILE_SIZE - camera_x
+                tile_y = row * TILE_SIZE - camera_y
+
                 if current_room[row][col] == 1:
-                    sprite = random.choice(wall_sprites)
-                    row_sprites.append(sprite)
-                else:
-                    row_sprites.append(None)
-            wall_tile_sprites.append(row_sprites)
+                    sprite = wall_tile_sprites[row][col]
+                    screen.blit(sprite, (tile_x, tile_y))
+                elif current_room[row][col] == 0:
+                    pygame.draw.rect(screen, WHITE, (tile_x, tile_y, TILE_SIZE, TILE_SIZE))
 
         # Remove the mouse_buttons check that was here
         
