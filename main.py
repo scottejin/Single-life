@@ -18,6 +18,7 @@ from xp_orb import XPOrb  # Ensure XPOrb is imported
 from save_load import save_game, load_game, show_no_saves_screen, get_available_saves  # Updated import
 from end_game import draw_death_screen, handle_death_screen_events
 import music  # Import the music module
+from win import draw_victory_screen  # Import the victory screen function
 
 pygame.init()
 pygame.mixer.init()
@@ -438,6 +439,24 @@ while running:
         # Check if player health is 1 and play boss music
         if player.health == 1 and not music.is_boss_mode:
             music.play_boss_music()
+
+        # Check for victory condition
+        if all(spawner.is_defeated for spawner in spawners):
+            screen.fill(BLACK)
+            draw_victory_screen(screen, elapsed_time, xp_counter, seed)
+            pygame.display.flip()
+            
+            # Handle victory screen events
+            waiting_for_input = True
+            while waiting_for_input:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        sys.exit()
+                    elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                        waiting_for_input = False
+                        in_main_menu = True
+                        restart_game(seed)  # Reset game state
 
         # After updating the player and enemies
         if (player.health <= 0):

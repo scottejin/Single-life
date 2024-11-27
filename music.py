@@ -45,11 +45,11 @@ def draw_equalizer(screen, x, y, color):
 
 def next_track():
     global current_track_index, is_boss_mode
+    pygame.mixer.music.stop()
     if is_boss_mode:
         is_boss_mode = False
-        current_track_index = 0
+        current_track_index = (current_track_index + 1) % len(tracks)
     else:
-        pygame.mixer.music.stop()
         current_track_index = (current_track_index + 1) % len(tracks)
     try:
         pygame.mixer.music.load(tracks[current_track_index])

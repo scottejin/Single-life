@@ -20,6 +20,7 @@ class EnemySpawner:
         self.width = int(ENEMY_SIZE * 1.5)
         self.height = int(ENEMY_SIZE * 1.5)
         self.has_spawned_in_circle = False  # Add this line
+        self.is_defeated = False  # Add this line to initialize the is_defeated property
         # Removed self.current_enemy to allow multiple active enemies
         # Removed self.first_seen since it's no longer needed
 
@@ -55,6 +56,9 @@ class EnemySpawner:
             if current_time - self.last_spawn_time >= self.spawn_interval:
                 self.spawn_enemy(enemies)
                 self.last_spawn_time = current_time  # Reset the spawn timer
+
+        if self.health <= 0:
+            self.is_defeated = True  # Set is_defeated to True when health is 0 or less
 
     def spawn_enemy(self, enemies):
         """Spawn an enemy with a 10% chance of being a StrongEnemy."""
