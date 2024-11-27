@@ -29,7 +29,7 @@ from sprites import load_sprite_sheet, load_sprite_sheet_image, get_sprite  # Im
 bullet_sound = None
 try:
     sound_file = os.path.join('sounds', 'gun.wav')
-    if os.path.exists(sound_file):
+    if (os.path.exists(sound_file)):
         bullet_sound = pygame.mixer.Sound(sound_file)
         bullet_sound.set_volume(0.3)
 except (pygame.error, FileNotFoundError) as e:
@@ -99,7 +99,7 @@ wall_tile_sprites = []
 for row in range(MAP_HEIGHT):
     row_sprites = []
     for col in range(MAP_WIDTH):
-        if initial_room[row][col] == 1:
+        if (initial_room[row][col] == 1):
             sprite = random.choice(wall_sprites)
             row_sprites.append(sprite)
         else:
@@ -113,7 +113,7 @@ player = Player(player_x, player_y, player_speed, player_sprite)
 SAVE_FOLDER = 'saves'
 
 # Ensure the save folder exists and cache available saves
-if not os.path.exists(SAVE_FOLDER):
+if (not os.path.exists(SAVE_FOLDER)):
     os.makedirs(SAVE_FOLDER)
 available_saves = get_available_saves()
 
@@ -143,35 +143,35 @@ running = True
 def create_bullet():
     global last_shot_time
     current_time = time.time()
-    if current_time - last_shot_time < 0.5:  # Limit to one bullet every 500 ms
+    if (current_time - last_shot_time < 0.5):  # Limit to one bullet every 500 ms
         return
     last_shot_time = current_time
     mouse_x, mouse_y = pygame.mouse.get_pos()
     direction = (mouse_x - SCREEN_WIDTH // 2, mouse_y - SCREEN_HEIGHT // 2)
     direction_length = (direction[0]**2 + direction[1]**2)**0.5
-    if direction_length != 0:
+    if (direction_length != 0):
         direction = (direction[0] / direction_length, direction[1] / direction_length)
         angle = math.degrees(math.atan2(-direction[1], direction[0])) % 360  # Invert y for screen coordinates
-        if 22.5 <= angle < 67.5:
+        if (22.5 <= angle < 67.5):
             direction_name = 'northeast'
-        elif 67.5 <= angle < 112.5:
+        elif (67.5 <= angle < 112.5):
             direction_name = 'north'
-        elif 112.5 <= angle < 157.5:
+        elif (112.5 <= angle < 157.5):
             direction_name = 'northwest'
-        elif 157.5 <= angle < 202.5:
+        elif (157.5 <= angle < 202.5):
             direction_name = 'west'
-        elif 202.5 <= angle < 247.5:
+        elif (202.5 <= angle < 247.5):
             direction_name = 'southwest'
-        elif 247.5 <= angle < 292.5:
+        elif (247.5 <= angle < 292.5):
             direction_name = 'south'
-        elif 292.5 <= angle < 337.5:
+        elif (292.5 <= angle < 337.5):
             direction_name = 'southeast'
         else:
             direction_name = 'east'
         selected_sprite = bullet_sprites[direction_name]
         new_bullet = Bullet(player_x, player_y, direction, bullet_speed, selected_sprite)
         bullets.append(new_bullet)
-        if bullet_sound:
+        if (bullet_sound):
             bullet_sound.play()
 
 def create_enemy(x, y):
@@ -179,7 +179,7 @@ def create_enemy(x, y):
     enemies.append(new_enemy)
 
 def handle_save_and_exit():
-    if selected_slot is not None:
+    if (selected_slot is not None):
         save_game(selected_slot, {
             'player_x': player_x,
             'player_y': player_y,
@@ -205,34 +205,36 @@ while running:
     dt = clock.tick(TARGET_FPS) / 1000.0
 
     for event in pygame.event.get():
-        if event.type == pygame.QUIT:
+        if (event.type == pygame.QUIT):
             running = False
-        elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-            if is_paused:
+        elif (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
+            if (is_paused):
                 is_paused = False  # Return to game
-            elif not in_main_menu and not in_end_game:
+            elif (not in_main_menu and not in_end_game):
                 is_paused = True  # Open pause menu
-            elif in_end_game:
+            elif (in_end_game):
                 in_end_game = False
                 in_main_menu = True  # Return to main menu
-        elif event.type == pygame.KEYDOWN and event.key == pygame.K_m:
+        elif (event.type == pygame.KEYDOWN and event.key == pygame.K_m):
             music.next_track()
-        elif in_main_menu:
+        elif (event.type == pygame.USEREVENT):
+            music.handle_music_event(event)
+        elif (in_main_menu):
             action = main_menu.handle_event(event)
-            if action == "New Game":
+            if (action == "New Game"):
                 selected_slot = main_menu.select_save_slot(screen, "Select Slot to Save New Game", mode="save")
-                if selected_slot is not None:
+                if (selected_slot is not None):
                     restart_game(seed)
                     in_main_menu = False
                     start_time = time.time()
                     elapsed_time = 0
                 else:
                     in_main_menu = True  # Return to main menu if no slot selected
-            elif action == "Load Game":
+            elif (action == "Load Game"):
                 selected_slot = main_menu.select_save_slot(screen, "Select Slot to Load Game", mode="load")
-                if selected_slot is not None:
+                if (selected_slot is not None):
                     game_state = load_game(selected_slot)
-                    if game_state:
+                    if (game_state):
                         # Load the game state
                         player = game_state['player']
                         player_x, player_y = player.get_position()
@@ -252,7 +254,7 @@ while running:
                         # Ensure player is on a walkable tile
                         tile_x = int(player_x // TILE_SIZE)
                         tile_y = int(player_y // TILE_SIZE)
-                        if current_room[tile_y][tile_x] == 1:  # If tile is a wall
+                        if (current_room[tile_y][tile_x] == 1):  # If tile is a wall
                             player_x, player_y = find_walkable_tile(current_room)
                             player.set_position(player_x, player_y)
                         in_main_menu = False
@@ -262,32 +264,34 @@ while running:
                         in_main_menu = True  # Return to main menu after showing the message
                 else:
                     in_main_menu = True  # Return to main menu if no slot selected
-            elif action == "Save and Exit":
+            elif (action == "Save and Exit"):
                 handle_save_and_exit()
-            elif action == "Exit":
+            elif (action == "Exit"):
                 running = False
-        elif in_end_game:
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+        elif (in_end_game):
+            if (event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE):
                 in_end_game = False
                 in_main_menu = True
                 restart_game(seed)
-        elif not is_paused:
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+        elif (not is_paused):
+            if (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
                 is_paused = True
-            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left click
+            elif (event.type == pygame.MOUSEBUTTONDOWN and event.button == 1):  # Left click
                 create_bullet()
-        elif is_paused:
+        elif (is_paused):
             action = menu.handle_event(event)
-            if action == "Save and Exit":
+            if (action == "Save and Exit"):
                 handle_save_and_exit()
-            elif action == "Resume":
+            elif (action == "Resume"):
                 is_paused = False
 
-    if in_main_menu:
+    if (in_main_menu):
         main_menu.draw(screen)
-    elif in_end_game:
+        music.update_track_display(screen)
+    elif (in_end_game):
         draw_death_screen(screen, elapsed_time, xp_counter, seed, selected_slot)
-    elif not is_paused:
+        music.update_track_display(screen)
+    elif (not is_paused):
         elapsed_time = time.time() - start_time
         current_room = load_room_at(current_room_x, current_room_y, dungeon_rooms, enemies, spawners, enemy_sprite)
 
@@ -300,41 +304,41 @@ while running:
                 tile_x = col * TILE_SIZE - camera_x
                 tile_y = row * TILE_SIZE - camera_y
 
-                if current_room[row][col] == 1:
+                if (current_room[row][col] == 1):
                     sprite = wall_tile_sprites[row][col]
-                    if sprite:  # Ensure sprite is not None
+                    if (sprite):  # Ensure sprite is not None
                         screen.blit(sprite, (tile_x, tile_y))
-                elif current_room[row][col] == 0:
+                elif (current_room[row][col] == 0):
                     pygame.draw.rect(screen, WHITE, (tile_x, tile_y, TILE_SIZE, TILE_SIZE))
                 else:
                     pygame.draw.rect(screen, GRAY, (tile_x, tile_y, TILE_SIZE, TILE_SIZE))  # Assign a default color for other tiles
 
         keys = pygame.key.get_pressed()
         dx, dy = 0, 0
-        if keys[pygame.K_LEFT] or keys[pygame.K_a]:
+        if (keys[pygame.K_LEFT] or keys[pygame.K_a]):
             dx = -1
             player.sprite = player_sprite  # Change to left-facing sprite
-        elif keys[pygame.K_RIGHT] or keys[pygame.K_d]:
+        elif (keys[pygame.K_RIGHT] or keys[pygame.K_d]):
             dx = 1
             player.sprite = player_sprite_right  # Change to right-facing sprite
-        if keys[pygame.K_UP] or keys[pygame.K_w]:
+        if (keys[pygame.K_UP] or keys[pygame.K_w]):
             dy = -1
-        if keys[pygame.K_DOWN] or keys[pygame.K_s]:
+        if (keys[pygame.K_DOWN] or keys[pygame.K_s]):
             dy = 1
 
         player.move(dx, dy, dt, current_room)
         player_x, player_y = player.get_position()
 
-        if player_x < 0:
+        if (player_x < 0):
             current_room_x -= 1
             player_x = (MAP_WIDTH - 1) * TILE_SIZE
-        elif player_x >= MAP_WIDTH * TILE_SIZE:
+        elif (player_x >= MAP_WIDTH * TILE_SIZE):
             current_room_x += 1
             player_x = 0
-        if player_y < 0:
+        if (player_y < 0):
             current_room_y -= 1
             player_y = (MAP_HEIGHT - 1) * TILE_SIZE
-        elif player_y >= MAP_HEIGHT * TILE_SIZE:
+        elif (player_y >= MAP_HEIGHT * TILE_SIZE):
             player_y = 0
 
         camera_x = int(player_x - SCREEN_WIDTH // 2)
@@ -347,22 +351,22 @@ while running:
                 tile_x = col * TILE_SIZE - camera_x
                 tile_y = row * TILE_SIZE - camera_y
 
-                if current_room[row][col] == 1:
+                if (current_room[row][col] == 1):
                     sprite = wall_tile_sprites[row][col]
-                    if sprite:  # Ensure sprite is not None
+                    if (sprite):  # Ensure sprite is not None
                         screen.blit(sprite, (tile_x, tile_y))
-                elif current_room[row][col] == 0:
+                elif (current_room[row][col] == 0):
                     pygame.draw.rect(screen, WHITE, (tile_x, tile_y, TILE_SIZE, TILE_SIZE))
                 else:
                     pygame.draw.rect(screen, GRAY, (tile_x, tile_y, TILE_SIZE, TILE_SIZE))  # Assign a default color for other tiles
 
         for bullet in bullets[:]:
-            if not bullet.is_broken:
+            if (not bullet.is_broken):
                 bullet.move(dt)
-                if bullet.check_collision(current_room, enemies, spawners, xp_orbs):
+                if (bullet.check_collision(current_room, enemies, spawners, xp_orbs)):
                     bullet.break_bullet()
             bullet_x, bullet_y = bullet.get_position()
-            if bullet.is_broken:
+            if (bullet.is_broken):
                 pygame.draw.circle(screen, (255, 255, 0), (int(bullet_x - camera_x), int(bullet_y - camera_y)), 5)  # Yellow for breaking animation
                 bullets.remove(bullet)
             else:
@@ -373,16 +377,16 @@ while running:
             spawner.draw(screen, camera_x, camera_y)
 
         for enemy in enemies[:]:
-            if enemy in enemies:  # Check if the enemy is still in the list
+            if (enemy in enemies):  # Check if the enemy is still in the list
                 enemy.move_towards_player(player_x, player_y, dt, current_room, player, enemies)
                 enemy_x, enemy_y = enemy.get_position()
-                if abs(enemy_x - player_x) < TILE_SIZE // 2 and abs(enemy_y - player_y) < TILE_SIZE // 2:
-                    if enemy in enemies:  # Double-check before removing
+                if (abs(enemy_x - player_x) < TILE_SIZE // 2 and abs(enemy_y - player_y) < TILE_SIZE // 2):
+                    if (enemy in enemies):  # Double-check before removing
                         enemies.remove(enemy)  # Remove enemy here
                         print(f"Enemy at ({enemy_x}, {enemy_y}) collided with player.")
                 else:
                     # Draw enemy based on its type
-                    if isinstance(enemy, StrongEnemy):
+                    if (isinstance(enemy, StrongEnemy)):
                         enemy.draw(screen, camera_x, camera_y)
                     else:
                         # Draw enemy border
@@ -407,7 +411,7 @@ while running:
                         )
 
         for xp_orb in xp_orbs[:]:
-            if xp_orb.update(player.rect):
+            if (xp_orb.update(player.rect)):
                 xp_counter += 1  # Increment XP by 1 per orb collected
                 xp_orbs.remove(xp_orb)
 
@@ -432,7 +436,7 @@ while running:
         screen.blit(xp_text, (10, 10 + health_bar_height + 5))
 
         # After updating the player and enemies
-        if player.health <= 0:
+        if (player.health <= 0):
             in_end_game = True
             screen.fill(BLACK)
             draw_death_screen(screen, elapsed_time, xp_counter, seed, selected_slot)
@@ -440,12 +444,12 @@ while running:
             
             # Handle death screen events
             waiting_for_input = True
-            while waiting_for_input:
+            while (waiting_for_input):
                 for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
+                    if (event.type == pygame.QUIT):
                         pygame.quit()
                         sys.exit()
-                    if handle_death_screen_events(event, selected_slot):
+                    if (handle_death_screen_events(event, selected_slot)):
                         waiting_for_input = False
                         in_main_menu = True
                         restart_game(seed)  # Reset game state
@@ -455,6 +459,7 @@ while running:
 
     else:
         menu.draw(screen)
+        music.update_track_display(screen)
 
     pygame.display.flip()
 

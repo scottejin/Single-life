@@ -2,6 +2,7 @@
 import pygame
 from settings import SCREEN_WIDTH, SCREEN_HEIGHT, WHITE, BLACK, RED
 from save_load import delete_save_slot
+import music  # Import the music module
 
 def format_time(seconds):
     minutes = int(seconds // 60)
@@ -34,6 +35,9 @@ def draw_death_screen(screen, elapsed_time, xp_counter, seed, selected_slot):
     prompt_text = stats_font.render("Press SPACE to continue", True, WHITE)
     prompt_rect = prompt_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT * 3 // 4))
     screen.blit(prompt_text, prompt_rect)
+
+    # Update the music track display
+    music.update_track_display(screen)
 
 def handle_death_screen_events(event, selected_slot):
     """Handle events on the death screen."""

@@ -1,6 +1,7 @@
 # menu.py
 import pygame
 from settings import SCREEN_WIDTH, SCREEN_HEIGHT, WHITE, BLACK, RED
+import music  # Import the music module
 
 class Menu:
     def __init__(self, seed):
@@ -14,6 +15,7 @@ class Menu:
         screen.fill(BLACK)
         for button in self.buttons:
             button.draw(screen)
+        music.update_track_display(screen)  # Update the music track display
 
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:

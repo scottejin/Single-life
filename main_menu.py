@@ -3,6 +3,7 @@ from settings import SCREEN_WIDTH, SCREEN_HEIGHT, WHITE, BLACK, RED, BLUE
 from save_load import get_available_saves, delete_save_slot
 from confirmation_dialog import ConfirmationDialog  # New import
 from utils import render_wrapped_text  # New import for text wrapping
+import music  # Import the music module
 
 class MainMenu:
     def __init__(self):
@@ -17,6 +18,7 @@ class MainMenu:
         screen.fill(BLACK)
         for button in self.buttons:
             button.draw(screen)
+        music.update_track_display(screen)  # Update the music track display
 
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
@@ -106,6 +108,8 @@ class MainMenu:
                                         running = False
             # Add this line to set the previous_slot after selection
             previous_slot = selected_slot
+
+            music.update_track_display(screen)  # Update the music track display
 
             pygame.display.flip()
         return selected_slot  # Add this line to store the selected slot
