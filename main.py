@@ -119,7 +119,11 @@ clock = pygame.time.Clock()
 running = True
 
 def create_bullet():
-    # Remove rate limiting to allow shooting a bullet per single left click
+    global last_shot_time
+    current_time = time.time()
+    if current_time - last_shot_time < 0.5:  # Limit to 2 bullets per second
+        return
+    last_shot_time = current_time
     mouse_x, mouse_y = pygame.mouse.get_pos()
     direction = (mouse_x - SCREEN_WIDTH // 2, mouse_y - SCREEN_HEIGHT // 2)
     direction_length = (direction[0]**2 + direction[1]**2)**0.5
