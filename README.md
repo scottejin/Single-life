@@ -4,12 +4,21 @@
 Endless Dungeon Explorer is a Python-based game built with Pygame, featuring dynamic dungeon generation, enemy spawners, and an XP collection system.
 
 ## Features
-- **Dynamic Dungeon Generation**: Explore an endless series of dungeon rooms.
-- **Enemy Spawners**: Spawn normal and strong enemies with varying behaviors.
-- **XP Orbs**: Collect XP orbs to enhance your gameplay.
+- **Dynamic Dungeon Generation**: Explore an endless series of procedurally generated dungeon rooms.
+- **Enemy Spawners**: Spawn normal and strong enemies with varying behaviors and health systems.
+- **XP Orbs**: Collect XP orbs to enhance your gameplay and upgrade abilities.
 - **Save and Load System**: Manage multiple save slots with confirmation prompts.
 - **Responsive UI**: User interface adapts to various screen resolutions.
 - **Accessibility**: Enhanced color contrast and readable fonts for better accessibility.
+- **Shop System**: Upgrade shooting speed using collected XP orbs.
+- **Dynamic Music System**: Multiple background tracks with seamless transitions.
+- **Visual Feedback**: 
+  - Enemy health indicators
+  - Player health bar
+  - XP counter
+  - Range indicator circle (toggleable)
+- **Directional Shooting**: Eight-way bullet system with unique sprites for each direction.
+- **Boss Mode**: Special music triggers when player health is critical.
 
 ## New Implementations
 ### Confirmation Dialog
@@ -32,6 +41,14 @@ UI elements dynamically adjust their positions and sizes based on screen resolut
 ### Robust Error Handling
 The `delete_save_slot` function now gracefully handles potential exceptions, such as file permission issues, preventing the game from crashing unexpectedly.
 
+## Controls
+- **WASD/Arrow Keys**: Move player
+- **Mouse**: Aim
+- **Left Click**: Shoot
+- **E**: Open shop
+- **M**: Change music track
+- **ESC**: Pause game/Exit menus
+
 ## Installation
 1. **Clone the Repository**
     ```bash
@@ -50,6 +67,19 @@ The `delete_save_slot` function now gracefully handles potential exceptions, suc
     python main.py
     ```
 
-## Contributing
-Contributions are welcome! Please fork the repository and submit a pull request for any enhancements or bug fixes.
+## Asset Credits
+All assets used in this game are public domain:
+
+- **Dungeon Bricks Textures**: 16x16 4-color dungeon bricks by Arachne
+  - Source: [OpenGameArt](https://opengameart.org/content/4-color-dungeon-bricks-16x16)
+  - License: Public Domain
+
+- **Background Music**: NES-Style Shooter Music (5 tracks, 3 jingles) by SketchyLogic
+  - Source: [OpenGameArt](https://opengameart.org/content/nes-shooter-music-5-tracks-3-jingles)
+  - License: Public Domain
+
+- **Player and Wall Textures**: Dungeon Crawl 32x32 tiles
+  - Source: [OpenGameArt](https://opengameart.org/content/dungeon-crawl-32x32-tiles)
+  - License: Public Domain
+
 
