@@ -1,5 +1,5 @@
 import pygame
-from settings import SCREEN_WIDTH, SCREEN_HEIGHT, WHITE, BLACK, RED, BLUE, enemy_spawn_interval, set_spawn_interval, get_spawn_interval  # Import the spawn interval setting
+from settings import SCREEN_WIDTH, SCREEN_HEIGHT, WHITE, BLACK, RED, BLUE, enemy_spawn_interval, set_spawn_interval, get_spawn_interval, set_show_circle, get_show_circle  # Import set_show_circle and get_show_circle
 from save_load import get_available_saves, delete_save_slot
 from confirmation_dialog import ConfirmationDialog  # New import
 from utils import render_wrapped_text  # New import for text wrapping
@@ -133,9 +133,16 @@ class SettingsMenu:
         self.slider_handle_rect.centerx = self.handle_pos
         self.slider_handle_rect.centery = self.slider_rect.centery
         self.dragging = False
+        self.show_circle = get_show_circle()  # Retrieve current setting
+        self.circle_toggle_button = Button(
+            "Hide Blue Circle" if self.show_circle else "Show Blue Circle",
+            position=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 150),
+            font_size=36
+        )
         self.buttons = [
             Button("Save Settings", position=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 50), font_size=36),
-            Button("Back", position=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 110), font_size=36)
+            Button("Back", position=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 110), font_size=36),
+            self.circle_toggle_button
         ]
 
     def draw(self, screen):
@@ -170,9 +177,16 @@ class SettingsMenu:
                 if button.rect.collidepoint(mouse_pos):
                     if button.text == "Save Settings":
                         set_spawn_interval(self.position_to_value(self.handle_pos))
+                        set_show_circle(self.show_circle)  # Save the show_circle setting
                         print("Settings saved!")
                     elif button.text == "Back":
                         return "Back"
+                    elif button.text == "Show Blue Circle":
+                        self.show_circle = True
+                        button.text = "Hide Blue Circle"
+                    elif button.text == "Hide Blue Circle":
+                        self.show_circle = False
+                        button.text = "Show Blue Circle"
         elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
             return "Back"
         return None

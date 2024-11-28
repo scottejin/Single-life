@@ -5,7 +5,7 @@ import time
 import os
 import json
 import math  # Import math module
-from settings import SCREEN_WIDTH, SCREEN_HEIGHT, TILE_SIZE, PLAYER_SIZE, ENEMY_SIZE, WHITE, GREEN, RED, GRAY, BLACK, PURPLE, BLUE, ORANGE, MAP_WIDTH, MAP_HEIGHT, TARGET_FPS, player_speed, DARK_ORANGE, get_spawn_interval  # Import the get_spawn_interval function
+from settings import SCREEN_WIDTH, SCREEN_HEIGHT, TILE_SIZE, PLAYER_SIZE, ENEMY_SIZE, WHITE, GREEN, RED, GRAY, BLACK, PURPLE, BLUE, ORANGE, MAP_WIDTH, MAP_HEIGHT, TARGET_FPS, player_speed, DARK_ORANGE, get_spawn_interval, get_show_circle  # Import the get_spawn_interval function and get_show_circle
 from map import load_room_at, find_walkable_tile
 from player import Player
 from bullet import Bullet
@@ -285,6 +285,9 @@ def draw_shop(screen):
     exit_text = font.render("Press 'ESC' to exit shop", True, WHITE)
     screen.blit(exit_text, (SCREEN_WIDTH//2 - exit_text.get_width()//2, 250))
 
+    # Draw blue circle if enabled
+    # pygame.draw.circle(screen, BLUE, (SCREEN_WIDTH//2, SCREEN_HEIGHT//2), circle_radius, 1)
+
 def handle_shop_event(event):
     global shooting_speed_multiplier, xp_orbs_available, xp_counter  # Added xp_counter
     if event.type == pygame.KEYDOWN:
@@ -563,8 +566,12 @@ while running:
         pygame.draw.rect(screen, RED, (10, 10, health_bar_width, health_bar_height))  # Background
         pygame.draw.rect(screen, GREEN, (10, 10, health_bar_width * health_ratio, health_bar_height))  # Current health
 
-        # Draw the blue circle
-        pygame.draw.circle(screen, BLUE, (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2), circle_radius, 1)
+        # Retrieve the current setting for showing the circle
+        show_circle = get_show_circle()
+        
+        # Draw the blue circle if the setting is enabled
+        if show_circle:
+            pygame.draw.circle(screen, BLUE, (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2), circle_radius, 1)
 
         for xp_orb in xp_orbs:
             xp_orb.draw(screen, camera_x, camera_y)

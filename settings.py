@@ -26,25 +26,27 @@ SETTINGS_FILE = 'settings.json'
 DEFAULT_SPAWN_INTERVAL = 5.0
 current_spawn_interval = DEFAULT_SPAWN_INTERVAL
 
-def save_spawn_interval():
-    """Save the current spawn interval to a settings file."""
-    settings = {}
-    if os.path.exists(SETTINGS_FILE):
-        with open(SETTINGS_FILE, 'r') as f:
-            settings = json.load(f)
-    
-    settings['spawn_interval'] = current_spawn_interval
-    
+def load_settings():
+    if not os.path.exists(SETTINGS_FILE):
+        return {"spawn_interval": 3.0, "show_circle": True}
+    with open(SETTINGS_FILE, 'r') as f:
+        return json.load(f)
+
+def save_settings(settings):
     with open(SETTINGS_FILE, 'w') as f:
         json.dump(settings, f)
+
+def save_spawn_interval():
+    """Save the current spawn interval to a settings file."""
+    settings = load_settings()
+    settings['spawn_interval'] = current_spawn_interval
+    save_settings(settings)
 
 def load_spawn_interval():
     """Load the spawn interval from settings file."""
     global current_spawn_interval
-    if os.path.exists(SETTINGS_FILE):
-        with open(SETTINGS_FILE, 'r') as f:
-            settings = json.load(f)
-            current_spawn_interval = settings.get('spawn_interval', DEFAULT_SPAWN_INTERVAL)
+    settings = load_settings()
+    current_spawn_interval = settings.get('spawn_interval', DEFAULT_SPAWN_INTERVAL)
     return current_spawn_interval
 
 def set_spawn_interval(value):
@@ -53,7 +55,17 @@ def set_spawn_interval(value):
     save_spawn_interval()
 
 def get_spawn_interval():
-    return enemy_spawn_interval
+    settings = load_settings()
+    return settings.get("spawn_interval", 3.0)
+
+def get_show_circle():
+    settings = load_settings()
+    return settings.get("show_circle", True)
+
+def set_show_circle(value):
+    settings = load_settings()
+    settings["show_circle"] = value
+    save_settings(settings)
 
 # Load settings when module is imported
 load_spawn_interval()
