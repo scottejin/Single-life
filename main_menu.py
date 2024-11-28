@@ -148,11 +148,11 @@ class SettingsMenu:
         value_label = self.font.render(f"Spawn Interval: {current_value:.1f}s", True, WHITE)
         screen.blit(value_label, (SCREEN_WIDTH // 2 - value_label.get_width() // 2, self.slider_rect.top - 40))
         easy_label = self.font.render("Easy (5s)", True, WHITE)
-        normal_label = self.font.render("Normal (3s)", True, WHITE)
+        medium_label = self.font.render("Medium (3s)", True, WHITE)
         hard_label = self.font.render("Hard (1.5s)", True, WHITE)
         screen.blit(easy_label, (self.slider_rect.left, self.slider_rect.top - 60))
-        screen.blit(normal_label, (SCREEN_WIDTH // 2 - normal_label.get_width() // 2, self.slider_rect.top - 60))
-        screen.blit(hard_label, (self.slider_rect.right - hard_label.get_width(), self.slider_rect.top - 60))
+        screen.blit(medium_label, (SCREEN_WIDTH // 2 - medium_label.get_width() // 2, self.slider_rect.top - 120))
+        screen.blit(hard_label, (self.slider_rect.right - hard_label.get_width(), self.slider_rect.top - 180))
         for button in self.buttons:
             button.draw(screen)
 

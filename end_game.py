@@ -15,31 +15,31 @@ def draw_death_screen(screen, elapsed_time, xp_counter, seed, selected_slot):
     font = pygame.font.SysFont(None, 64)
     stats_font = pygame.font.SysFont(None, 36)
     
-    # Calculate right side positions
-    right_x = SCREEN_WIDTH * 3 // 4  # Start drawing from 75% of the screen width
+    # Calculate center positions
+    center_x = SCREEN_WIDTH // 2
+    center_y = SCREEN_HEIGHT // 2
     
-    # Draw "YOU DIED" text on the right side
+    # Draw "YOU DIED" text at the center top
     death_text = font.render("YOU DIED", True, RED)
-    death_rect = death_text.get_rect(center=(right_x, SCREEN_HEIGHT // 3))
+    death_rect = death_text.get_rect(center=(center_x, center_y - 100))
     screen.blit(death_text, death_rect)
     
-    # Draw statistics on the right side
+    # Draw statistics centered vertically
     time_text = stats_font.render(f"Time Survived: {format_time(elapsed_time)}", True, WHITE)
     xp_text = stats_font.render(f"XP Collected: {xp_counter}", True, WHITE)
     seed_text = stats_font.render(f"Map Seed: {seed}", True, WHITE)
     
-    # Position text on the right
     spacing = 50
-    screen.blit(time_text, (right_x - time_text.get_width() // 2, SCREEN_HEIGHT // 2))
-    screen.blit(xp_text, (right_x - xp_text.get_width() // 2, SCREEN_HEIGHT // 2 + spacing))
-    screen.blit(seed_text, (right_x - seed_text.get_width() // 2, SCREEN_HEIGHT // 2 + spacing * 2))
+    screen.blit(time_text, (center_x - time_text.get_width() // 2, center_y))
+    screen.blit(xp_text, (center_x - xp_text.get_width() // 2, center_y + spacing))
+    screen.blit(seed_text, (center_x - seed_text.get_width() // 2, center_y + spacing * 2))
     
-    # Draw continue prompt on the right side
+    # Draw continue prompt at the center bottom
     prompt_text = stats_font.render("Press SPACE to continue", True, WHITE)
-    prompt_rect = prompt_text.get_rect(center=(right_x, SCREEN_HEIGHT * 3 // 4))
+    prompt_rect = prompt_text.get_rect(center=(center_x, center_y + 150))
     screen.blit(prompt_text, prompt_rect)
 
-    # Update the music track display on the right side
+    # Update the music track display at the bottom center
     music.update_track_display(screen, right_side=True)
 
 def handle_death_screen_events(event, selected_slot):
