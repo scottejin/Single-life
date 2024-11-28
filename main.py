@@ -5,7 +5,7 @@ import time
 import os
 import json
 import math  # Import math module
-from settings import SCREEN_WIDTH, SCREEN_HEIGHT, TILE_SIZE, PLAYER_SIZE, ENEMY_SIZE, WHITE, GREEN, RED, GRAY, BLACK, PURPLE, BLUE, ORANGE, MAP_WIDTH, MAP_HEIGHT, TARGET_FPS, player_speed, DARK_ORANGE
+from settings import SCREEN_WIDTH, SCREEN_HEIGHT, TILE_SIZE, PLAYER_SIZE, ENEMY_SIZE, WHITE, GREEN, RED, GRAY, BLACK, PURPLE, BLUE, ORANGE, MAP_WIDTH, MAP_HEIGHT, TARGET_FPS, player_speed, DARK_ORANGE, get_spawn_interval  # Import the get_spawn_interval function
 from map import load_room_at, find_walkable_tile
 from player import Player
 from bullet import Bullet
@@ -137,6 +137,8 @@ def restart_game(seed):
     elapsed_time = 0
     xp_counter = 0
     wall_tile_sprites = []  # Initialize wall_tile_sprites
+    for spawner in spawners:
+        spawner.spawn_interval = get_spawn_interval()  # Set spawn interval
 
 clock = pygame.time.Clock()
 running = True
@@ -289,6 +291,7 @@ while running:
     if (in_main_menu):
         main_menu.draw(screen)
         music.update_track_display(screen, right_side=True)
+        # ...existing code...
     elif (in_end_game):
         draw_death_screen(screen, elapsed_time, xp_counter, seed, selected_slot)
         music.update_track_display(screen, right_side=True)

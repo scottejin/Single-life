@@ -3,14 +3,14 @@ import time
 import random  # Ensure this is imported
 from enemy import Enemy
 from strong_enemy import StrongEnemy  # Updated import
-from settings import TILE_SIZE, ENEMY_SIZE, PURPLE, BLACK
+from settings import TILE_SIZE, ENEMY_SIZE, PURPLE, BLACK, get_spawn_interval  # Import the spawn interval getter
 from xp_orb import XPOrb  # Ensure XPOrb is imported
 
 class EnemySpawner:
-    def __init__(self, x, y, spawn_interval=5, max_enemies=3, sprite=None, health=10):
+    def __init__(self, x, y, max_enemies=3, sprite=None, health=10):
         self.x = x
         self.y = y
-        self.spawn_interval = 5.0  # Fixed: Now a float instead of Surface
+        self.spawn_interval = get_spawn_interval()
         self.max_enemies = max_enemies
         self.last_spawn_time = pygame.time.get_ticks() / 1000.0  # Convert to seconds
         self.health = health

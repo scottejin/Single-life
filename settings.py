@@ -15,3 +15,13 @@ MAP_WIDTH, MAP_HEIGHT = 50, 50  # in tiles
 WORLD_WIDTH, WORLD_HEIGHT = MAP_WIDTH * TILE_SIZE, MAP_HEIGHT * TILE_SIZE
 TARGET_FPS = 60
 player_speed = 200  # Pixels per second
+
+ENEMY_SPAWN_INTERVAL_DEFAULT = 5  # Default to 5 seconds
+enemy_spawn_interval = ENEMY_SPAWN_INTERVAL_DEFAULT
+
+def set_spawn_interval(value):
+    global enemy_spawn_interval
+    enemy_spawn_interval = value
+
+def get_spawn_interval():
+    return enemy_spawn_interval
