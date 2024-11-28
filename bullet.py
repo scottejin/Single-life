@@ -71,8 +71,8 @@ class Bullet:
         if sprite is None:
             from sprites import get_sprite  # Import here to avoid circular import
             direction = data['direction']
-            # Determine sprite based on direction
             angle = math.degrees(math.atan2(-direction[1], direction[0])) % 360
+            # Determine sprite based on angle
             if 22.5 <= angle < 67.5:
                 sprite = get_sprite(25, 8)  # northeast
             elif 67.5 <= angle < 112.5:

@@ -301,6 +301,27 @@ while running:
                         if (current_room[tile_y][tile_x] == 1):  # If tile is a wall
                             player_x, player_y = find_walkable_tile(current_room)
                             player.set_position(player_x, player_y)
+                        # Reconstruct the wall_tile_sprites and walkable_tile_sprites
+                        current_room = dungeon_rooms[(current_room_x, current_room_y)]
+                        wall_tile_sprites = []
+                        walkable_tile_sprites = []
+                        for row in range(MAP_HEIGHT):
+                            row_sprites = []
+                            walkable_row_sprites = []
+                            for col in range(MAP_WIDTH):
+                                if current_room[row][col] == 1:
+                                    sprite = random.choice(wall_sprites)
+                                    row_sprites.append(sprite)
+                                    walkable_row_sprites.append(None)
+                                elif current_room[row][col] == 0:
+                                    sprite = random.choice(walkable_sprites)
+                                    row_sprites.append(sprite)
+                                    walkable_row_sprites.append(sprite)
+                                else:
+                                    row_sprites.append(pygame.Surface((TILE_SIZE, TILE_SIZE)))
+                                    walkable_row_sprites.append(None)
+                            wall_tile_sprites.append(row_sprites)
+                            walkable_tile_sprites.append(walkable_row_sprites)
                         in_main_menu = False
                         start_time = time.time() - elapsed_time
                     else:

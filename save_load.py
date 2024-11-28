@@ -1,8 +1,7 @@
 import os
 import json
 import pygame
-import random
-# import numpy as np  # Remove this import if you're using NumPy arrays
+import random  # Ensure this is imported
 from player import Player
 from bullet import Bullet
 from enemy import Enemy
@@ -85,14 +84,14 @@ def load_game(slot):
 
         # Load bullet sprites for all directions
         bullet_sprites = {
-            'north': get_sprite(25,7),
-            'northeast': get_sprite(25,8),
-            'east': get_sprite(25,9),
-            'southeast': get_sprite(25,10),
-            'south': get_sprite(25,11),
-            'southwest': get_sprite(25,12),
-            'west': get_sprite(25,13),
-            'northwest': get_sprite(25,14)
+            'north': get_sprite(25, 7),
+            'northeast': get_sprite(25, 8),
+            'east': get_sprite(25, 9),
+            'southeast': get_sprite(25, 10),
+            'south': get_sprite(25, 11),
+            'southwest': get_sprite(25, 12),
+            'west': get_sprite(25, 13),
+            'northwest': get_sprite(25, 14)
         }
 
         # Convert string keys back to tuples for dungeon_rooms

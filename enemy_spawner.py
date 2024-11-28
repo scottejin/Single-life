@@ -122,7 +122,6 @@ class EnemySpawner:
 
     @classmethod
     def from_dict(cls, data):
-        # Get spawner sprite
         spawner = cls(
             x=data['x'],
             y=data['y'],
