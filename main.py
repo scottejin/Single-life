@@ -352,14 +352,15 @@ while running:
             elif (action == "Resume"):
                 is_paused = False
 
-    if (in_main_menu):
+    if in_main_menu:
+        screen.fill(BLACK)  # Ensure the screen is filled only once
         main_menu.draw(screen)
         music.update_track_display(screen, right_side=True)
-        # ...existing code...
-    elif (in_end_game):
+    elif in_end_game:
+        screen.fill(BLACK)  # Ensure the screen is filled only once
         draw_death_screen(screen, elapsed_time, xp_counter, seed, selected_slot)
         music.update_track_display(screen, right_side=True)  # Ensure right_side is True
-    elif (not is_paused):
+    elif not is_paused:
         elapsed_time = time.time() - start_time
         current_room = load_room_at(current_room_x, current_room_y, dungeon_rooms, enemies, spawners, enemy_sprite)
 
@@ -367,18 +368,20 @@ while running:
         camera_x = int(player_x - SCREEN_WIDTH // 2)
         camera_y = int(player_y - SCREEN_HEIGHT // 2)
 
+        screen.fill(BLACK)  # Ensure the screen is filled only once
+
         for row in range(MAP_HEIGHT):
             for col in range(MAP_WIDTH):
                 tile_x = col * TILE_SIZE - camera_x
                 tile_y = row * TILE_SIZE - camera_y
 
-                if (current_room[row][col] == 1):
+                if current_room[row][col] == 1:
                     sprite = wall_tile_sprites[row][col]
-                    if (sprite):  # Ensure sprite is not None
+                    if sprite:  # Ensure sprite is not None
                         screen.blit(sprite, (tile_x, tile_y))
-                elif (current_room[row][col] == 0):
+                elif current_room[row][col] == 0:
                     sprite = walkable_tile_sprites[row][col]
-                    if (sprite):
+                    if sprite:
                         screen.blit(sprite, (tile_x, tile_y))
                     else:
                         pygame.draw.rect(screen, WHITE, (tile_x, tile_y, TILE_SIZE, TILE_SIZE))
@@ -415,8 +418,6 @@ while running:
 
         camera_x = int(player_x - SCREEN_WIDTH // 2)
         camera_y = int(player_y - SCREEN_HEIGHT // 2)
-
-        screen.fill(BLACK)
 
         for row in range(MAP_HEIGHT):
             for col in range(MAP_WIDTH):
@@ -558,6 +559,7 @@ while running:
         music.update_track_display(screen, right_side=True)
 
     else:
+        screen.fill(BLACK)  # Ensure the screen is filled only once
         menu.draw(screen)
         music.update_track_display(screen, right_side=True)
 
