@@ -39,8 +39,11 @@ def draw_death_screen(screen, elapsed_time, xp_counter, seed, selected_slot):
     prompt_rect = prompt_text.get_rect(center=(center_x, center_y + 150))
     screen.blit(prompt_text, prompt_rect)
 
-    # Update the music track display at the bottom center
-    music.update_track_display(screen, right_side=True)
+    # Remove the music track display update
+    # music.update_track_display(screen, right_side=True)
+
+    # Remove the pygame.display.flip() call
+    # pygame.display.flip()
 
 def handle_death_screen_events(event, selected_slot):
     """Handle events on the death screen."""

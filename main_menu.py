@@ -24,7 +24,7 @@ class MainMenu:
                 button.draw(screen)
         else:
             self.settings_menu.draw(screen)
-        pygame.display.flip()
+        # Removed pygame.display.flip() to prevent multiple flips per frame
 
     def handle_event(self, event):
         if not self.in_settings:
@@ -120,8 +120,6 @@ class MainMenu:
                                         running = False
             # Add this line to set the previous_slot after selection
             previous_slot = selected_slot
-
-            music.update_track_display(screen, right_side=True)  # Update the music track display
 
             pygame.display.flip()
         return selected_slot  # Add this line to store the selected slot

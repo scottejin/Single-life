@@ -15,7 +15,8 @@ class Menu:
         screen.fill(BLACK)
         for button in self.buttons:
             button.draw(screen)
-        music.update_track_display(screen, right_side=True)  # Update the music track display
+        # Removed music.update_track_display to centralize it in main loop
+        # Ensure no pygame.display.flip() is called here
 
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:

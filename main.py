@@ -563,6 +563,7 @@ while running:
         menu.draw(screen)
         music.update_track_display(screen, right_side=True)
 
+    # Ensure pygame.display.flip() is called here only once per frame
     pygame.display.flip()
 
 pygame.quit()

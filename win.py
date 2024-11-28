@@ -36,8 +36,6 @@ def draw_victory_screen(screen, elapsed_time, xp_counter, seed):
     prompt_rect = prompt_text.get_rect(center=(center_x, center_y + 150))
     screen.blit(prompt_text, prompt_rect)
 
-    pygame.display.flip()
-
     # Play victory music
     try:
         pygame.mixer.music.load(os.path.join('music', 'victory.wav'))
@@ -82,6 +80,3 @@ def draw_victory_screen(screen, elapsed_time, xp_counter, seed):
             screen.blit(victory_text, victory_rect)
             pygame.display.flip()
             pygame.time.delay(100)  # Delay to control the speed of color change
-
-        # Update the music track display at the bottom center
-        music.update_track_display(screen, right_side=True, rainbow=True)
