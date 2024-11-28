@@ -91,10 +91,14 @@ wall_sprites = [
     for col in range(23, 30)
 ]
 
-# Load walkable tile sprites from row 15, columns 4 to 7
+# Load bricks sprite sheet
+bricks_sprites = load_sprite_sheet_image('assets/bricks.png', 32, 32)
+
+# Replace walkable_sprites definition
 walkable_sprites = [
-    get_sprite(15, col) for col in range(4, 8)  # Columns 4 to 7 inclusive
+    get_sprite(bricks_sprites, 1, 1)  # Use bricks.png sprite at (1,1)
 ]
+# ...existing code...
 
 # Load the initial room and find a walkable tile for the player
 initial_room = load_room_at(current_room_x, current_room_y, dungeon_rooms, enemies, spawners, enemy_sprite)
