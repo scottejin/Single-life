@@ -61,7 +61,7 @@ def save_game(slot, game_state):
         'seed': game_state['seed'],
         'dungeon_rooms': {str(k): v for k, v in game_state['dungeon_rooms'].items()},
         'enemies': [make_serializable(e) for e in game_state['enemies']],
-        'spawners': [make_serializable(s) for s in game_state['spawners']],
+        'spawners': [spawner.to_dict() for spawner in game_state['spawners']],  # Ensure spawn_interval is included
         'bullets': [make_serializable(b) for b in game_state['bullets']],
         'xp_orbs': [make_serializable(o) for o in game_state['xp_orbs']]
     }
