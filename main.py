@@ -187,6 +187,11 @@ def restart_game(seed):
 clock = pygame.time.Clock()
 running = True
 
+# Add at the top with other initializations
+shop_open = False
+shooting_speed_multiplier = 1.0
+xp_orbs_available = 0  # Initialize or set based on xp_counter if necessary
+
 def create_bullet():
     global last_shot_time
     current_time = time.time()
@@ -248,6 +253,49 @@ def handle_save_and_exit():
 # Ensure the music starts playing when the game starts
 music.play_music()
 
+def open_shop():
+    global shop_open, is_paused
+    shop_open = True
+    is_paused = True
+
+def close_shop():
+    global shop_open, is_paused
+    shop_open = False
+    is_paused = False
+
+def draw_shop(screen):
+    font = pygame.font.SysFont(None, 36)
+    screen.fill(GRAY)
+    title = font.render("Shop - Upgrade Shooting Speed", True, WHITE)
+    screen.blit(title, (SCREEN_WIDTH//2 - title.get_width()//2, 50))
+    
+    # Display current multiplier
+    multiplier_text = font.render(f"Shooting Speed: {int((shooting_speed_multiplier)*100)}%", True, WHITE)
+    screen.blit(multiplier_text, (SCREEN_WIDTH//2 - multiplier_text.get_width()//2, 150))
+    
+    # Display upgrade option
+    if shooting_speed_multiplier == 1.0:
+        cost = 10
+    else:
+        cost = 20
+    upgrade_text = font.render(f"Press 'P' to upgrade (+20%) for {cost} XP orbs", True, WHITE)
+    screen.blit(upgrade_text, (SCREEN_WIDTH//2 - upgrade_text.get_width()//2, 200))
+    
+    # Display exit option
+    exit_text = font.render("Press 'ESC' to exit shop", True, WHITE)
+    screen.blit(exit_text, (SCREEN_WIDTH//2 - exit_text.get_width()//2, 250))
+
+def handle_shop_event(event):
+    global shooting_speed_multiplier, xp_orbs_available, xp_counter  # Added xp_counter
+    if event.type == pygame.KEYDOWN:
+        if event.key == pygame.K_p:
+            cost = 10 if shooting_speed_multiplier == 1.0 else 20
+            if xp_counter >= cost:
+                shooting_speed_multiplier += 0.2
+                xp_counter -= cost
+        elif event.key == pygame.K_ESCAPE:
+            close_shop()
+
 while running:
     dt = clock.tick(TARGET_FPS) / 1000.0
 
@@ -266,6 +314,8 @@ while running:
             music.next_track()
         elif (event.type == pygame.USEREVENT):
             music.handle_music_event(event)
+        elif (event.type == pygame.KEYDOWN and event.key == pygame.K_e):  # Moved above other state checks
+            open_shop()
         elif (in_main_menu):
             action = main_menu.handle_event(event)
             if action == "New Game":
@@ -358,8 +408,12 @@ while running:
                 handle_save_and_exit()
             elif (action == "Resume"):
                 is_paused = False
+        if shop_open:
+            handle_shop_event(event)
 
-    if in_main_menu:
+    if shop_open:
+        draw_shop(screen)
+    elif in_main_menu:
         screen.fill(BLACK)  # Ensure the screen is filled only once
         main_menu.draw(screen)
         music.update_track_display(screen, right_side=True)
