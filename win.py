@@ -6,31 +6,34 @@ import music  # Import the music module
 from settings import SCREEN_WIDTH, SCREEN_HEIGHT  # Add this import
 
 def draw_victory_screen(screen, elapsed_time, xp_counter, seed):
+    """Draw the victory screen with game statistics."""
     screen.fill((0, 0, 0))  # Fill the screen with black
 
     font = pygame.font.SysFont(None, 48)
     stats_font = pygame.font.SysFont(None, 36)
     
-    # Calculate right side positions
-    right_x = SCREEN_WIDTH * 3 // 4  # Start drawing from 75% of the screen width
+    # Calculate center positions
+    center_x = SCREEN_WIDTH // 2
+    center_y = SCREEN_HEIGHT // 2
 
-    # Draw "Victory!" text on the right side
+    # Draw "Victory!" text at the center top
     victory_text = font.render("Victory!", True, (255, 255, 255))
-    screen.blit(victory_text, (right_x - victory_text.get_width() // 2, SCREEN_HEIGHT // 2 - 100))
+    victory_rect = victory_text.get_rect(center=(center_x, center_y - 100))
+    screen.blit(victory_text, victory_rect)
 
-    # Draw statistics on the right side
+    # Draw statistics centered vertically
     time_text = stats_font.render(f"Time Played: {elapsed_time:.2f} seconds", True, (255, 255, 255))
     xp_text = stats_font.render(f"XP Collected: {xp_counter}", True, (255, 255, 255))
     seed_text = stats_font.render(f"Game Seed: {seed}", True, (255, 255, 255))
-    
-    # Position text on the right
-    screen.blit(time_text, (right_x - time_text.get_width() // 2, SCREEN_HEIGHT // 2 - 50))
-    screen.blit(xp_text, (right_x - xp_text.get_width() // 2, SCREEN_HEIGHT // 2))
-    screen.blit(seed_text, (right_x - seed_text.get_width() // 2, SCREEN_HEIGHT // 2 + 50))
-    
-    # Draw continue prompt on the right side
+
+    spacing = 50
+    screen.blit(time_text, (center_x - time_text.get_width() // 2, center_y - 50))
+    screen.blit(xp_text, (center_x - xp_text.get_width() // 2, center_y))
+    screen.blit(seed_text, (center_x - seed_text.get_width() // 2, center_y + 50))
+
+    # Draw continue prompt at the center bottom
     prompt_text = stats_font.render("Press SPACE to continue", True, (255, 255, 255))
-    prompt_rect = prompt_text.get_rect(center=(right_x, SCREEN_HEIGHT * 3 // 4))
+    prompt_rect = prompt_text.get_rect(center=(center_x, center_y + 150))
     screen.blit(prompt_text, prompt_rect)
 
     pygame.display.flip()
@@ -70,15 +73,15 @@ def draw_victory_screen(screen, elapsed_time, xp_counter, seed):
         if not pygame.mixer.music.get_busy() and song_playing:
             song_playing = False
             message_text = stats_font.render("Out of wins, win again to listen", True, (255, 255, 255))
-            screen.blit(message_text, (right_x - message_text.get_width() // 2, SCREEN_HEIGHT // 2 + 100))
+            screen.blit(message_text, (center_x - message_text.get_width() // 2, center_y + 100))
             pygame.display.flip()
 
         if song_playing:
             color = next(color_gen)
             victory_text = font.render("Victory!", True, color)
-            screen.blit(victory_text, (right_x - victory_text.get_width() // 2, SCREEN_HEIGHT // 2 - 100))
+            screen.blit(victory_text, victory_rect)
             pygame.display.flip()
             pygame.time.delay(100)  # Delay to control the speed of color change
 
-        # Update the music track display with flashing rainbow colors on the right side
+        # Update the music track display at the bottom center
         music.update_track_display(screen, right_side=True, rainbow=True)
