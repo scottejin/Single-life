@@ -141,7 +141,7 @@ if (not os.path.exists(SAVE_FOLDER)):
 available_saves = get_available_saves()
 
 def restart_game(seed):
-    global dungeon_rooms, bullets, player, player_x, player_y, current_room_x, current_room_y, enemies, spawners, start_time, elapsed_time, xp_orbs, xp_counter, wall_tile_sprites, walkable_tile_sprites
+    global dungeon_rooms, bullets, player, player_x, player_y, current_room_x, current_room_y, enemies, spawners, start_time, elapsed_time, xp_orbs, xp_counter, wall_tile_sprites, walkable_tile_sprites, menu
     random.seed(seed)
     dungeon_rooms = {}
     bullets = []
@@ -180,6 +180,9 @@ def restart_game(seed):
     
     for spawner in spawners:
         spawner.spawn_interval = get_spawn_interval()  # Set spawn interval
+    
+    # Reinitialize Menu with the current seed
+    menu = Menu(seed)
 
 clock = pygame.time.Clock()
 running = True
@@ -295,6 +298,10 @@ while running:
                         spawners = game_state['spawners']
                         bullets = game_state['bullets']
                         xp_orbs = game_state['xp_orbs']
+                        
+                        # Reinitialize Menu with the loaded seed
+                        menu = Menu(seed)
+                        
                         # Reconstruct the current room
                         current_room = load_room_at(current_room_x, current_room_y, dungeon_rooms, enemies, spawners, enemy_sprite)
                         # Ensure player is on a walkable tile

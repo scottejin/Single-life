@@ -10,11 +10,15 @@ class Menu:
             Button("Resume", position=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 40)),
             Button("Save and Exit", position=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 40))
         ]
+        self.seed = seed  # Store the seed
 
     def draw(self, screen):
         screen.fill(BLACK)
         for button in self.buttons:
             button.draw(screen)
+        # Display the seed at the bottom of the screen
+        seed_text = self.font.render(f"Seed: {self.seed}", True, WHITE)
+        screen.blit(seed_text, (10, SCREEN_HEIGHT - 30))  # Position as needed
         # Removed music.update_track_display to centralize it in main loop
         # Ensure no pygame.display.flip() is called here
 
