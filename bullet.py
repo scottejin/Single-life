@@ -1,6 +1,7 @@
 from settings import TILE_SIZE
 import pygame
 import os
+import math
 
 class Bullet:
     def __init__(self, x, y, direction, speed, sprite, is_broken=False):
