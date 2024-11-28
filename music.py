@@ -109,6 +109,14 @@ def handle_music_event(event):
             except pygame.error as e:
                 print(f"Error loading or playing music: {e}")
 
+def stop_boss_music():
+    global is_boss_mode, current_track_index
+    if is_boss_mode:
+        pygame.mixer.music.stop()
+        is_boss_mode = False
+        current_track_index = 0  # Reset track index to start from the first track
+        play_music()  # Restart normal music loop
+
 def play_boss_music():
     global current_track_index, is_boss_mode, is_victory_mode
     if not is_victory_mode:

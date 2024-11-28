@@ -515,6 +515,7 @@ while running:
 
         # Check for victory condition
         if all(spawner.is_defeated for spawner in spawners):
+            music.stop_boss_music()  # Stop boss music and revert to normal music
             screen.fill(BLACK)
             draw_victory_screen(screen, elapsed_time, xp_counter, seed)
             pygame.display.flip()
@@ -533,6 +534,7 @@ while running:
 
         # After updating the player and enemies
         if (player.health <= 0):
+            music.stop_boss_music()  # Stop boss music and revert to normal music
             in_end_game = True
             screen.fill(BLACK)
             draw_death_screen(screen, elapsed_time, xp_counter, seed, selected_slot)
