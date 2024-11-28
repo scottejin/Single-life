@@ -96,7 +96,7 @@ wall_sprites = [
 
 # Load bricks.png using pygame and extract the sprite at (1,1)
 bricks_image = pygame.image.load('assets/bricks.png').convert_alpha()
-bricks_sprite = bricks_image.subsurface((1 * TILE_SIZE, 1 * TILE_SIZE, TILE_SIZE, TILE_SIZE))  # (x, y, width, height)
+bricks_sprite = bricks_image.subsurface((0 * TILE_SIZE, 0 * TILE_SIZE, TILE_SIZE, TILE_SIZE))  # (x, y, width, height)
 
 # Replace walkable_sprites definition to use the extracted bricks sprite
 walkable_sprites = [
