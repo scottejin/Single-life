@@ -1,4 +1,4 @@
-
+# Generic confirmation dialog for user interactions
 import pygame
 from settings import WHITE, BLACK
 

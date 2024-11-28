@@ -2,20 +2,24 @@ import pygame
 import sys
 import os
 import itertools
-import music  # Import the music module
-from settings import SCREEN_WIDTH, SCREEN_HEIGHT  # Add this import
+import music
+from settings import SCREEN_WIDTH, SCREEN_HEIGHT
 
 def draw_victory_screen(screen, elapsed_time, xp_counter, seed):
-    """Draw the victory screen with game statistics."""
-    screen.fill((0, 0, 0))  # Fill the screen with black
-
+    """
+    Display the victory screen with game statistics and rainbow animation.
+    Shows play time, XP collected, and game seed while playing victory music.
+    """
+    # Initialize screen
+    screen.fill((0, 0, 0))
+    
+    # Setup fonts and positioning
     font = pygame.font.SysFont(None, 48)
     stats_font = pygame.font.SysFont(None, 36)
-    
-    # Calculate center positions
     center_x = SCREEN_WIDTH // 2
     center_y = SCREEN_HEIGHT // 2
 
+    # Draw victory message and stats
     # Draw "Victory!" text at the center top
     victory_text = font.render("Victory!", True, (255, 255, 255))
     victory_rect = victory_text.get_rect(center=(center_x, center_y - 100))
@@ -36,7 +40,7 @@ def draw_victory_screen(screen, elapsed_time, xp_counter, seed):
     prompt_rect = prompt_text.get_rect(center=(center_x, center_y + 150))
     screen.blit(prompt_text, prompt_rect)
 
-    # Play victory music
+    # Initialize victory music
     try:
         pygame.mixer.music.load(os.path.join('music', 'victory.wav'))
         pygame.mixer.music.set_volume(0.5)
@@ -46,9 +50,10 @@ def draw_victory_screen(screen, elapsed_time, xp_counter, seed):
     except pygame.error as e:
         print(f"Error loading or playing victory music: {e}")
 
-    # Rainbow color generator
     def rainbow_colors():
-        colors = [(255, 0, 0), (255, 127, 0), (255, 255, 0), (0, 255, 0), (0, 0, 255), (75, 0, 130), (148, 0, 211)]
+        """Generate an infinite cycle of rainbow colors"""
+        colors = [(255, 0, 0), (255, 127, 0), (255, 255, 0),
+                 (0, 255, 0), (0, 0, 255), (75, 0, 130), (148, 0, 211)]
         for color in itertools.cycle(colors):
             yield color
 
@@ -56,6 +61,7 @@ def draw_victory_screen(screen, elapsed_time, xp_counter, seed):
     waiting_for_input = True
     song_playing = True
 
+    # Main victory screen loop
     while waiting_for_input:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:

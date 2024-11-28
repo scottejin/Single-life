@@ -6,6 +6,7 @@ from xp_orb import XPOrb  # Ensure XPOrb is imported
 from sprites import get_sprite  # Add this import
 
 class StrongEnemy(Enemy):
+    """A more powerful enemy variant with increased health and damage."""
     def __init__(self, x, y, sprite, speed=50, health=2, max_health=2, strength=2):
         super().__init__(x, y, speed, sprite)
         self.health = health
@@ -25,7 +26,7 @@ class StrongEnemy(Enemy):
         )
 
     def take_damage(self):
-        """Handle taking damage by reducing health."""
+        """Process damage and return whether enemy was killed."""
         self.health -= 1
         print(f"StrongEnemy at ({self.x}, {self.y}) took damage! Remaining health: {self.health}")
         return self.health <= 0  # Return True if the enemy is dead
@@ -39,6 +40,7 @@ class StrongEnemy(Enemy):
             print(f"StrongEnemy collided with player! Player health: {player.health}")
 
     def die(self, xp_orbs):
+        """Handle death by spawning multiple XP orbs."""
         # ...existing death logic...
         for _ in range(3):  # Drop 3 XP orbs
             xp_orb = XPOrb(self.x, self.y, size=int(10 * 1.5))  # Set size to match EnemySpawner's orbs

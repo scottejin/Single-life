@@ -1,4 +1,3 @@
-
 import pygame
 from settings import WHITE, BLUE
 
@@ -30,3 +29,5 @@ class Button:
         else:
             self.rendered_text = self.font.render(self.text, True, self.base_color)
         surface.blit(self.rendered_text, self.rect)
+
+# Reusable button component with hover effects

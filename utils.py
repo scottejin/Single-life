@@ -2,6 +2,7 @@ from settings import TILE_SIZE
 import pygame
 
 def count_white_spaces(dungeon_map, x, y):
+    """Count empty cells surrounding a given position in an 8-direction neighbor check."""
     white_spaces = 0
     for dx in [-1, 0, 1]:
         for dy in [-1, 0, 1]:
@@ -13,12 +14,14 @@ def count_white_spaces(dungeon_map, x, y):
     return white_spaces
 
 def is_walkable(x, y, dungeon_map):
+    """Check if a given pixel coordinate is within a walkable map tile."""
     map_x, map_y = int(x // TILE_SIZE), int(y // TILE_SIZE)
     if map_x < 0 or map_x >= len(dungeon_map[0]) or map_y < 0 or map_y >= len(dungeon_map):
         return False
     return dungeon_map[map_y][map_x] == 0
 
 def render_wrapped_text(text, font, color, surface, x, y, max_width):
+    """Render text with automatic word wrapping to fit within a specified width."""
     """
     Renders text onto a surface with dynamic wrapping based on max_width.
 

@@ -18,13 +18,13 @@ if not os.path.exists(SAVE_FOLDER):
     os.makedirs(SAVE_FOLDER)
 
 def convert_dict_keys_to_str(d):
-    """Convert tuple keys to string representation for JSON serialization"""
+    """Convert dictionary tuple keys to strings for JSON serialization."""
     if isinstance(d, dict):
         return {str(k): v for k, v in d.items()}
     return d
 
 def object_to_dict(obj):
-    """Convert an object to a serializable dictionary"""
+    """Convert an object to a serializable dictionary."""
     if hasattr(obj, 'to_dict'):
         return obj.to_dict()
     elif isinstance(obj, pygame.Surface):
@@ -34,7 +34,7 @@ def object_to_dict(obj):
     return obj
 
 def make_serializable(obj):
-    """Convert complex objects to serializable format"""
+    """Convert game objects to JSON-serializable format, handling Pygame objects."""
     if isinstance(obj, (pygame.Surface, pygame.sprite.Sprite)):
         return None
     elif isinstance(obj, tuple):
@@ -46,6 +46,7 @@ def make_serializable(obj):
     return obj
 
 def save_game(slot, game_state):
+    """Save the current game state to the specified slot."""
     save_path = os.path.join(SAVE_FOLDER, f'save_slot_{slot}.json')
     
     # Convert game state to serializable format
@@ -69,6 +70,7 @@ def save_game(slot, game_state):
         json.dump(serializable_state, f)
 
 def load_game(slot):
+    """Load the game state from the specified slot."""
     save_file = os.path.join(SAVE_FOLDER, f'save_slot_{slot}.json')
     if os.path.exists(save_file):
         with open(save_file, 'r') as f:
@@ -148,6 +150,7 @@ def load_game(slot):
         return None
 
 def get_available_saves():
+    """Get a dictionary of available save slots."""
     available_saves = {}
     for slot in range(1, 4):  # Assuming 3 slots
         save_file = os.path.join(SAVE_FOLDER, f'save_slot_{slot}.json')
@@ -155,6 +158,7 @@ def get_available_saves():
     return available_saves
 
 def show_no_saves_screen(screen):
+    """Display a screen indicating that no saves are available."""
     no_saves_screen = True
     font = pygame.font.SysFont(None, 50)
     arrow_font = pygame.font.SysFont(None, 36)

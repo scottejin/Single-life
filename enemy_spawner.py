@@ -133,3 +133,6 @@ class EnemySpawner:
         )
         spawner.last_spawn_time = data.get('last_spawn_time', 0)
         return spawner
+
+# Enemy spawner mechanics and progression system
+# ...existing code...

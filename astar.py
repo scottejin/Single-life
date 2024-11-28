@@ -1,3 +1,4 @@
+# A* pathfinding implementation for enemy navigation
 from heapq import heappop, heappush
 
 def heuristic(a, b):

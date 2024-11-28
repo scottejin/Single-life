@@ -1,4 +1,4 @@
-# menu.py
+# Centralized menu system for game pause and settings
 import pygame
 from settings import SCREEN_WIDTH, SCREEN_HEIGHT, WHITE, BLACK, RED, BLUE, save_spawn_interval  # Add BLUE to the import
 import music  # Import the music module

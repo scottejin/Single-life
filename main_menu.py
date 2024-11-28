@@ -5,6 +5,7 @@ from confirmation_dialog import ConfirmationDialog  # New import
 from utils import render_wrapped_text  # New import for text wrapping
 import music  # Import the music module
 
+# Main menu interface with game initialization options and settings management
 class MainMenu:
     def __init__(self):
         self.font = pygame.font.SysFont(None, 50)

@@ -117,3 +117,6 @@ class StrongEnemy(Enemy):
             speed=data.get('speed', 50),
             # ...other attributes...
         )
+
+# Enemy behavior, combat, and spawning logic
+# ...existing code...

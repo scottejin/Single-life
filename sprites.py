@@ -3,6 +3,7 @@ from assets.sprite_sheet import load_sprite_sheet_image  # Import the function
 from assets.sprite_sheet import get_sprite
 
 def load_sprite_sheet(sprite_width, sprite_height):
+    """Load sprite sheet with fallback to colored rectangles if file missing."""
     try:
         sprite_sheet_image = load_sprite_sheet_image()  # Load the image here
         sheet_width, sheet_height = sprite_sheet_image.get_size()
@@ -35,5 +36,6 @@ def load_sprite_sheet(sprite_width, sprite_height):
         return sprites
 
 def get_sprite(row, col, width=32, height=32):
+    """Extract a single sprite from the sheet using grid coordinates."""
     sprite_sheet = load_sprite_sheet_image()
     return sprite_sheet.subsurface((col * width, row * height, width, height))

@@ -52,3 +52,6 @@ def handle_death_screen_events(event, selected_slot):
             delete_save_slot(selected_slot)
         return True  # Return to main menu
     return False
+
+# Death screen and game over state management
+# ...existing code...

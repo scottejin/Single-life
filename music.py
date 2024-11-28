@@ -29,6 +29,7 @@ font = pygame.font.Font(None, 28)  # Make the font a bit smaller
 
 # Rainbow color generator
 def rainbow_colors():
+    """Generate an infinite cycle of rainbow color tuples."""
     colors = [(255, 0, 0), (255, 127, 0), (255, 255, 0), (0, 255, 0), (0, 0, 255), (75, 0, 130), (148, 0, 211)]
     for color in itertools.cycle(colors):
         yield color
@@ -36,6 +37,7 @@ def rainbow_colors():
 color_gen = rainbow_colors()
 
 def update_track_display(screen, right_side=False, rainbow=False):
+    """Display current track info with optional rainbow effect."""
     if is_victory_mode:
         track_name = "Victory Track"
         color = next(color_gen) if rainbow else (255, 215, 0)  # Gold color for victory or rainbow

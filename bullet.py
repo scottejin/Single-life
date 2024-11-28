@@ -98,3 +98,6 @@ class Bullet:
             sprite=sprite,
             is_broken=data['is_broken']
         )
+
+# Projectile physics and collision detection system
+# ...existing code...

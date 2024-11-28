@@ -1,3 +1,4 @@
+# Procedural dungeon generation and room management system
 import random
 from settings import TILE_SIZE, MAP_WIDTH, MAP_HEIGHT
 from utils import count_white_spaces

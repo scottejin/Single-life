@@ -1,7 +1,7 @@
-
 import pygame
 
 class TilesetHandler:
+    """Manages loading and extracting tiles from sprite sheets in different layouts."""
     def __init__(self):
         # Load your tilesets
         self.horizontal_tileset = pygame.image.load('path_to_horizontal_tileset.png')
@@ -12,6 +12,7 @@ class TilesetHandler:
         self.tile_size = 32
 
     def get_tile_from_horizontal(self, index):
+        """Extract a single tile from a horizontal strip sprite sheet."""
         # Extract tile from horizontal tileset
         x = index * self.tile_size
         return self.horizontal_tileset.subsurface((x, 0, self.tile_size, self.tile_size))
