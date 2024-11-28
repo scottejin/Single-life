@@ -15,29 +15,32 @@ def draw_death_screen(screen, elapsed_time, xp_counter, seed, selected_slot):
     font = pygame.font.SysFont(None, 64)
     stats_font = pygame.font.SysFont(None, 36)
     
-    # Draw "YOU DIED" text
+    # Calculate right side positions
+    right_x = SCREEN_WIDTH * 3 // 4  # Start drawing from 75% of the screen width
+    
+    # Draw "YOU DIED" text on the right side
     death_text = font.render("YOU DIED", True, RED)
-    death_rect = death_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 3))
+    death_rect = death_text.get_rect(center=(right_x, SCREEN_HEIGHT // 3))
     screen.blit(death_text, death_rect)
     
-    # Draw statistics
+    # Draw statistics on the right side
     time_text = stats_font.render(f"Time Survived: {format_time(elapsed_time)}", True, WHITE)
     xp_text = stats_font.render(f"XP Collected: {xp_counter}", True, WHITE)
     seed_text = stats_font.render(f"Map Seed: {seed}", True, WHITE)
     
-    # Position text
+    # Position text on the right
     spacing = 50
-    screen.blit(time_text, (SCREEN_WIDTH // 4, SCREEN_HEIGHT // 2))
-    screen.blit(xp_text, (SCREEN_WIDTH // 4, SCREEN_HEIGHT // 2 + spacing))
-    screen.blit(seed_text, (SCREEN_WIDTH // 4, SCREEN_HEIGHT // 2 + spacing * 2))
+    screen.blit(time_text, (right_x - time_text.get_width() // 2, SCREEN_HEIGHT // 2))
+    screen.blit(xp_text, (right_x - xp_text.get_width() // 2, SCREEN_HEIGHT // 2 + spacing))
+    screen.blit(seed_text, (right_x - seed_text.get_width() // 2, SCREEN_HEIGHT // 2 + spacing * 2))
     
-    # Draw continue prompt
+    # Draw continue prompt on the right side
     prompt_text = stats_font.render("Press SPACE to continue", True, WHITE)
-    prompt_rect = prompt_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT * 3 // 4))
+    prompt_rect = prompt_text.get_rect(center=(right_x, SCREEN_HEIGHT * 3 // 4))
     screen.blit(prompt_text, prompt_rect)
 
-    # Update the music track display
-    music.update_track_display(screen)
+    # Update the music track display on the right side
+    music.update_track_display(screen, right_side=True)
 
 def handle_death_screen_events(event, selected_slot):
     """Handle events on the death screen."""

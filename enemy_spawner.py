@@ -5,6 +5,7 @@ from enemy import Enemy
 from strong_enemy import StrongEnemy  # Updated import
 from settings import TILE_SIZE, ENEMY_SIZE, PURPLE, BLACK, get_spawn_interval  # Import the spawn interval getter
 from xp_orb import XPOrb  # Ensure XPOrb is imported
+from sprites import get_sprite  # Add this import
 
 class EnemySpawner:
     def __init__(self, x, y, spawn_interval, max_enemies=3, sprite=None, health=10):  # Add spawn_interval parameter
@@ -63,7 +64,8 @@ class EnemySpawner:
     def spawn_enemy(self, enemies):
         """Spawn an enemy with a 10% chance of being a StrongEnemy."""
         if random.random() <= 0.10:
-            new_enemy =StrongEnemy(self.x, self.y, health=10, max_health=10, strength=2)
+            strong_enemy_sprite = get_sprite(78, 9)  # Get the strong enemy sprite
+            new_enemy = StrongEnemy(self.x, self.y, sprite=strong_enemy_sprite, health=10, max_health=10, strength=2)
             print(f"StrongEnemy spawned at ({self.x}, {self.y})")
         else:
             new_enemy = Enemy(self.x, self.y, self.sprite, health=2, max_health=2)

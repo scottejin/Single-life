@@ -6,8 +6,8 @@ from xp_orb import XPOrb  # Ensure XPOrb is imported
 from sprites import get_sprite  # Add this import
 
 class StrongEnemy(Enemy):
-    def __init__(self, x, y, speed=50, health=2, max_health=2, strength=2):
-        super().__init__(x, y, speed)
+    def __init__(self, x, y, sprite, speed=50, health=2, max_health=2, strength=2):
+        super().__init__(x, y, speed, sprite)
         self.health = health
         self.max_health = max_health
         self.strength = strength
