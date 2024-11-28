@@ -91,12 +91,16 @@ wall_sprites = [
     for col in range(23, 30)
 ]
 
-# Load bricks sprite sheet
-bricks_sprites = load_sprite_sheet_image('assets/bricks.png', 32, 32)
+# Remove the incorrect load_sprite_sheet_image call
+# bricks_sprites = load_sprite_sheet_image('assets/bricks.png', 32, 32)
 
-# Replace walkable_sprites definition
+# Load bricks.png using pygame and extract the sprite at (1,1)
+bricks_image = pygame.image.load('assets/bricks.png').convert_alpha()
+bricks_sprite = bricks_image.subsurface((1 * TILE_SIZE, 1 * TILE_SIZE, TILE_SIZE, TILE_SIZE))  # (x, y, width, height)
+
+# Replace walkable_sprites definition to use the extracted bricks sprite
 walkable_sprites = [
-    get_sprite(bricks_sprites, 1, 1)  # Use bricks.png sprite at (1,1)
+    bricks_sprite  # Use bricks.png sprite at (1,1)
 ]
 # ...existing code...
 
