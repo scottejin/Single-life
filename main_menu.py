@@ -132,79 +132,36 @@ class MainMenu:
 class SettingsMenu:
     def __init__(self):
         self.font = pygame.font.SysFont(None, 36)
-        self.slider_rect = pygame.Rect(SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT // 2, 200, 20)
-        self.slider_handle_rect = pygame.Rect(0, 0, 10, 30)
-        self.handle_pos = self.value_to_position(enemy_spawn_interval)
-        self.slider_handle_rect.centerx = self.handle_pos
-        self.slider_handle_rect.centery = self.slider_rect.centery
-        self.dragging = False
-
-    def value_to_position(self, value):
-        # Map value (1 to 10) to position on the slider
-        min_pos = self.slider_rect.left
-        max_pos = self.slider_rect.right
-        position = min_pos + (value - 1) / 9 * (max_pos - min_pos)
-        return position
-
-    def position_to_value(self, position):
-        # Map position on the slider to value (1 to 10)
-        min_pos = self.slider_rect.left
-        max_pos = self.slider_rect.right
-        value = 1 + (position - min_pos) / (max_pos - min_pos) * 9
-        return max(1, min(10, value))
-
-    def draw(self, screen):
-        # Draw slider background
-        pygame.draw.rect(screen, WHITE, self.slider_rect, 2)
-        # Draw slider handle
-        pygame.draw.rect(screen, RED, self.slider_handle_rect)
-        # Draw labels
-        min_label = self.font.render("1s", True, WHITE)
-        max_label = self.font.render("10s", True, WHITE)
-        screen.blit(min_label, (self.slider_rect.left - min_label.get_width() // 2, self.slider_rect.bottom + 5))
-        screen.blit(max_label, (self.slider_rect.right - max_label.get_width() // 2, self.slider_rect.bottom + 5))
-        # Draw current value
-        current_value = round(self.position_to_value(self.handle_pos), 1)
-        value_label = self.font.render(f"Spawn Interval: {current_value:.1f}s", True, WHITE)
-        screen.blit(value_label, (SCREEN_WIDTH // 2 - value_label.get_width() // 2, self.slider_rect.top - 40))
-        # Draw Back button
-        back_button = Button("Back", position=(SCREEN_WIDTH // 2, SCREEN_HEIGHT - 50), font_size=36)
-        back_button.draw(screen)
-        self.back_button = back_button  # Store for event handling
-
-        # Draw difficulty labels
-        difficulty_font = pygame.font.SysFont(None, 24)
-
-        # Difficulty levels with their corresponding spawn intervals
-        difficulties = [
-            ("Easy\n5 sec", 5),
-            ("Normal\n3 sec", 3),
-            ("Hard\n1.5 sec", 1.5)
+        self.buttons = [
+            Button("Easy", position=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 60)),
+            Button("Normal", position=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)),
+            Button("Hard", position=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 60)),
+            Button("Back", position=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 120), font_size=36)
         ]
 
-        # Draw each difficulty label at the correct position on the slider
-        for label_text, value in difficulties:
-            pos_x = self.value_to_position(value)
-            label_surface = difficulty_font.render(label_text, True, WHITE)
-            label_rect = label_surface.get_rect(center=(pos_x, self.slider_rect.top - 40))
-            screen.blit(label_surface, label_rect)
+    def draw(self, screen):
+        screen.fill(BLACK)
+        for button in self.buttons:
+            button.draw(screen)
 
     def handle_event(self, event):
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if self.slider_handle_rect.collidepoint(event.pos):
-                self.dragging = True
-            elif self.back_button.rect.collidepoint(event.pos):
-                return "Back"
-        elif event.type == pygame.MOUSEBUTTONUP:
-            self.dragging = False
-        elif event.type == pygame.MOUSEMOTION:
-            if self.dragging:
-                self.handle_pos = max(self.slider_rect.left, min(self.slider_rect.right, event.pos[0]))
-                self.slider_handle_rect.centerx = self.handle_pos
-                # Update the enemy_spawn_interval value
-                new_value = self.position_to_value(self.handle_pos)
-                from settings import set_spawn_interval
-                set_spawn_interval(new_value)
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            mouse_pos = pygame.mouse.get_pos()
+            for button in self.buttons:
+                if button.rect.collidepoint(mouse_pos):
+                    if button.text == "Easy":
+                        from settings import set_spawn_interval
+                        set_spawn_interval(5)
+                    elif button.text == "Normal":
+                        from settings import set_spawn_interval
+                        set_spawn_interval(3)
+                    elif button.text == "Hard":
+                        from settings import set_spawn_interval
+                        set_spawn_interval(1.5)
+                    elif button.text == "Back":
+                        return "Back"
+        elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+            return "Back"
         return None
 
 class Button:
