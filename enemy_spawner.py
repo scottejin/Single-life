@@ -8,10 +8,10 @@ from xp_orb import XPOrb  # Ensure XPOrb is imported
 from sprites import get_sprite  # Add this import
 
 class EnemySpawner:
-    def __init__(self, x, y, spawn_interval, max_enemies=3, sprite=None, health=10):  # Add spawn_interval parameter
+    def __init__(self, x, y, spawn_interval=None, max_enemies=3, sprite=None, health=10):  # Add spawn_interval parameter
         self.x = x
         self.y = y
-        self.spawn_interval = spawn_interval
+        self.spawn_interval = spawn_interval if spawn_interval is not None else get_spawn_interval()
         self.max_enemies = max_enemies
         self.last_spawn_time = pygame.time.get_ticks() / 1000.0  # Convert to seconds
         self.health = health

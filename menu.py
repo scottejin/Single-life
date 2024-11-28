@@ -1,6 +1,6 @@
 # menu.py
 import pygame
-from settings import SCREEN_WIDTH, SCREEN_HEIGHT, WHITE, BLACK, RED
+from settings import SCREEN_WIDTH, SCREEN_HEIGHT, WHITE, BLACK, RED, save_spawn_interval  # Add this import
 import music  # Import the music module
 
 class Menu:
@@ -8,7 +8,8 @@ class Menu:
         self.font = pygame.font.Font(None, 50)
         self.buttons = [
             Button("Resume", position=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 40)),
-            Button("Save and Exit", position=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 40))
+            Button("Save and Exit", position=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 40)),
+            Button("Save Settings", position=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 120))  # Add new button
         ]
 
     def draw(self, screen):
@@ -22,7 +23,11 @@ class Menu:
             mouse_pos = pygame.mouse.get_pos()
             for button in self.buttons:
                 if button.rect.collidepoint(mouse_pos):
-                    return button.text
+                    action = button.text
+                    if action == "Save Settings":
+                        save_spawn_interval()  # Save the current spawn interval
+                        print("Settings saved!")  # Optional feedback
+                    return action
         elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
             return "Resume"  # Treat Escape as Resume button
         return None
