@@ -413,6 +413,7 @@ while running:
 
     if shop_open:
         draw_shop(screen)
+        music.update_track_display(screen, right_side=True)  # Add this line
     elif in_main_menu:
         screen.fill(BLACK)  # Ensure the screen is filled only once
         main_menu.draw(screen)
