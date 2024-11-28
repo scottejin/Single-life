@@ -91,21 +91,35 @@ wall_sprites = [
     for col in range(23, 30)
 ]
 
+# Load walkable tile sprites from row 15, columns 4 to 7
+walkable_sprites = [
+    get_sprite(15, col) for col in range(4, 8)  # Columns 4 to 7 inclusive
+]
+
 # Load the initial room and find a walkable tile for the player
 initial_room = load_room_at(current_room_x, current_room_y, dungeon_rooms, enemies, spawners, enemy_sprite)
 player_x, player_y = find_walkable_tile(initial_room)
 
-# Assign a random sprite to each wall tile once during level setup
+# Assign a random sprite to each wall and walkable tile
 wall_tile_sprites = []
+walkable_tile_sprites = []  # New list for walkable tile sprites
 for row in range(MAP_HEIGHT):
     row_sprites = []
+    walkable_row_sprites = []  # New list for walkable sprites in the row
     for col in range(MAP_WIDTH):
         if (initial_room[row][col] == 1):
             sprite = random.choice(wall_sprites)
             row_sprites.append(sprite)
+            walkable_row_sprites.append(None)  # No sprite for wall tiles
+        elif (initial_room[row][col] == 0):
+            sprite = random.choice(walkable_sprites)
+            row_sprites.append(sprite)  # Optional: If you want to keep using row_sprites for walkable tiles
+            walkable_row_sprites.append(sprite)  # Assign sprite to walkable tile
         else:
             row_sprites.append(pygame.Surface((TILE_SIZE, TILE_SIZE)))  # Ensure non-wall tiles have a surface
+            walkable_row_sprites.append(None)
     wall_tile_sprites.append(row_sprites)
+    walkable_tile_sprites.append(walkable_row_sprites)  # Append the walkable row sprites
 
 # Update player initialization
 player = Player(player_x, player_y, player_speed, player_sprite)
@@ -119,7 +133,7 @@ if (not os.path.exists(SAVE_FOLDER)):
 available_saves = get_available_saves()
 
 def restart_game(seed):
-    global dungeon_rooms, bullets, player, player_x, player_y, current_room_x, current_room_y, enemies, spawners, start_time, elapsed_time, xp_orbs, xp_counter
+    global dungeon_rooms, bullets, player, player_x, player_y, current_room_x, current_room_y, enemies, spawners, start_time, elapsed_time, xp_orbs, xp_counter, wall_tile_sprites, walkable_tile_sprites
     random.seed(seed)
     dungeon_rooms = {}
     bullets = []
@@ -136,7 +150,26 @@ def restart_game(seed):
     start_time = time.time()
     elapsed_time = 0
     xp_counter = 0
-    wall_tile_sprites = []  # Initialize wall_tile_sprites
+    wall_tile_sprites = []
+    walkable_tile_sprites = []  # Reset walkable tile sprites
+    for row in range(MAP_HEIGHT):
+        row_sprites = []
+        walkable_row_sprites = []
+        for col in range(MAP_WIDTH):
+            if (initial_room[row][col] == 1):
+                sprite = random.choice(wall_sprites)
+                row_sprites.append(sprite)
+                walkable_row_sprites.append(None)
+            elif (initial_room[row][col] == 0):
+                sprite = random.choice(walkable_sprites)
+                row_sprites.append(sprite)
+                walkable_row_sprites.append(sprite)
+            else:
+                row_sprites.append(pygame.Surface((TILE_SIZE, TILE_SIZE)))
+                walkable_row_sprites.append(None)
+        wall_tile_sprites.append(row_sprites)
+        walkable_tile_sprites.append(walkable_row_sprites)
+    
     for spawner in spawners:
         spawner.spawn_interval = get_spawn_interval()  # Set spawn interval
 
@@ -313,7 +346,11 @@ while running:
                     if (sprite):  # Ensure sprite is not None
                         screen.blit(sprite, (tile_x, tile_y))
                 elif (current_room[row][col] == 0):
-                    pygame.draw.rect(screen, WHITE, (tile_x, tile_y, TILE_SIZE, TILE_SIZE))
+                    sprite = walkable_tile_sprites[row][col]
+                    if (sprite):
+                        screen.blit(sprite, (tile_x, tile_y))
+                    else:
+                        pygame.draw.rect(screen, WHITE, (tile_x, tile_y, TILE_SIZE, TILE_SIZE))
                 else:
                     pygame.draw.rect(screen, GRAY, (tile_x, tile_y, TILE_SIZE, TILE_SIZE))  # Assign a default color for other tiles
 
@@ -360,7 +397,11 @@ while running:
                     if (sprite):  # Ensure sprite is not None
                         screen.blit(sprite, (tile_x, tile_y))
                 elif (current_room[row][col] == 0):
-                    pygame.draw.rect(screen, WHITE, (tile_x, tile_y, TILE_SIZE, TILE_SIZE))
+                    sprite = walkable_tile_sprites[row][col]
+                    if (sprite):
+                        screen.blit(sprite, (tile_x, tile_y))
+                    else:
+                        pygame.draw.rect(screen, WHITE, (tile_x, tile_y, TILE_SIZE, TILE_SIZE))
                 else:
                     pygame.draw.rect(screen, GRAY, (tile_x, tile_y, TILE_SIZE, TILE_SIZE))  # Assign a default color for other tiles
 
