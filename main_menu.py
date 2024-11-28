@@ -1,5 +1,5 @@
 import pygame
-from settings import SCREEN_WIDTH, SCREEN_HEIGHT, WHITE, BLACK, RED, BLUE, enemy_spawn_interval  # Import the spawn interval setting
+from settings import SCREEN_WIDTH, SCREEN_HEIGHT, WHITE, BLACK, RED, BLUE, enemy_spawn_interval, set_spawn_interval, get_spawn_interval  # Import the spawn interval setting
 from save_load import get_available_saves, delete_save_slot
 from confirmation_dialog import ConfirmationDialog  # New import
 from utils import render_wrapped_text  # New import for text wrapping
@@ -7,42 +7,80 @@ import music  # Import the music module
 
 class MainMenu:
     def __init__(self):
+        self.font = pygame.font.SysFont(None, 50)
         self.buttons = [
-            Button("New Game", position=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 120)),
-            Button("Load Game", position=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 60)),
-            Button("Settings", position=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)),
+            Button("New Game", position=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 60)),
+            Button("Load Game", position=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 20)),
+            Button("Settings", position=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 20)),
             Button("Exit", position=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 60))
         ]
+        self.settings_buttons = [
+            Button("Increase Spawn Rate", position=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 40)),
+            Button("Decrease Spawn Rate", position=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)),
+            Button("Save", position=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 40)),
+            Button("Back", position=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 80))
+        ]
+        self.in_settings = False
+        self.spawn_rate = get_spawn_interval()
         self.confirmation_dialog = None  # Initialize confirmation dialog
         self.settings_menu = None  # Initialize settings menu
 
     def draw(self, screen):
         screen.fill(BLACK)
-        if self.settings_menu:
-            self.settings_menu.draw(screen)
-        else:
+        if not self.in_settings:
             for button in self.buttons:
                 button.draw(screen)
-        music.update_track_display(screen, right_side=True)  # Update the music track display
+        else:
+            # Draw settings menu
+            for button in self.settings_buttons:
+                button.draw(screen)
+            # Display current spawn rate
+            spawn_rate_text = self.font.render(f"Spawn Rate: {self.spawn_rate:.1f}s", True, WHITE)
+            spawn_rate_rect = spawn_rate_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 100))
+            screen.blit(spawn_rate_text, spawn_rate_rect)
+        pygame.display.flip()
 
     def handle_event(self, event):
-        if self.settings_menu:
-            result = self.settings_menu.handle_event(event)
-            if result == "Back":
-                self.settings_menu = None  # Exit settings menu
-            return None  # When in settings menu, do not process other events
-        else:
-            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                mouse_pos = pygame.mouse.get_pos()
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            mouse_pos = pygame.mouse.get_pos()
+            if not self.in_settings:
                 for button in self.buttons:
                     if button.rect.collidepoint(mouse_pos):
                         if button.text == "Settings":
-                            self.settings_menu = SettingsMenu()  # Open settings menu
-                            return None
+                            self.in_settings = True
                         else:
                             return button.text
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                return "Exit"  # Treat Escape as Exit button
+            else:
+                for button in self.settings_buttons:
+                    if button.rect.collidepoint(mouse_pos):
+                        if button.text == "Increase Spawn Rate":
+                            self.spawn_rate += 0.5
+                            print(f"Spawn rate increased to {self.spawn_rate}s")
+                        elif button.text == "Decrease Spawn Rate":
+                            self.spawn_rate -= 0.5
+                            if self.spawn_rate < 1.0:
+                                self.spawn_rate = 1.0  # Minimum spawn rate
+                            print(f"Spawn rate decreased to {self.spawn_rate}s")
+                        elif button.text == "Save":
+                            set_spawn_interval(self.spawn_rate)
+                            print("Settings saved!")
+                        elif button.text == "Back":
+                            self.in_settings = False
+        elif event.type == pygame.KEYDOWN:
+            if self.in_settings:
+                if event.key == pygame.K_UP:
+                    self.spawn_rate += 0.5
+                    print(f"Spawn rate increased to {self.spawn_rate}s")
+                elif event.key == pygame.K_DOWN:
+                    self.spawn_rate -= 0.5
+                    if self.spawn_rate < 1.0:
+                        self.spawn_rate = 1.0  # Minimum spawn rate
+                    print(f"Spawn rate decreased to {self.spawn_rate}s")
+                elif event.key == pygame.K_s:
+                    set_spawn_interval(self.spawn_rate)
+                    print("Settings saved!")
+                elif event.key == pygame.K_b:
+                    self.in_settings = False
         return None
 
     def select_save_slot(self, screen, title, mode):
@@ -132,8 +170,8 @@ class MainMenu:
 class SettingsMenu:
     def __init__(self):
         self.font = pygame.font.SysFont(None, 36)
-        # Initialize slider
-        self.slider_rect = pygame.Rect(SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT // 2 - 100, 200, 20)
+        # Initialize slider with range 1 to 8
+        self.slider_rect = pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 - 100, 300, 20)  # Increased width for better precision
         self.slider_handle_rect = pygame.Rect(0, 0, 10, 30)
         self.handle_pos = self.value_to_position(enemy_spawn_interval)
         self.slider_handle_rect.centerx = self.handle_pos
@@ -145,7 +183,8 @@ class SettingsMenu:
             Button("Easy", position=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 50)),
             Button("Normal", position=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 10)),
             Button("Hard", position=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 70)),
-            Button("Back", position=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 130), font_size=36)
+            Button("Save", position=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 130), font_size=36),
+            Button("Back", position=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 190), font_size=36)
         ]
 
     def draw(self, screen):
@@ -185,11 +224,14 @@ class SettingsMenu:
             for button in self.buttons:
                 if button.rect.collidepoint(mouse_pos):
                     if button.text == "Easy":
-                        self.set_spawn_interval(5)
+                        self.set_spawn_interval(5.0)
                     elif button.text == "Normal":
-                        self.set_spawn_interval(3)
+                        self.set_spawn_interval(3.0)
                     elif button.text == "Hard":
                         self.set_spawn_interval(1.5)
+                    elif button.text == "Save":
+                        set_spawn_interval(self.position_to_value(self.handle_pos))
+                        print("Settings saved!")
                     elif button.text == "Back":
                         return "Back"
         elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
@@ -204,18 +246,18 @@ class SettingsMenu:
         self.slider_handle_rect.centerx = self.handle_pos
 
     def value_to_position(self, value):
-        # Map spawn interval from 1 to 5 seconds to slider position
+        # Map spawn interval from 1 to 8 seconds to slider position
         min_pos = self.slider_rect.left
         max_pos = self.slider_rect.right
-        position = min_pos + (value - 1) / (5 - 1) * (max_pos - min_pos)
+        position = min_pos + (value - 1) / (8 - 1) * (max_pos - min_pos)
         return position
 
     def position_to_value(self, position):
-        # Map slider position back to spawn interval between 1 and 5 seconds
+        # Map slider position back to spawn interval between 1 and 8 seconds
         min_pos = self.slider_rect.left
         max_pos = self.slider_rect.right
-        value = 1 + (position - min_pos) / (max_pos - min_pos) * (5 - 1)
-        return max(1, min(5, value))
+        value = 1 + (position - min_pos) / (max_pos - min_pos) * (8 - 1)
+        return max(1, min(8, value))
 
 class Button:
     def __init__(self, text, position, font_size=50, base_color=WHITE, hover_color=BLUE):

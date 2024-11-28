@@ -33,12 +33,20 @@ class Menu:
         return None
 
 class Button:
-    def __init__(self, text, position):
+    def __init__(self, text, position, font_size=50, base_color=WHITE, hover_color=BLUE):
         self.text = text
         self.position = position
-        self.font = pygame.font.SysFont(None, 50)
-        self.rendered_text = self.font.render(self.text, True, WHITE)
+        self.font = pygame.font.SysFont(None, font_size)
+        self.base_color = base_color
+        self.hover_color = hover_color
+        self.rendered_text = self.font.render(self.text, True, self.base_color)
         self.rect = self.rendered_text.get_rect(center=self.position)
 
     def draw(self, surface):
-        surface.blit(self.rendered_text, self.rect)
+        mouse_pos = pygame.mouse.get_pos()
+        if self.rect.collidepoint(mouse_pos):
+            # Change color on hover
+            rendered = self.font.render(self.text, True, self.hover_color)
+        else:
+            rendered = self.font.render(self.text, True, self.base_color)
+        surface.blit(rendered, self.rect)

@@ -48,8 +48,10 @@ def load_spawn_interval():
     return current_spawn_interval
 
 def set_spawn_interval(value):
-    global enemy_spawn_interval
-    enemy_spawn_interval = value
+    """Set the current spawn interval."""
+    global current_spawn_interval
+    current_spawn_interval = max(1.0, min(8.0, value))  # Clamp value between 1 and 8
+    save_spawn_interval()
 
 def get_spawn_interval():
     """Get the current spawn interval."""

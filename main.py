@@ -265,7 +265,8 @@ while running:
             music.handle_music_event(event)
         elif (in_main_menu):
             action = main_menu.handle_event(event)
-            if (action == "New Game"):
+            if action == "New Game":
+                # ...existing New Game handling...
                 selected_slot = main_menu.select_save_slot(screen, "Select Slot to Save New Game", mode="save")
                 if (selected_slot is not None):
                     restart_game(seed)
@@ -274,7 +275,8 @@ while running:
                     elapsed_time = 0
                 else:
                     in_main_menu = True  # Return to main menu if no slot selected
-            elif (action == "Load Game"):
+            elif action == "Load Game":
+                # ...existing Load Game handling...
                 selected_slot = main_menu.select_save_slot(screen, "Select Slot to Load Game", mode="load")
                 if (selected_slot is not None):
                     game_state = load_game(selected_slot)
