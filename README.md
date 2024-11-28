@@ -52,11 +52,11 @@ The `delete_save_slot` function now gracefully handles potential exceptions, suc
 ## Installation
 1. **Clone the Repository**
     ```bash
-    git clone https://github.com/yourusername/endless-dungeon-explorer.git
+    git clone https://github.com/scottejin/Single-life
     ```
 2. **Navigate to the Project Directory**
     ```bash
-    cd endless-dungeon-explorer
+    cd Single-life
     ```
 3. **Install Dependencies**
     ```bash
